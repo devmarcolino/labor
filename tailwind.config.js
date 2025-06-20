@@ -1,14 +1,19 @@
-const preline = require('preline/plugin') // CommonJS mesmo, não ES module
-
+/** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './resources/**/*.blade.php',
-    './resources/**/*.js',
-    './resources/**/*.vue',
-    './node_modules/preline/**/*.js',
+    './resources/js/**/*.js',
+    './node_modules/preline/dist/*.js',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Figtree', 'sans-serif'],
+      },
+    },
   },
-  plugins: [preline],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }

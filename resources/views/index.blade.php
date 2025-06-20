@@ -67,6 +67,6 @@
             <a class="text-white bg-sky-700 hover:bg-sky-800 focus:ring-2 focus:ring-sky-300/55 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-sky-600 dark:hover:bg-sky-700 focus:outline-none dark:focus:ring-sky-800/55" href="{{ url('/login') }}">Entre ou se cadastre</a>
         </div>
     </div>
-    <!--<script src="https://cdn.jsdelivr.net/npm/preline@2.3.0/dist/preline.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/preline@2.3.0/dist/preline.min.js"></script>
 </body>
 </html>

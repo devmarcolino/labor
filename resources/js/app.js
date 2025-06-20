@@ -5,12 +5,6 @@ import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 Alpine.start();
 
-import { initPreline } from 'preline'
-
-document.addEventListener('DOMContentLoaded', () => {
-  initPreline()
-})
-
 document.addEventListener("DOMContentLoaded", function () {
     const titleElement = document.getElementById("carousel-title");
 
@@ -81,8 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (savedTheme) {
     setTheme(savedTheme);
   } else {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setTheme(prefersDark ? "dark" : "light");
+    const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+    setTheme(prefersLight ? "light" : "dark");
   }
 
   themeToggleBtn.addEventListener("click", () => {

@@ -5,6 +5,7 @@ module.exports = {
     './resources/**/*.blade.php',
     './resources/js/**/*.js',
     './node_modules/preline/dist/*.js',
+    "./node_modules/flowbite/**/*.js"
   ],
   theme: {
     extend: {
@@ -15,5 +16,6 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/forms'),
+    require('flowbite/plugin'),
   ],
 }

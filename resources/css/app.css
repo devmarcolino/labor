@@ -3,4 +3,28 @@
 @import 'tailwindcss/utilities';
 
 @import "../../node_modules/preline/variants.css";
-@source "../../node_modules/preline/dist/*.js";
+@import "flowbite/src/themes/default";
+
+.datepicker-cell.selected {
+    @apply bg-sky-600 text-white;
+}
+
+/* Altera a cor quando o mouse passa por cima do dia SELECIONADO */
+.datepicker-cell.selected:hover {
+    @apply bg-sky-700;
+}
+
+/* Altera a cor do destaque do dia de HOJE (quando ele não está selecionado) */
+.datepicker-cell.today {
+    @apply bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-white font-semibold;
+}
+
+/* Altera a cor quando o mouse passa por cima do dia de HOJE */
+.datepicker-cell.today:hover {
+     @apply bg-sky-200 dark:bg-sky-900;
+}
+
+
+button[data-carousel-slide-to][aria-current="true"] {
+    @apply bg-sky-600 border-sky-600;
+}

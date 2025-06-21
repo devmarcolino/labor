@@ -7,7 +7,13 @@
    @vite('resources/css/app.css')
    @vite('resources/js/app.js')
 </head>
-<body class="bg-gray-100 dark:bg-neutral-900 transition-colors duration-500">
+<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-500">
+
+<div id="page-loader" class="fixed top-0 left-0 w-full h-full bg-gray-100 dark:bg-gray-900 flex justify-center items-center z-[9999]">
+  <div class="animate-spin inline-block size-6 border-[3px] border-current border-t-transparent text-sky-600 rounded-full" role="status" aria-label="loading">
+    <span class="sr-only">Carregando...</span>
+  </div>
+</div>
 
 <div class="flex min-h-screen flex-col px-5 justify-center">
   <div class="flex justify-center gap-10">
@@ -24,44 +30,62 @@
         </div>
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    <form class="space-y-6" action="#" method="POST">
-      <div class="max-w-sm space-y-3">
-        <div class="relative">
-          <input type="email" class="peer py-2.5 sm:py-3 px-4 ps-11 block w-full bg-gray-50 border-transparent focus:outline-gray-300 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-gray-700 dark:focus:outline-gray-800" placeholder="Insira seu e-mail">
-          <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none">
-            <svg class="shrink-0 size-4 text-gray-500 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-        </div>
+<form class="space-y-6" action="#" method="POST">
+  <div class="max-w-sm space-y-3">
+    <div class="relative">
+      <input type="email" id="hs-floating-input-email-value" class="peer p-4 block w-full bg-gray-50 border-gray-200 rounded-lg sm:text-sm placeholder:text-transparent focus:border-sky-500 focus:ring-sky-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600
+        focus:pt-6
+        focus:pb-2
+        [&:not(:placeholder-shown)]:pt-6
+        [&:not(:placeholder-shown)]:pb-2
+        autofill:pt-6
+        autofill:pb-2" placeholder="you@email.com">
+      <label for="hs-floating-input-email-value" class="absolute top-0 start-0 p-4 h-full sm:text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent origin-[0_0] text-gray-600  dark:text-gray-100 peer-disabled:opacity-50 peer-disabled:pointer-events-none
+          peer-focus:scale-90
+          peer-focus:translate-x-0.5
+          peer-focus:-translate-y-1.5
+          peer-focus:text-gray-500 dark:peer-focus:text-gray-300
+          peer-[:not(:placeholder-shown)]:scale-90
+          peer-[:not(:placeholder-shown)]:translate-x-0.5
+          peer-[:not(:placeholder-shown)]:-translate-y-1.5
+          peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-gray-300 dark:text-gray-300">E-mail</label>
+    </div>
 
-        <div class="relative">
-          <input type="password" class="peer py-2.5 sm:py-3 px-4 ps-11 block w-full bg-gray-50 border-transparent focus:outline-gray-300 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-gray-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-gray-700 dark:focus:outline-gray-800" placeholder="Insira sua senha">
-          <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none">
-            <svg class="shrink-0 size-4 text-gray-500 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z"></path>
-              <circle cx="16.5" cy="7.5" r=".5"></circle>
-            </svg>
-          </div>
-        </div>
+    <div class="relative">
+      <input type="password" id="hs-floating-input-passowrd-value" class="peer p-4 block w-full bg-gray-50 border-gray-200 rounded-lg sm:text-sm placeholder:text-transparent focus:border-sky-500 focus:ring-sky-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600
+        focus:pt-6
+        focus:pb-2
+        [&:not(:placeholder-shown)]:pt-6
+        [&:not(:placeholder-shown)]:pb-2
+        autofill:pt-6
+        autofill:pb-2" placeholder="********">
+      <label for="hs-floating-input-passowrd-value" class="absolute top-0 start-0 p-4 h-full sm:text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent origin-[0_0] text-gray-600  dark:text-gray-100 peer-disabled:opacity-50 peer-disabled:pointer-events-none
+          peer-focus:scale-90
+          peer-focus:translate-x-0.5
+          peer-focus:-translate-y-1.5
+          peer-focus:text-gray-500 dark:peer-focus:text-gray-300
+          peer-[:not(:placeholder-shown)]:scale-90
+          peer-[:not(:placeholder-shown)]:translate-x-0.5
+          peer-[:not(:placeholder-shown)]:-translate-y-1.5
+          peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-gray-300 dark:text-gray-300">Senha</label>
+    </div>
 
-        <div class="text-sm text-right">
-          <a href="#" class="font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-500 dark:hover:text-sky-400">Esqueceu sua senha?</a>
-        </div>
-      </div>
+    <div class="text-sm text-right">
+      <a href="#" class="font-semibold text-sky-600 hover:underline hover:text-sky-500 dark:text-sky-500 dark:hover:text-sky-400">Esqueceu sua senha?</a>
+    </div>
+  </div>
 
-      <div>
-        <button type="submit" class="text-white bg-sky-700 hover:bg-sky-800 focus:ring-2 focus:ring-sky-300/55 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-sky-600 dark:hover:bg-sky-700 focus:outline-none dark:focus:ring-sky-800/55 w-full">Entrar</button>
-      </div>
-    </form>
+  <div>
+    <button type="submit" class="text-white bg-sky-700 hover:bg-sky-800 focus:ring-2 focus:ring-sky-300/55 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-sky-600 dark:hover:bg-sky-700 focus:outline-none dark:focus:ring-sky-800/55 w-full">Entrar</button>
+  </div>
+</form>
 
     <p class="mt-10 text-center text-sm/6 text-gray-500">
       Não tem uma conta ainda?
-      <a href="{{ url('/cadastro') }}" class="font-semibold text-sky-600 hover:text-sky-500">Crie uma agora.</a>
+      <a href="{{ url('/register') }}" class="font-semibold hover:underline text-sky-600 hover:text-sky-500">Crie uma agora.</a>
     </p>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/preline@2.3.0/dist/preline.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/preline@3.1.0/dist/preline.min.js"></script>
 </body>
 </html>

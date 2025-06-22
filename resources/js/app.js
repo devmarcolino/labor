@@ -151,9 +151,16 @@ if (carouselWrapper && titleElement) {
     checkActiveAndSetTitle();
 }
     const cpfInput = document.getElementById('cpf');
-    const dataNascInput = document.getElementById('data-nasc');
+    const dataNascInput = document.getElementById('datanasc');
+    const telInput = document.getElementById('telefone');
 
     // Aplica a máscara de CPF, se o campo existir na página
+    if (telInput) {
+        IMask(telInput, {
+            mask: '(00) 00000-0000'
+        });
+    }
+
     if (cpfInput) {
         IMask(cpfInput, {
             mask: '000.000.000-00'

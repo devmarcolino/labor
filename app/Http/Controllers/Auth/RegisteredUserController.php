@@ -12,15 +12,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Http\Requests\StoreUserRequest;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
-        return view('auth.register');
+        return view('register');
     }
 
     /**
@@ -28,24 +26,21 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+    public function store(StoreUserRequest $request)
+{
+    $dadosValidados = $request->validated();
+    $dadosValidados['datanasc'] = \Carbon\Carbon::createFromFormat('d/m/Y', $dadosValidados['datanasc'])->format('Y-m-d');
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+    $user = User::create([
+        'nome' => $dadosValidados['nome'],
+        'telefone' => $dadosValidados['telefone'],
+        'email' => $dadosValidados['email'],
+        'cpf' => $dadosValidados['cpf'],
+        'datanasc' => $dadosValidados['datanasc'],
+        'password' => Hash::make($dadosValidados['password']),
+    ]);
 
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return redirect(RouteServiceProvider::HOME);
-    }
+    event(new Registered($user));
+    Auth::login($user);
+}
 }

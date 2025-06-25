@@ -27,10 +27,13 @@ class StoreUserRequest extends FormRequest
         // Movemos as regras de validação do controller para cá
         return [
             'nome' => ['required', 'string', 'max:255'],
+            'user' => ['required', 'string', 'max:255', 'unique:'.User::class.',user'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'telefone' => ['required', 'string', 'min:10', 'max:11', 'unique:'.User::class.',telefone'],
             'datanasc' => ['required', 'date_format:d/m/Y'],
             'cpf' => ['required', 'string', 'size:11', 'unique:'.User::class.',cpf'],
+            'cidade' => ['string', 'max:100'],
+            'uf' => ['string', 'max:2'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }

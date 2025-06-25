@@ -9,6 +9,72 @@ import 'flowbite';
 import Alpine from 'alpinejs';
 import { Carousel } from 'flowbite';
 
+function registrationForm() {
+    return {
+        // --- Estado do formulário ---
+        step: 1,
+        totalSteps: 5, // O número total de passos do seu formulário
+
+        // --- Variáveis de Dados de Localização ---
+        states: [],
+        cities: [],
+        cep: '',
+        selectedState: { sigla: '', nome: '' },
+        selectedCity: '',
+        
+        // --- Variáveis de Controle da UI (Interface) ---
+        stateDropdownOpen: false,
+        cityDropdownOpen: false,
+        stateSearch: '',
+        citySearch: '',
+        isLoadingStates: true,
+        isLoadingCities: false,
+        isLoadingCep: false,
+        cepError: '',
+
+        // --- Funções (Nossas Ações) ---
+        fetchStates() {
+            fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
+                .then(r => r.json())
+                .then(data => { this.states = data; this.isLoadingStates = false; });
+        },
+        fetchCities() {
+            if (!this.selectedState.sigla) return;
+            this.isLoadingCities = true;
+            this.cities = [];
+            this.selectedCity = '';
+            fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${this.selectedState.sigla}/municipios`)
+                .then(r => r.json())
+                .then(data => { this.cities = data; this.isLoadingCities = false; });
+        },
+        fetchAddressByCep() {
+            const cleanCep = this.cep.replace(/\D/g, '');
+            if (cleanCep.length !== 8) { this.cepError = ''; return; }
+            this.isLoadingCep = true;
+            this.cepError = '';
+            fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        this.cepError = 'CEP não encontrado.';
+                        this.isLoadingCep = false;
+                        return;
+                    }
+                    const foundState = this.states.find(s => s.sigla === data.uf);
+                    if (foundState) { this.selectedState = foundState; }
+                    this.selectedCity = data.localidade;
+                    this.isLoadingCep = false;
+                });
+        }
+    };
+}
+
+// PASSO 2: O REGISTRO (O PASSO CRÍTICO)
+// Apresentamos nossa 'fábrica' para o Alpine com o nome 'registrationForm'
+Alpine.data('registrationForm', registrationForm);
+
+// PASSO 3: A INICIALIZAÇÃO
+
 window.Alpine = Alpine;
 Alpine.start()
 
@@ -153,7 +219,7 @@ if (carouselWrapper && titleElement) {
     const cpfInput = document.getElementById('cpf');
     const dataNascInput = document.getElementById('datanasc');
     const telInput = document.getElementById('telefone');
-
+    const userInput = document.getElementById('user');
     // Aplica a máscara de CPF, se o campo existir na página
     if (telInput) {
         IMask(telInput, {
@@ -171,6 +237,12 @@ if (carouselWrapper && titleElement) {
     if (dataNascInput) {
         IMask(dataNascInput, {
             mask: '00/00/0000'
+        });
+    }
+
+    if (userInput) {
+        IMask(userInput, {
+            mask: '@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
         });
     }
 

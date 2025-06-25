@@ -33,10 +33,13 @@ class RegisteredUserController extends Controller
 
     $user = User::create([
         'nome' => $dadosValidados['nome'],
+        'user' => $dadosValidados['user'],
+        'datanasc' => $dadosValidados['datanasc'],
         'telefone' => $dadosValidados['telefone'],
         'email' => $dadosValidados['email'],
         'cpf' => $dadosValidados['cpf'],
-        'datanasc' => $dadosValidados['datanasc'],
+        'cidade' => $dadosValidados['cidade'],
+        'uf' => $dadosValidados['uf'],
         'password' => Hash::make($dadosValidados['password']),
     ]);
 

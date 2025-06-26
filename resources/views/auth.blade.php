@@ -7,7 +7,7 @@
    @vite('resources/css/app.css')
    @vite('resources/js/app.js')
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-500">
+<body class="bg-white dark:bg-gray-900 transition-colors duration-500">
 
 <x-loading/>
 

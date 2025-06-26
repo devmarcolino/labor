@@ -11,6 +11,14 @@ body {
     font-family: "Inter", sans-serif;
 }
 
+.box-login {
+    border-radius: 20px 20px 0px 0px;
+}
+
+.box-logo {
+    border-radius:  0px 0px 20px 20px;
+}
+
 .datepicker-cell.selected {
     @apply bg-sky-600 text-white;
 }

@@ -7,7 +7,7 @@
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-500">
+<body class="bg-white dark:bg-gray-900 transition-colors duration-500">
 
     <x-loading/>
 
@@ -16,7 +16,7 @@
     <div class="flex flex-col mt-2 sm:gap-3 sm:pt-5">
      <div class="flex justify-between mx-1 items-center gap-12">
             <x-btn-back/>
-      </div>
+    </div>
 
       <div class="my-2 w-full bg-gray-200 h-1 dark:bg-gray-700">
           <div class="bg-sky-600 h-1" style="width: 10%"></div>

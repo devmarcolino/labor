@@ -39,7 +39,7 @@
 
     <div class="flex items-center my-5">
         <input id="remember" type="checkbox" value="" class="w-4 h-4 text-sky-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-sky-500 dark:focus:ring-sky-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-        <label for="remember" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Lembrar de mim</label>
+        <label for="remember" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"><p class="text-gray-600">Lembrar de mim</p></label>
     </div>
 
     <div class="text-sm text-right">
@@ -51,11 +51,6 @@
     <x-btn-primary type="submit">Entrar</x-btn-primary>
   </div>
 </form>
-
-    <p class="mt-10 text-center text-sm/6 text-gray-500">
-      Não tem uma conta ainda?
-      <a href="{{ url('/register') }}" class="font-semibold hover:underline text-sky-600 hover:text-sky-500">Crie uma agora.</a>
-    </p>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/preline@3.1.0/dist/preline.min.js"></script>

@@ -39,7 +39,7 @@ class RegisteredUserController extends Controller
         'email' => $dadosValidados['email'],
         'cpf' => $dadosValidados['cpf'],
         'cidade' => $dadosValidados['cidade'],
-        'uf' => $dadosValidados['uf'],
+        'estado' => $dadosValidados['estado'],
         'password' => Hash::make($dadosValidados['password']),
     ]);
 

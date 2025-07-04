@@ -9,6 +9,72 @@ import 'flowbite';
 import Alpine from 'alpinejs';
 import { Carousel } from 'flowbite';
 
+// NOVO CÓDIGO DE VALIDAÇÃO - SUBSTITUA O ANTIGO
+// NOVO CÓDIGO DE VALIDAÇÃO (VERSÃO 3 - CORRIGIDA)
+
+function updateButtonState() {
+    console.log("--- Validando etapa... ---");
+
+    const form = document.querySelector('form[x-data="registrationForm"]');
+    if (!form) return;
+
+    const stepContainers = form.querySelectorAll(':scope > div[x-show]');
+    
+    const activeStepContainer = Array.from(stepContainers).find(
+        (div) => div.offsetParent !== null
+    );
+
+    if (!activeStepContainer) {
+        console.warn("AVISO: Nenhum container de etapa ativo foi encontrado.");
+        return;
+    }
+    console.log("Container da etapa ativa encontrado:", activeStepContainer);
+
+    const inputs = activeStepContainer.querySelectorAll("[validate-input]");
+    const buttons = document.querySelectorAll("[validate-btn]");
+
+    console.log(`Inputs nesta etapa: ${inputs.length}`);
+
+    const allFilled = Array.from(inputs).every(
+        (input) => {
+            // AQUI ESTÁ A CORREÇÃO!
+            // Agora procuramos pelo nosso atributo 'data-dropdown-container', que é um seletor válido.
+            if (input.closest('[data-dropdown-container]')) {
+                return true; // Se o input está dentro de um dropdown, ignore a validação.
+            }
+            return input.value.trim() !== "";
+        }
+    );
+
+    console.log(`Todos os campos preenchidos? ${allFilled}`);
+
+    buttons.forEach((button) => {
+        if(button.textContent.toLowerCase().includes('voltar')){
+             button.disabled = false;
+             return;
+        }
+        button.disabled = !allFilled;
+    });
+}
+
+document.addEventListener('alpine:init', () => {
+    console.log("✅ Alpine.js inicializado. Configurando validação...");
+    setTimeout(updateButtonState, 150); 
+
+    const inputsToValidate = document.querySelectorAll("[validate-input]");
+    inputsToValidate.forEach(input => {
+        input.addEventListener('input', updateButtonState);
+    });
+
+    const navButtons = document.querySelectorAll('button[validate-btn]');
+    navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            setTimeout(updateButtonState, 150); 
+        });
+    });
+});
+// FIM DO NOVO CÓDIGO
+
 function registrationForm() {
     return {
         // --- Estado do formulário ---

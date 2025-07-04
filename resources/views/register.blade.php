@@ -34,11 +34,11 @@
                     <h3 class="text-2xl font-bold text-gray-900">Informações pessoais</h3>
                     <p class="text-sm text-gray-700">Precisamos saber mais sobre você.</p>
                 </div>
-                <x-input name="nome" type="text" placeholder="Insira seu nome completo" value="{{ old('nome') }}">
+                <x-input name="nome" type="text" placeholder="Insira seu nome completo" value="{{ old('nome') }}" validate-input>
                 Nome Completo
                 </x-input>
-
-                <x-input name="user" type="text" placeholder="Crie seu @" value="{{ old('user') }}">
+ 
+                <x-input name="user" type="text" placeholder="Crie seu @" value="{{ old('user') }}" validate-input>
                 Usuário
                 </x-input>
                 
@@ -53,7 +53,7 @@
                     <p class="text-sm text-gray-700">Ele será seu principal meio de login, contato e recuperação de senha.</p>
                 </div>
 
-                <x-input name="email" type="email" placeholder="seu@email.com" value="{{ old('email') }}">
+                <x-input name="email" type="email" placeholder="seu@email.com" value="{{ old('email') }}" validate-input>
                     E-mail
                 </x-input>
 
@@ -68,7 +68,7 @@
                     <p class="text-sm text-gray-700">Usaremos seu número para verificações de segurança e para manter sua conta protegida.</p>
                 </div>
 
-                <x-input name="telefone" type="tel" placeholder="(00)00000-0000" value="{{ old('telefone') }}">
+                <x-input name="telefone" type="tel" placeholder="(00)00000-0000" value="{{ old('telefone') }}" validate-input>
                     Telefone
                 </x-input>
 
@@ -83,7 +83,7 @@
                     <p class="text-sm text-gray-700">Esses dados são essenciais para a segurança do seu perfil e para validar suas candidaturas futuras.</p>
                 </div>
 
-                <x-input type="text" name="datanasc" datepicker datepicker-format="dd/mm/yyyy" placeholder="00/00/0000" value="{{ old('datanasc') }}">
+                <x-input type="text" name="datanasc" datepicker datepicker-format="dd/mm/yyyy" placeholder="00/00/0000" value="{{ old('datanasc') }}"  validate-input>
                 Data de Nascimento
                 <x-slot:icon>
                         <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -96,7 +96,7 @@
                     <x-warn>{{ $message }}</x-warn>
                 @enderror
 
-                <x-input name="cpf" type="text" placeholder="000.000.000-00" value="{{ old('cpf') }}">
+                <x-input name="cpf" type="text" placeholder="000.000.000-00" value="{{ old('cpf') }}" validate-input>
                     CPF
                 </x-input>   
 
@@ -129,9 +129,9 @@
                             </button>
 
 
-                            <div x-show="stateDropdownOpen" @click.away="stateDropdownOpen = false" x-cloak class="absolute z-10 w-full mt-1 bg-white rounded-lg shadow dark:bg-gray-700">
+                            <div data-dropdown-container x-show="stateDropdownOpen" @click.away="stateDropdownOpen = false" x-cloak class="absolute z-10 w-full mt-1 bg-white rounded-lg shadow dark:bg-gray-700">
                                 <div class="p-2">
-                                    <input type="text" x-model="stateSearch" placeholder="Buscar estado..." class="w-full p-2 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white focus:ring-sky-500 focus:border-sky-500">
+                                    <input type="text" x-model="stateSearch" placeholder="Buscar estado..." class="w-full p-2 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white focus:ring-sky-500 focus:border-sky-500" validate-input>
                                 </div>
                                 <ul class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200">
                                     <template x-for="state in states.filter(s => s.nome.toLowerCase().includes(stateSearch.toLowerCase()))" :key="state.id">
@@ -161,9 +161,9 @@
                                 </svg>
                             </button>
 
-                            <div x-show="cityDropdownOpen" @click.away="cityDropdownOpen = false" x-cloak class="absolute z-10 w-full mt-1 bg-white rounded-lg shadow dark:bg-gray-700">
+                            <div data-dropdown-container x-show="cityDropdownOpen" @click.away="cityDropdownOpen = false" x-cloak class="absolute z-10 w-full mt-1 bg-white rounded-lg shadow dark:bg-gray-700">
                                 <div class="p-2">
-                                    <input type="text" x-model="citySearch" placeholder="Buscar cidade..." class="w-full p-2 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white focus:ring-sky-500 focus:border-sky-500">
+                                    <input type="text" x-model="citySearch" placeholder="Buscar cidade..." class="w-full p-2 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white focus:ring-sky-500 focus:border-sky-500" validate-input>
                                 </div>
                                 <ul class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200">
                                     <template x-for="city in cities.filter(c => c.nome.toLowerCase().includes(citySearch.toLowerCase()))" :key="city.id">
@@ -178,8 +178,8 @@
                         </div>
                     </div>
                     
-                    <input type="hidden" name="estado" :value="selectedState.sigla">
-                    <input type="hidden" name="cidade" :value="selectedCity">
+                    <input type="hidden" id="estado" name="estado" :value="selectedState.sigla">
+                    <input type="hidden" id="cidade" name="cidade" :value="selectedCity">
                 </div>
             </div> 
            
@@ -187,10 +187,9 @@
             <div class="text-left mb-6">
                     <h3 class="text-2xl font-bold text-gray-900">Crie sua senha de acesso</h3>
                     <p class="text-sm text-gray-700">Escolha uma senha forte com letras, números e símbolos. Esta será a chave para proteger sua conta.</p>
-                </div>
-                                    
+                </div>                   
             
-                <x-input name="password" type="password" placeholder="*******">
+                <x-input name="password" type="password" placeholder="*******" validate-input>
                 Senha
                 </x-input>
 
@@ -198,7 +197,7 @@
                     <x-warn>{{ $message }}</x-warn>
                 @enderror
 
-                <x-input name="password_confirmation" type="password" placeholder="*******">
+                <x-input name="password_confirmation" type="password" placeholder="*******" validate-input>
                 Confirme sua senha
                 </x-input>
 
@@ -206,17 +205,17 @@
             
             <div class="navigation-area mx-auto fixed bottom-0 left-0 right-0 p-5 sm:w-[25rem]">
                 <div x-show="step === 1">
-                    <x-btn-primary type="button" @click="step = step + 1">Continuar</x-btn-primary>
+                    <x-btn-primary type="button" @click="step = step + 1" validate-btn>Continuar</x-btn-primary>
                 </div>
 
                 <div x-show="[2, 3, 4, 5].includes(step)">
-                    <x-btn-outline type="button" @click="step = step - 1">Voltar</x-btn-outline>
-                    <x-btn-primary type="button" @click="step = step + 1">Continuar</x-btn-primary>
+                    <x-btn-outline type="button" @click="step = step - 1" validate-btn>Voltar</x-btn-outline>
+                    <x-btn-primary type="button" @click="step = step + 1" validate-btn>Continuar</x-btn-primary>
                 </div>
 
                 <div x-show="step === 6">
-                    <x-btn-outline type="button" @click="step = step - 1">Voltar</x-btn-outline>
-                    <x-btn-primary type="submit">Criar conta</x-btn-primary>
+                    <x-btn-outline type="button" @click="step = step - 1" validate-btn>Voltar</x-btn-outline>
+                    <x-btn-primary type="submit" validate-btn>Criar conta</x-btn-primary>
                 </div>
             </div>
         </form>

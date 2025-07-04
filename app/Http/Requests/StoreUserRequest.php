@@ -32,8 +32,8 @@ class StoreUserRequest extends FormRequest
             'telefone' => ['required', 'string', 'min:10', 'max:11', 'unique:'.User::class.',telefone'],
             'datanasc' => ['required', 'date_format:d/m/Y'],
             'cpf' => ['required', 'string', 'size:11', 'unique:'.User::class.',cpf'],
-            'cidade' => ['string', 'max:100'],
-            'uf' => ['string', 'max:2'],
+            'cidade' => ['required','string', 'max:100'],
+            'estado' => ['required','string', 'max:2'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }

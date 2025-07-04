@@ -69,6 +69,5 @@
       </div>
     </form>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/preline@3.1.0/dist/preline.min.js"></script>
 </body>
 </html>

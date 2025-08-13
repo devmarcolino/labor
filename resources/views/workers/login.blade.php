@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Labor for workers</title>
-   @vite('resources/css/app.css')
-   @vite('resources/js/app.js')
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Labor for workers</title>
+    @vite('resources/css/app.css')
+    @vite('resources/js/app.js')
 </head>
 <body class="bg-white dark:bg-gray-900  transition-colors duration-500">
 
@@ -53,7 +55,7 @@
       @enderror
 
             <div class="flex items-center my-5">
-                <input id="remember" type="checkbox" value="" class="w-4 h-4 text-sky-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-sky-500 dark:focus:ring-sky-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                <input id="remember" name="remember" type="checkbox" value="" class="w-4 h-4 text-sky-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-sky-500 dark:focus:ring-sky-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                 <label for="remember" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"><p class="text-gray-600">Lembrar de mim</p></label>
             </div>
 

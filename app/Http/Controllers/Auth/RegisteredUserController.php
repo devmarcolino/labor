@@ -18,7 +18,7 @@ class RegisteredUserController extends Controller
 {
     public function create(): View
     {
-        return view('register');
+        return view('/workers/register');
     }
 
     /**
@@ -44,6 +44,6 @@ class RegisteredUserController extends Controller
     ]);
 
     event(new Registered($user));
-    return redirect('/login');
+    return redirect('/workers/login');
 }
 }

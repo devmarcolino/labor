@@ -2,8 +2,10 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Labor for workers</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Labor</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
 </head>
@@ -42,7 +44,7 @@
 
             <h1 id="carousel-title" class="text-3xl font-black text-gray-900 dark:text-white h-24 flex items-center justify-center transition-opacity duration-300"></h1>
             
-             <x-btn-primary href="{{ url('/auth') }}">Começar</x-btn-primary>
+             <x-btn-primary href="{{ url('/choose') }}">Começar</x-btn-primary>
         </div>
     </div>
 </body>

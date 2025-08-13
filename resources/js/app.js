@@ -75,6 +75,8 @@ document.addEventListener('alpine:init', () => {
 });
 // FIM DO NOVO CÓDIGO
 
+
+
 function registrationForm() {
     return {
         // --- Estado do formulário ---

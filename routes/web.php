@@ -19,20 +19,22 @@ Route::get('/', function () {
     return view('index');
 })->middleware('guest');
 
-Route::get('/auth', function () {
-    return view('auth');
+Route::get('/choose', function () {
+    return view('choose');
 })->middleware('guest');
 
+Route::get('/workers/auth', function () {
+    return view('/workers/auth');
+})->middleware('guest');
 
+Route::get('/workers/login', [AuthenticatedSessionController::class, 'create'])->middleware('guest')->name('login');
+Route::post('/workers/login', [AuthenticatedSessionController::class, 'store'])->middleware('guest');
 
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])->middleware('guest')->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('guest');
-
-Route::get('/register', [RegisteredUserController::class, 'create'])->middleware('guest')->name('register');
-Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('guest');
+Route::get('/workers/register', [RegisteredUserController::class, 'create'])->middleware('guest')->name('register');
+Route::post('/workers/register', [RegisteredUserController::class, 'store'])->middleware('guest');
 
 Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth')->name('logout');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
+Route::get('/workers/dashboard', function () {
+    return view('/workers/dashboard');
 })->middleware('auth')->name('dashboard');

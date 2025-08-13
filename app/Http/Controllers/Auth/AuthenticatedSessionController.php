@@ -17,7 +17,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('/login');
+        return view('/workers/login');
     }
 
     /**
@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect('/dashboard');
+        return redirect('/workers/dashboard');
     }
 
     /**

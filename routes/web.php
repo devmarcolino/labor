@@ -33,8 +33,24 @@ Route::post('/workers/login', [AuthenticatedSessionController::class, 'store'])-
 Route::get('/workers/register', [RegisteredUserController::class, 'create'])->middleware('guest')->name('register');
 Route::post('/workers/register', [RegisteredUserController::class, 'store'])->middleware('guest');
 
-Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth')->name('logout');
-
 Route::get('/workers/dashboard', function () {
     return view('/workers/dashboard');
 })->middleware('auth')->name('dashboard');
+
+Route::get('/enterprises/auth', function () {
+    return view('/enterprises/auth');
+})->middleware('guest');
+
+Route::get('/enterprises/login', [AuthenticatedSessionController::class, 'create'])->middleware('guest')->name('login');
+Route::post('/enterprises/login', [AuthenticatedSessionController::class, 'store'])->middleware('guest');
+
+Route::get('/enterprises/register', [RegisteredUserController::class, 'create'])->middleware('guest')->name('register');
+Route::post('/enterprises/register', [RegisteredUserController::class, 'store'])->middleware('guest');
+
+Route::get('/enterprises/dashboard', function () {
+    return view('/enterprises/dashboard');
+})->middleware('auth')->name('dashboard');
+
+
+Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth')->name('logout');
+

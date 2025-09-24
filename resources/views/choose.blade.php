@@ -13,21 +13,24 @@
 
 <x-loading/>
 
-<div class="flex min-h-screen flex-col p-5 justify-between items-center">
+<div class="flex flex-col justify-between items-center self-center min-h-screen text-center gap-8 px-5 py-5 sm:py-9">
 
+<div class="w-full">
   <x-header-guest/>
+</div>
 
+<div class="flex flex-col items-center justify-center w-full max-w-2xl gap-8">
   <img src="img/auth.svg" class="w-[17rem] h-auto" alt="">
+  <div class="text-center mb-8">
+     <h2 class="text-3xl font-extrabold">Um clique, <br>uma oportunidade.</h2>
+  </div>
+</div>
 
-  <div class="min-w-full">
 
   
 
-  <div class="text-center mb-8">
-    <h2 class="text-3xl font-extrabold">Seja bem-vindo a Labor!</h2>
-  </div>
-
-   <div class="text-center">
+  
+  <div class="w-full max-w-2xl">
       <x-btn-primary href="{{ url('/workers/auth') }}">Trabalhador</x-btn-primary>
       <x-btn-outline href="{{ url('') }}">Empresa</x-btn-outline>
   </div>

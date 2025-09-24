@@ -7,54 +7,78 @@ import './bootstrap';
 import IMask from 'imask';
 import 'flowbite';
 import Alpine from 'alpinejs';
+import interact from 'interactjs';
 import { Carousel } from 'flowbite';
 
 // NOVO CÓDIGO DE VALIDAÇÃO - SUBSTITUA O ANTIGO
 // NOVO CÓDIGO DE VALIDAÇÃO (VERSÃO 3 - CORRIGIDA)
 
+
 function updateButtonState() {
-    console.log("--- Validando etapa... ---");
+    console.log("--- 1. Iniciando validação da etapa ---");
 
-    const form = document.querySelector('form[x-data="registrationForm"]');
-    if (!form) return;
+    // CORREÇÃO 1: Procuramos o container principal do Alpine.
+    const alpineContainer = document.querySelector('div[x-data="registrationForm"]');
+    if (!alpineContainer) {
+        console.error("ERRO CRÍTICO: Container Alpine 'registrationForm' não encontrado.");
+        return;
+    }
 
-    const stepContainers = form.querySelectorAll(':scope > div[x-show]');
-    
+    // CORREÇÃO 2: Procuramos os containers de etapa DENTRO do container Alpine,
+    // sem usar o seletor de filho direto '>'.
+    const stepContainers = alpineContainer.querySelectorAll('div[x-show]');
+    if (stepContainers.length === 0) {
+        console.warn("AVISO: Nenhum container de etapa com 'x-show' foi encontrado.");
+        return;
+    }
+
+    // A sua lógica para encontrar a etapa ativa está ótima, ela continua igual.
     const activeStepContainer = Array.from(stepContainers).find(
         (div) => div.offsetParent !== null
     );
 
     if (!activeStepContainer) {
-        console.warn("AVISO: Nenhum container de etapa ativo foi encontrado.");
+        console.warn("AVISO: Nenhuma etapa ativa visível no momento.");
         return;
     }
-    console.log("Container da etapa ativa encontrado:", activeStepContainer);
+    console.log("--- 2. Etapa ativa encontrada:", activeStepContainer);
 
     const inputs = activeStepContainer.querySelectorAll("[validate-input]");
     const buttons = document.querySelectorAll("[validate-btn]");
 
-    console.log(`Inputs nesta etapa: ${inputs.length}`);
+    console.log(`--- 3. Encontrados ${inputs.length} inputs para validar nesta etapa.`);
 
-    const allFilled = Array.from(inputs).every(
-        (input) => {
-            // AQUI ESTÁ A CORREÇÃO!
-            // Agora procuramos pelo nosso atributo 'data-dropdown-container', que é um seletor válido.
-            if (input.closest('[data-dropdown-container]')) {
-                return true; // Se o input está dentro de um dropdown, ignore a validação.
-            }
-            return input.value.trim() !== "";
+    // CORREÇÃO 3: Lógica de validação melhorada para selects/dropdowns.
+    // Ela agora verifica se um valor foi selecionado nos seus campos de Estado/Cidade.
+    const allFilled = Array.from(inputs).every((input) => {
+        // Para os campos hidden de estado e cidade, verificamos se têm valor.
+        if (input.type === 'hidden' && (input.name === 'estado' || input.name === 'cidade')) {
+            const hasValue = input.value.trim() !== "";
+            console.log(`Validando campo hidden '${input.name}': ${hasValue ? 'Preenchido' : 'Vazio'}`);
+            return hasValue;
         }
-    );
+        // Para inputs de busca dentro de dropdowns, ignoramos.
+        if (input.closest('[data-dropdown-container]')) {
+            return true;
+        }
+        // Para todos os outros inputs, verificamos o valor.
+        const hasValue = input.value.trim() !== "";
+        console.log(`Validando input '${input.name}': ${hasValue ? 'Preenchido' : 'Vazio'}`);
+        return hasValue;
+    });
 
-    console.log(`Todos os campos preenchidos? ${allFilled}`);
+    console.log(`--- 4. Todos os campos obrigatórios estão preenchidos? ${allFilled}`);
 
     buttons.forEach((button) => {
-        if(button.textContent.toLowerCase().includes('voltar')){
-             button.disabled = false;
-             return;
+        // Sempre habilita o botão "Voltar"
+        if (button.textContent.toLowerCase().includes('voltar')) {
+            button.disabled = false;
+            return;
         }
+        // Habilita ou desabilita os outros botões com base na validação
         button.disabled = !allFilled;
     });
+    console.log("--- 5. Estado dos botões atualizado. ---");
 }
 
 document.addEventListener('alpine:init', () => {
@@ -81,8 +105,8 @@ function registrationForm() {
     return {
         // --- Estado do formulário ---
         step: 1,
-        totalSteps: 5, // O número total de passos do seu formulário
-
+        totalSteps: 6, // O número total de passos do seu formulário
+   
         // --- Variáveis de Dados de Localização ---
         states: [],
         cities: [],
@@ -90,6 +114,35 @@ function registrationForm() {
         selectedState: { sigla: '', nome: '' },
         selectedCity: '',
         
+
+        updateProgressBar() {
+            // Calcula a porcentagem
+            const percentage = (this.step / this.totalSteps) * 100;
+            
+            // Acessa o elemento com o "apelido" progressBar que demos no HTML
+            // e define sua largura diretamente via JavaScript
+            if (this.$refs.progressBar) {
+                this.$refs.progressBar.style.width = `${percentage}%`;
+            }
+        },
+
+        // 2. Uma função de inicialização que o Alpine chama uma vez
+        init() {
+            console.log('Componente de formulário inicializado!');
+
+            // 3. O "$watch" é um 'espião' do Alpine.
+            // Ele fica de olho na variável 'step' e executa a função
+            // toda vez que o valor dela mudar.
+            this.$watch('step', () => {
+                console.log('Etapa mudou! Atualizando a barra de progresso.');
+                this.updateProgressBar();
+            });
+
+            // 4. Também chamamos a função uma vez no início
+            // para definir a largura inicial correta da barra.
+            this.updateProgressBar();
+        },
+
         // --- Variáveis de Controle da UI (Interface) ---
         stateDropdownOpen: false,
         cityDropdownOpen: false,

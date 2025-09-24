@@ -211,7 +211,7 @@
 
         <div class="navigation-area mx-auto w-full max-w-2xl px-5 py-5 sm:py-9">
                 <div x-show="step === 1">
-                    <x-btn-primary x-ref="validateStep1" type="button" @click="step = step + 1" validate-btn>Continuar</x-btn-primary>
+                    <x-btn-primary type="button" @click="step = step + 1" validate-btn>Continuar</x-btn-primary>
                 </div>
 
                 <div x-show="[2, 3, 4, 5].includes(step)">

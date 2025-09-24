@@ -7,6 +7,10 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+[aria-selected="true"] {
+    @apply bg-white text-gray-900 shadow-sm;
+}
+
 body {
     font-family: "Inter", sans-serif;
 }
@@ -41,4 +45,30 @@ body {
 
 button[data-carousel-slide-to][aria-current="true"] {
     @apply bg-sky-600 border-sky-600;
+}
+
+.shadow-labor {
+    box-shadow: 0 6px 22.8px 0 rgba(0, 0, 0, 0.06);
+}
+
+.bg-labor {
+    background: rgba(0, 0, 0, 0.16);
+    backdrop-filter: blur(6.300000190734863px);
+}
+
+.icon-btn {
+    background-color: transparent;
+}
+
+.box {
+    height: 80vh;
+}
+
+.border-match {
+    border-radius: 3rem;
+}
+
+.match-bg {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, #000 100%);
+    backdrop-filter: blur(13.800000190734863px);
 }

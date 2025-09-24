@@ -17,5 +17,7 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
     require('flowbite/plugin'),
+    
+    // Plugin corrigido
   ],
 }

@@ -13,11 +13,12 @@
 
     <x-loading/>
 
-    <div class="flex justify-center items-center self-center min-h-screen">
-        <div class="flex flex-col gap-8 p-5 text-center w-full max-w-2xl">
+    <div class="flex flex-col justify-between items-center self-center min-h-screen text-center gap-8 px-5 py-5 sm:py-9">
 
+        <div class="w-full">
             <x-header-guest/>
-            
+        </div>
+
             <div class="w-full flex flex-col items-center gap-2">
             <div id="default-carousel" class="relative w-full" data-carousel="slide">
                 <div class=" relative overflow-hidden w-full min-h-96 rounded-lg">
@@ -40,12 +41,14 @@
                 </div>
                 </div>
             </div>
+            <h1 id="carousel-title" class="text-3xl font-black text-gray-900 dark:text-white h-24 flex items-center justify-center transition-opacity duration-300"></h1>
             </div>
 
-            <h1 id="carousel-title" class="text-3xl font-black text-gray-900 dark:text-white h-24 flex items-center justify-center transition-opacity duration-300"></h1>
             
-             <x-btn-primary href="{{ url('/choose') }}">Começar</x-btn-primary>
-        </div>
+
+            <div class="w-full max-w-2xl">
+            <x-btn-primary href="{{ url('/choose') }}">Começar</x-btn-primary>
+            </div>
     </div>
 </body>
 </html>

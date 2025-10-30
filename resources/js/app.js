@@ -1,149 +1,149 @@
 // =================================================================
-// ARQUIVO: resources/js/app.js
+// ARQUIVO: resources/js/app.js (VERSÃO FINAL COMPLETA E CORRIGIDA)
 // =================================================================
 
-// --- 1. CONFIGURAÇÕES INICIAIS ---
+// --- 1. IMPORTS ---
 import './bootstrap';
-import IMask from 'imask';
-import 'flowbite';
 import Alpine from 'alpinejs';
 import interact from 'interactjs';
-import { Carousel } from 'flowbite';
+import IMask from 'imask';
+import 'flowbite';
+import { Datepicker } from 'flowbite-datepicker';
+import ptBR from './flowbite-locale-pt.js';
 
-// NOVO CÓDIGO DE VALIDAÇÃO - SUBSTITUA O ANTIGO
-// NOVO CÓDIGO DE VALIDAÇÃO (VERSÃO 3 - CORRIGIDA)
+// Em: resources/js/app.js
 
+function cardStack() {
+    return {
+        cards: [
+            { id: 1, title: 'Garçom', company: 'Adventree Buffet e Eventos', image: '/img/match-example.png' },
+            { id: 2, title: 'Barista', company: 'Café do Bairro', image: '/img/match-example-1.png' },
+            { id: 3, title: 'Recepcionista', company: 'Hotel Central', image: '/img/match-example-2.png' },
+            { id: 4, title: '', company: 'Restaurante Saboroso', image: '/img/match-example-3.jpg' }
+        ],
 
-function updateButtonState() {
-    console.log("--- 1. Iniciando validação da etapa ---");
+        // Ativa o card do topo
+        activateTopCard() {
+            this.$nextTick(() => {
+                const cardElements = this.$el.querySelectorAll('.card-item');
+                if (cardElements.length > 0) {
+                    const topCard = cardElements[0];
+                    this.initInteract(topCard);
+                }
+            });
+        },
 
-    // CORREÇÃO 1: Procuramos o container principal do Alpine.
-    const alpineContainer = document.querySelector('div[x-data="registrationForm"]');
-    if (!alpineContainer) {
-        console.error("ERRO CRÍTICO: Container Alpine 'registrationForm' não encontrado.");
-        return;
-    }
+        // Observa mudanças nos cards
+        initWatcher() {
+            this.activateTopCard();
+            this.$watch('cards', () => {
+                this.activateTopCard();
+            });
+        },
 
-    // CORREÇÃO 2: Procuramos os containers de etapa DENTRO do container Alpine,
-    // sem usar o seletor de filho direto '>'.
-    const stepContainers = alpineContainer.querySelectorAll('div[x-show]');
-    if (stepContainers.length === 0) {
-        console.warn("AVISO: Nenhum container de etapa com 'x-show' foi encontrado.");
-        return;
-    }
+        // Remove o card do topo
+        removeTopCard() {
+            this.cards = this.cards.slice(1);
+        },
 
-    // A sua lógica para encontrar a etapa ativa está ótima, ela continua igual.
-    const activeStepContainer = Array.from(stepContainers).find(
-        (div) => div.offsetParent !== null
-    );
+        // Inicializa o Interact.js e duplo clique
+        initInteract(element) {
+            if (!element || element.classList.contains('interact-enabled')) return;
+            element.classList.add('interact-enabled');
 
-    if (!activeStepContainer) {
-        console.warn("AVISO: Nenhuma etapa ativa visível no momento.");
-        return;
-    }
-    console.log("--- 2. Etapa ativa encontrada:", activeStepContainer);
+            const component = this;
 
-    const inputs = activeStepContainer.querySelectorAll("[validate-input]");
-    const buttons = document.querySelectorAll("[validate-btn]");
+            // 🎯 Duplo clique = curtir
+            element.addEventListener("dblclick", () => {
+                // Borda vermelha
+                element.style.border = "4px solid #e63946";
 
-    console.log(`--- 3. Encontrados ${inputs.length} inputs para validar nesta etapa.`);
+                // Pulsada
+                const pulse = [
+                    { transform: "scale(1)" },
+                    { transform: "scale(1.1)" },
+                    { transform: "scale(0.98)" },
+                    { transform: "scale(1)" }
+                ];
+                const pulseAnimation = element.animate(pulse, { duration: 400, iterations: 1 });
 
-    // CORREÇÃO 3: Lógica de validação melhorada para selects/dropdowns.
-    // Ela agora verifica se um valor foi selecionado nos seus campos de Estado/Cidade.
-    const allFilled = Array.from(inputs).every((input) => {
-        // Para os campos hidden de estado e cidade, verificamos se têm valor.
-        if (input.type === 'hidden' && (input.name === 'estado' || input.name === 'cidade')) {
-            const hasValue = input.value.trim() !== "";
-            console.log(`Validando campo hidden '${input.name}': ${hasValue ? 'Preenchido' : 'Vazio'}`);
-            return hasValue;
+                // ❤️ Corações
+                for (let i = 0; i < 15; i++) {
+                    const heart = document.createElement("div");
+                    heart.innerHTML = "❤️";
+                    heart.classList.add("floating-heart");
+                    heart.style.left = `${Math.random() * 100}vw`;
+                    heart.style.fontSize = `${Math.random() * 30 + 40}px`;
+                    heart.style.animationDuration = `${Math.random() * 1 + 1.5}s`;
+                    document.body.appendChild(heart);
+                    heart.addEventListener("animationend", () => heart.remove());
+                }
+
+                // Quando pulsada terminar, anima subida reta e fluida
+                pulseAnimation.onfinish = () => {
+                    const rise = element.animate(
+                        [
+                            { transform: "translate(0px, 0px)" },
+                            { transform: "translate(0px, -500px)" }
+                        ],
+                        { duration: 500, easing: "ease-in-out", fill: "forwards" }
+                    );
+
+                    // Remove card ao final
+                    rise.onfinish = () => component.removeTopCard();
+                };
+            });
+
+            // 🧲 Interact.js — arrastar = recusar
+            interact(element).draggable({
+                onstart: () => { element.style.transition = 'none'; },
+                onmove: (event) => {
+                    const x = (parseFloat(element.getAttribute('data-x')) || 0) + event.dx;
+                    const y = (parseFloat(element.getAttribute('data-y')) || 0) + event.dy;
+                    const rotation = x * 0.1;
+                    element.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
+                    element.setAttribute('data-x', x);
+                    element.setAttribute('data-y', y);
+                },
+                onend: () => {
+                    element.style.transition = 'transform 0.4s ease-in-out';
+                    const totalX = parseFloat(element.getAttribute('data-x')) || 0;
+                    const totalY = parseFloat(element.getAttribute('data-y')) || 0;
+                    const distance = Math.sqrt(totalX ** 2 + totalY ** 2);
+
+                    if (distance > 10) {
+                        // Sai para baixo reto
+                        element.animate(
+                            [
+                                { transform: element.style.transform },
+                                { transform: "translate(0px, 500px)" }
+                            ],
+                            { duration: 400, easing: "ease-in-out", fill: "forwards" }
+                        );
+                        setTimeout(() => component.removeTopCard(), 400);
+                    } else {
+                        element.style.transform = 'translate(0px, 0px) rotate(0deg)';
+                        element.setAttribute('data-x', 0);
+                        element.setAttribute('data-y', 0);
+                    }
+                }
+            });
         }
-        // Para inputs de busca dentro de dropdowns, ignoramos.
-        if (input.closest('[data-dropdown-container]')) {
-            return true;
-        }
-        // Para todos os outros inputs, verificamos o valor.
-        const hasValue = input.value.trim() !== "";
-        console.log(`Validando input '${input.name}': ${hasValue ? 'Preenchido' : 'Vazio'}`);
-        return hasValue;
-    });
-
-    console.log(`--- 4. Todos os campos obrigatórios estão preenchidos? ${allFilled}`);
-
-    buttons.forEach((button) => {
-        // Sempre habilita o botão "Voltar"
-        if (button.textContent.toLowerCase().includes('voltar')) {
-            button.disabled = false;
-            return;
-        }
-        // Habilita ou desabilita os outros botões com base na validação
-        button.disabled = !allFilled;
-    });
-    console.log("--- 5. Estado dos botões atualizado. ---");
+    }
 }
 
-document.addEventListener('alpine:init', () => {
-    console.log("✅ Alpine.js inicializado. Configurando validação...");
-    setTimeout(updateButtonState, 150); 
-
-    const inputsToValidate = document.querySelectorAll("[validate-input]");
-    inputsToValidate.forEach(input => {
-        input.addEventListener('input', updateButtonState);
-    });
-
-    const navButtons = document.querySelectorAll('button[validate-btn]');
-    navButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            setTimeout(updateButtonState, 150); 
-        });
-    });
-});
-// FIM DO NOVO CÓDIGO
-
-
-
+/**
+ * Componente Alpine para o formulário de registro multi-etapas.
+ */
 function registrationForm() {
     return {
-        // --- Estado do formulário ---
         step: 1,
-        totalSteps: 6, // O número total de passos do seu formulário
-   
-        // --- Variáveis de Dados de Localização ---
+        totalSteps: 6,
         states: [],
         cities: [],
         cep: '',
-        selectedState: { sigla: '', nome: '' },
+        selectedState: { sigla: '', nome: 'Selecione um Estado' },
         selectedCity: '',
-        
-
-        updateProgressBar() {
-            // Calcula a porcentagem
-            const percentage = (this.step / this.totalSteps) * 100;
-            
-            // Acessa o elemento com o "apelido" progressBar que demos no HTML
-            // e define sua largura diretamente via JavaScript
-            if (this.$refs.progressBar) {
-                this.$refs.progressBar.style.width = `${percentage}%`;
-            }
-        },
-
-        // 2. Uma função de inicialização que o Alpine chama uma vez
-        init() {
-            console.log('Componente de formulário inicializado!');
-
-            // 3. O "$watch" é um 'espião' do Alpine.
-            // Ele fica de olho na variável 'step' e executa a função
-            // toda vez que o valor dela mudar.
-            this.$watch('step', () => {
-                console.log('Etapa mudou! Atualizando a barra de progresso.');
-                this.updateProgressBar();
-            });
-
-            // 4. Também chamamos a função uma vez no início
-            // para definir a largura inicial correta da barra.
-            this.updateProgressBar();
-        },
-
-        // --- Variáveis de Controle da UI (Interface) ---
         stateDropdownOpen: false,
         cityDropdownOpen: false,
         stateSearch: '',
@@ -153,7 +153,17 @@ function registrationForm() {
         isLoadingCep: false,
         cepError: '',
 
-        // --- Funções (Nossas Ações) ---
+        init() {
+            this.fetchStates();
+            this.$watch('step', () => this.updateProgressBar());
+            this.$nextTick(() => this.updateProgressBar());
+        },
+        updateProgressBar() {
+            if (this.$refs.progressBar) {
+                const percentage = (this.step / this.totalSteps) * 100;
+                this.$refs.progressBar.style.width = `${percentage}%`;
+            }
+        },
         fetchStates() {
             fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
                 .then(r => r.json())
@@ -190,204 +200,194 @@ function registrationForm() {
     };
 }
 
-// PASSO 2: O REGISTRO (O PASSO CRÍTICO)
-// Apresentamos nossa 'fábrica' para o Alpine com o nome 'registrationForm'
-Alpine.data('registrationForm', registrationForm);
 
-// PASSO 3: A INICIALIZAÇÃO
-
+// --- 3. INICIALIZAÇÃO DO ALPINE ---
 window.Alpine = Alpine;
-Alpine.start()
+Alpine.data('cardStack', cardStack);
+Alpine.data('registrationForm', registrationForm);
+Alpine.start();
 
-import ptBR from './flowbite-locale-pt.js';
-
-// Garante que o locale seja registrado
-if (!Datepicker.locales) Datepicker.locales = {};
-Object.assign(Datepicker.locales, ptBR);
-
-// Inicializa
-
-
-// --- 2. LÓGICA PRINCIPAL (executa quando o DOM está pronto) ---
+// --- 4. LÓGICA EXECUTADA APÓS O DOM CARREGAR ---
+// =================================================================
+// COLE ESTE BLOCO INTEIRO NO LUGAR DO SEU "DOMContentLoaded" ATUAL
+// =================================================================
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM Carregado. Executando scripts adicionais.");
 
-    // ========================================================
-    // MÓDULO: TEMA CLARO / ESCURO (DARK MODE)
-    // ========================================================
-    const themeToggleBtn = document.getElementById("theme-toggle");
-const iconSun = document.getElementById("icon-sun");
-const iconMoon = document.getElementById("icon-moon");
-const html = document.documentElement;
-
-if (themeToggleBtn && iconSun && iconMoon) {
-    
-    // A função que aplica o tema na prática
-    const setTheme = (theme) => {
-        if (theme === "dark") {
-            html.classList.add("dark");
-            iconMoon.classList.add("hidden");
-            iconSun.classList.remove("hidden");
-        } else {
-            html.classList.remove("dark");
-            iconMoon.classList.remove("hidden");
-            iconSun.classList.add("hidden");
+    // MÓDULO: VALIDAÇÃO DO FORMULÁRIO DE REGISTRO
+    const registrationForm = document.querySelector('div[x-data="registrationForm"]');
+    if (registrationForm) {
+        function updateButtonState() {
+            const activeStepContainer = Array.from(registrationForm.querySelectorAll('div[x-show]'))
+                .find(div => div.offsetParent !== null);
+            if (!activeStepContainer) return;
+            const inputs = activeStepContainer.querySelectorAll("[validate-input]");
+            const buttons = document.querySelectorAll("[validate-btn]");
+            const allFilled = Array.from(inputs).every((input) => {
+                if (input.type === 'hidden' && (input.name === 'estado' || input.name === 'cidade')) {
+                    return input.value.trim() !== "";
+                }
+                if (input.closest('[data-dropdown-container]')) {
+                    return true;
+                }
+                return input.value.trim() !== "";
+            });
+            buttons.forEach((button) => {
+                if (button.textContent.toLowerCase().includes('voltar')) {
+                    button.disabled = false;
+                    return;
+                }
+                button.disabled = !allFilled;
+            });
         }
-        localStorage.setItem("theme", theme);
-    };
+        registrationForm.addEventListener('input', updateButtonState);
+        registrationForm.addEventListener('click', (e) => {
+            if (e.target.closest('[validate-btn]')) {
+                setTimeout(updateButtonState, 150);
+            }
+        });
+        setTimeout(updateButtonState, 200);
+    }
 
-    // A LÓGICA CORRIGIDA PARA O TEMA PADRÃO
-    if (localStorage.getItem('theme') === 'dark') {
-        // Se o usuário já navegou e ativou o modo escuro, mantenha.
-        setTheme('dark');
+    // Em: resources/js/app.js
+// Dentro de: document.addEventListener("DOMContentLoaded", () => { ... });
+
+// ======================================================================
+// MÓDULO: TEMA CLARO / ESCURO (VERSÃO FINAL E ROBUSTA)
+// ======================================================================
+
+// 1. A função de aplicar o tema agora fica do lado de fora.
+// Ela vai rodar em TODAS as páginas, independente de existir um botão.
+function applyThemeFromStorage() {
+    const savedTheme = localStorage.getItem('theme') || 'light'; // Padrão é 'light'
+    const html = document.documentElement;
+
+    if (savedTheme === "dark") {
+        html.classList.add("dark");
     } else {
-        // Para novos visitantes ou qualquer outro caso, o padrão é 'light'.
-        setTheme('light');
+        html.classList.remove("dark");
     }
-
-    // A lógica para o clique no botão continua a mesma
-    themeToggleBtn.addEventListener("click", () => {
-        if (html.classList.contains("dark")) {
-            setTheme("light");
-        } else {
-            setTheme("dark");
-        }
-    });
 }
 
-    // ========================================================
-    // MÓDULO: CARREGADOR DE PÁGINA (PAGE LOADER)
-    // ========================================================
-    const pageLoader = document.getElementById('page-loader');
+// 2. Executa a função assim que o script do DOM está pronto.
+applyThemeFromStorage();
 
-    if (pageLoader) {
-        // Esconde o loader inicial
-        pageLoader.style.opacity = '0';
-        setTimeout(() => {
-            pageLoader.style.display = 'none';
-        }, 500); // Garante que a transição de opacidade termine
-
-        // Mostra o loader ao navegar
-        document.querySelectorAll('a[href]:not([href^="#"]):not([target="_blank"])').forEach(link => {
-            link.addEventListener('click', () => pageLoader.style.display = 'flex');
-        });
-
-        // Lida com o botão "voltar" do navegador
-        window.addEventListener('pageshow', (event) => {
-            if (event.persisted) {
-                pageLoader.style.display = 'none';
-            }
-        });
+// 3. Adiciona o listener para o botão "voltar" do navegador.
+// Isso também vai rodar em TODAS as páginas.
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+        console.log("Página restaurada do cache. Re-aplicando tema...");
+        applyThemeFromStorage();
     }
+});
 
+// 4. A lógica do BOTÃO DE CLIQUE agora tem sua própria verificação separada.
+// Ela só vai tentar configurar o botão SE ele existir na página atual.
+const themeToggleBtn = document.getElementById("theme-toggle");
+if (themeToggleBtn) {
+    const iconSun = document.getElementById("icon-sun");
+    const iconMoon = document.getElementById("icon-moon");
 
-    // ========================================================
-    // MÓDULO: CARROSSEL E TÍTULO SINCRONIZADO (LÓGICA CORRETA)
-    // ========================================================
-    // ========================================================
-const carouselWrapper = document.getElementById('default-carousel')?.parentElement;
-const titleElement = document.getElementById('carousel-title');
-
-// A condição agora só verifica se o wrapper e o título existem
-if (carouselWrapper && titleElement) {
-
-    // Voltamos ao array simples apenas com os títulos
-    const carouselTexts = [
-        "A oportunidade na sua mão.",
-        "Gostou da vaga? O trampo é seu.",
-        "As vagas que vem até você."
-    ];
-
-    let lastUpdatedIndex = -1;
-
-    // A função de update foi simplificada para cuidar apenas do título
-    const updateTitle = (index) => {
-        const numericIndex = parseInt(index);
-        
-        if (numericIndex !== lastUpdatedIndex && carouselTexts[numericIndex] !== undefined) {
-            lastUpdatedIndex = numericIndex;
-            
-            // Animação de fade-out
-            titleElement.classList.add('opacity-0');
-            
-            setTimeout(() => {
-                // Troca o texto e aplica fade-in
-                titleElement.textContent = carouselTexts[numericIndex];
-                titleElement.classList.remove('opacity-0');
-            }, 300); // Mantenha este tempo igual à classe 'duration-300' do HTML
+    // Função para atualizar apenas os ícones sol/lua
+    const updateThemeIcons = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        if (iconSun && iconMoon) {
+            iconSun.style.display = isDark ? 'block' : 'none';
+            iconMoon.style.display = isDark ? 'none' : 'block';
         }
     };
     
-    // O resto da lógica (o "espião") continua exatamente igual
-    const checkActiveAndSetTitle = () => {
-        const activeButton = carouselWrapper.querySelector('button[data-carousel-slide-to][aria-current="true"]');
-        if (activeButton) {
-            const activeIndex = activeButton.getAttribute('data-carousel-slide-to');
-            updateTitle(activeIndex);
-        }
-    };
-
-    const observer = new MutationObserver(checkActiveAndSetTitle);
-
-    observer.observe(carouselWrapper, {
-        attributes: true,
-        subtree: true,
-        attributeFilter: ['aria-current']
+    // Listener para o clique
+    themeToggleBtn.addEventListener("click", () => {
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem("theme", newTheme);
+        
+        // Aplica o tema na página e depois atualiza os ícones
+        applyThemeFromStorage();
+        updateThemeIcons();
     });
 
-    // Define o conteúdo inicial
-    checkActiveAndSetTitle();
+    // Atualiza os ícones no carregamento da página
+    updateThemeIcons();
 }
-    const cpfInput = document.getElementById('cpf');
-    const dataNascInput = document.getElementById('datanasc');
-    const telInput = document.getElementById('telefone');
-    const userInput = document.getElementById('user');
-    // Aplica a máscara de CPF, se o campo existir na página
-    if (telInput) {
-        IMask(telInput, {
-            mask: '(00) 00000-0000'
-        });
-    }
 
-    if (cpfInput) {
-        IMask(cpfInput, {
-            mask: '000.000.000-00'
-        });
-    }
+    console.log("Procurando por #page-loader...");
+const pageLoader = document.getElementById('page-loader');
+console.log("Elemento encontrado:", pageLoader); // O que aparece aqui?
 
-    // Aplica a máscara de Data, se o campo existir na página
-    if (dataNascInput) {
-        IMask(dataNascInput, {
-            mask: '00/00/0000'
-        });
-    }
+if (pageLoader) {
+    pageLoader.style.opacity = '0';
+    setTimeout(() => {
+        pageLoader.style.display = 'none';
+    }, 500);
+}
 
-    if (userInput) {
-        IMask(userInput, {
-            mask: '@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        });
-    }
-
-    const datepickerEls = document.querySelectorAll('[datepicker]');
-
-if (datepickerEls.length > 0 && window.Datepicker) {
-    datepickerEls.forEach((datepickerEl) => {
-        const datepickerInstance = new Datepicker(datepickerEl, {
-            language: 'pt-BR',
-            autohide: true,
-            format: 'dd/mm/yyyy',
-            maxDate: new Date(),
-            clearBtn: true,
-            todayBtn: true,
-            todayBtnMode: 1,
-        });
-
-        datepickerEl.addEventListener('show', () => {
-            if (datepickerEl.value === '') {
-                const eighteenYearsAgo = new Date();
-                eighteenYearsAgo.setFullYear(new Date().getFullYear() - 18);
-                datepickerInstance.setDate(eighteenYearsAgo);
+    // MÓDULO: CARROSSEL E TÍTULO SINCRONIZADO (A LÓGICA QUE FALTAVA)
+    const carouselWrapper = document.getElementById('default-carousel')?.parentElement;
+    const titleElement = document.getElementById('carousel-title');
+    if (carouselWrapper && titleElement) {
+        const carouselTexts = [
+            "A oportunidade na sua mão.",
+            "Gostou da vaga? O trampo é seu.",
+            "As vagas que vem até você."
+        ];
+        let lastUpdatedIndex = -1;
+        const updateTitle = (index) => {
+            const numericIndex = parseInt(index);
+            if (numericIndex !== lastUpdatedIndex && carouselTexts[numericIndex] !== undefined) {
+                lastUpdatedIndex = numericIndex;
+                titleElement.classList.add('opacity-0');
+                setTimeout(() => {
+                    titleElement.textContent = carouselTexts[numericIndex];
+                    titleElement.classList.remove('opacity-0');
+                }, 300);
             }
+        };
+        const checkActiveAndSetTitle = () => {
+            const activeButton = carouselWrapper.querySelector('button[data-carousel-slide-to][aria-current="true"]');
+            if (activeButton) {
+                const activeIndex = activeButton.getAttribute('data-carousel-slide-to');
+                updateTitle(activeIndex);
+            }
+        };
+        const observer = new MutationObserver(checkActiveAndSetTitle);
+        observer.observe(carouselWrapper, {
+            attributes: true,
+            subtree: true,
+            attributeFilter: ['aria-current']
         });
-    });
-}
+        checkActiveAndSetTitle();
+    }
+
+    // MÓDULO: MÁSCARAS (IMask)
+    const fieldsToMask = {
+        '#cpf': '000.000.000-00',
+        '#datanasc': '00/00/0000',
+        '#telefone': '(00) 00000-0000',
+        '#user': '@aaaaaaaaaaaaaaaaaa'
+    };
+    for (const selector in fieldsToMask) {
+        const element = document.querySelector(selector);
+        if (element) {
+            IMask(element, fieldsToMask[selector]);
+        }
+    }
+
+    // MÓDULO: DATEPICKER (Flowbite)
+    if (typeof Datepicker !== 'undefined') {
+        if (!Datepicker.locales) Datepicker.locales = {};
+        Object.assign(Datepicker.locales, ptBR);
+        document.querySelectorAll('[datepicker]').forEach((datepickerEl) => {
+            new Datepicker(datepickerEl, {
+                language: 'pt-BR',
+                autohide: true,
+                format: 'dd/mm/yyyy',
+                maxDate: new Date(),
+                clearBtn: true,
+                todayBtn: true,
+                todayBtnMode: 1,
+            });
+        });
+    }
 });

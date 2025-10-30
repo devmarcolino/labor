@@ -8,6 +8,7 @@
     <title>Labor for workers</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
+    <link rel="shortcut icon" href="img/lb-blue.svg" type="image/x-icon">
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-500">
 
@@ -22,7 +23,7 @@
   <div class="flex flex-col items-center justify-center w-full max-w-2xl gap-8">
     <img src="../img/auth-worker.png" class="w-[17rem] h-auto" alt="">
 
-    <h2 class="text-3xl font-extrabold">Labor for you! <br>Worker</h2>
+    <h2 class="text-3xl font-black text-gray-900 dark:text-white">Labor para você <br>Trabalhador</h2>
   </div>
 
    <div class="navigation-area mx-auto w-full max-w-2xl">

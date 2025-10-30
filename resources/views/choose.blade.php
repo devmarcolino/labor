@@ -8,6 +8,7 @@
     <title>Labor</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
+    <link rel="shortcut icon" href="img/lb-blue.svg" type="image/x-icon">
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-500">
 
@@ -22,7 +23,7 @@
 <div class="flex flex-col items-center justify-center w-full max-w-2xl gap-8">
   <img src="img/auth.svg" class="w-[17rem] h-auto" alt="">
   <div class="text-center mb-8">
-     <h2 class="text-3xl font-extrabold">Um clique, <br>uma oportunidade.</h2>
+     <h2 class="text-3xl font-black text-gray-900 dark:text-white">Um clique, <br>uma oportunidade.</h2>
   </div>
 </div>
 

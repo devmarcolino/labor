@@ -3,17 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ProfileController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+// Esta rota só funciona se o usuário estiver logado (middleware 'auth')
+// Em routes/web.ph
+Route::get('/workers/account', [ProfileController::class, 'edit'])
+    ->middleware('auth') // Garante que só usuários logados acessem
+    ->name('account'); // Dá um "apelido" à rota
+////////////
 
 Route::get('/', function () {
     return view('index');
@@ -36,6 +33,7 @@ Route::post('/workers/register', [RegisteredUserController::class, 'store'])->mi
 Route::get('/workers/dashboard', function () {
     return view('/workers/dashboard');
 })->middleware('auth')->name('dashboard');
+
 
 Route::get('/enterprises/auth', function () {
     return view('/enterprises/auth');

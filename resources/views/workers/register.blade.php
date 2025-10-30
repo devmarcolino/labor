@@ -8,6 +8,7 @@
     <title>Labor for workers</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
+    <link rel="shortcut icon" href="img/lb-blue.svg" type="image/x-icon">
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-500">
 
@@ -35,8 +36,8 @@
             
             <div x-show="step === 1" x-cloak class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900">Informações pessoais</h3>
-                    <p class="text-sm text-gray-700">Precisamos saber mais sobre você.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Informações pessoais</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Precisamos saber mais sobre você.</p>
                 </div>
                 <x-input name="nome" type="text" placeholder="Insira seu nome completo" value="{{ old('nome') }}" validate-input>
                 Nome Completo
@@ -53,8 +54,8 @@
 
             <div x-show="step === 2" x-cloak class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900">Adicione seu e-mail</h3>
-                    <p class="text-sm text-gray-700">Ele será seu principal meio de login, contato e recuperação de senha.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Adicione seu e-mail</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400 ">Ele será seu principal meio de login, contato e recuperação de senha.</p>
                 </div>
 
                 <x-input name="email" type="email" placeholder="seu@email.com" value="{{ old('email') }}" validate-input>
@@ -68,8 +69,8 @@
 
             <div x-show="step === 3" x-cloak class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900">Adicione seu telefone</h3>
-                    <p class="text-sm text-gray-700">Usaremos seu número para verificações de segurança e para manter sua conta protegida.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Adicione seu telefone</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Usaremos seu número para verificações de segurança e para manter sua conta protegida.</p>
                 </div>
 
                 <x-input name="telefone" type="tel" placeholder="(00)00000-0000" value="{{ old('telefone') }}" validate-input>
@@ -83,8 +84,8 @@
 
             <div x-show="step === 4" x-cloak class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900">Para sua segurança</h3>
-                    <p class="text-sm text-gray-700">Esses dados são essenciais para a segurança do seu perfil e para validar suas candidaturas futuras.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Para sua segurança</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Esses dados são essenciais para a segurança do seu perfil e para validar suas candidaturas futuras.</p>
                 </div>
 
                 <x-input type="text" name="datanasc" datepicker datepicker-format="dd/mm/yyyy" placeholder="00/00/0000" value="{{ old('datanasc') }}"  validate-input>
@@ -189,8 +190,8 @@
            
             <div x-show="step === 6" x-cloak class="flex flex-col gap-3 text-left">
             <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900">Crie sua senha de acesso</h3>
-                    <p class="text-sm text-gray-700">Escolha uma senha forte com letras, números e símbolos. Esta será a chave para proteger sua conta.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Crie sua senha de acesso</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Escolha uma senha forte com letras, números e símbolos. Esta será a chave para proteger sua conta.</p>
                 </div>                   
             
                 <x-input name="password" type="password" placeholder="*******" validate-input>

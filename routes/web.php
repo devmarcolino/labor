@@ -34,6 +34,11 @@ Route::get('/workers/dashboard', function () {
     return view('/workers/dashboard');
 })->middleware('auth')->name('dashboard');
 
+Route::get('/workers/chat', function () {
+    return view('/workers/chat');
+})->middleware('auth')->name('chat');
+
+
 
 Route::get('/enterprises/auth', function () {
     return view('/enterprises/auth');

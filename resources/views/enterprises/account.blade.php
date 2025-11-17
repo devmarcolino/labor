@@ -24,12 +24,19 @@
       
 
       <div class="bg-white dark:bg-gray-800 flex flex-col items-center justify-center text-center rounded-[40px] shadow-md w-full max-w-2xl py-5 px-5 mt-[5rem]">
-        <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[120px] h-[120px] rounded-full shadow-md relative mt-[-6rem]" style="background-image: url('{{ asset('img/Ferreirinha.jpg') }}');">
-        </div>
+        <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[120px] h-[120px] rounded-full shadow-md relative mt-[-6rem]" style="background-image: url('{{ Auth::user()->fotoEmpresa ? asset('storage/' . Auth::user()->fotoEmpresa) : '' }}');">
+         
+         {{-- Se NÃO tiver foto, mostra um ícone padrão --}}
+         @if(!Auth::user()->fotoEmpresa)
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+         @endif
+    </div>
 
         <div class="my-2">
-          <p class="font-[300] text-gray-900 dark:text-white">{{ $user->ramo }}</p>
-          <h3 class="font-bold  text-gray-900 dark:text-white">{{ $user->nome_empresa }}</h3>
+          <p class="font-[300] text-gray-900 dark:text-white">{{ Auth::user()->ramo }}</p>
+          <h3 class="font-bold  text-gray-900 dark:text-white">{{ Auth::user()->nome_empresa }}</h3>
         </div>
 
         <hr class="border-1.5 border-gray-300 px-[4rem] my-2 dark:border-gray-700">
@@ -82,7 +89,7 @@
           Configurações
         </x-btn-outline-account>
 
-        <form method="POST" action="{{ route('enterprises/logout') }}">
+        <form method="POST" action="{{ route('enterprises.logout') }}">
             @csrf
 
             <x-btn-red type="submit">

@@ -63,10 +63,18 @@
             </li>
         </ul>
 
-            <a href="{{ url('enterprises/account') }}" class="text-gray-600 hover:text-gray-900 shadow-labor">
-                <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[40px] h-[40px] rounded-full shadow-md" style="background-image: url('{{ asset('img/Ferreirinha.jpg') }}');">
-                </div>
-            </a>
+            <a href="{{ route('enterprises.account') }}" class="text-gray-600 hover:text-gray-900 shadow-labor rounded-full">
+    <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[40px] h-[40px] rounded-full shadow-md flex items-center justify-center overflow-hidden" 
+         style="background-image: url('{{ Auth::user()->fotoEmpresa ? asset('storage/' . Auth::user()->fotoEmpresa) : '' }}');">
+         
+         {{-- Se NÃO tiver foto, mostra um ícone padrão --}}
+         @if(!Auth::user()->fotoEmpresa)
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+         @endif
+    </div>
+</a>
     </header>
 
     <main id="icon-tabs-content" class="relative p-3 flex-1 h-full">
@@ -219,5 +227,10 @@
             </div>
         </div>
     </main>
+    @auth('empresa')
+    @if(Auth::guard('empresa')->user()->status == 1)
+        @include('partials.onboarding-modal-enterprise')
+    @endif
+@endauth
 </body>
 </html>

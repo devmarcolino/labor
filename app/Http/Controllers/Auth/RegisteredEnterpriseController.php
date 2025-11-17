@@ -28,9 +28,9 @@ class RegisteredEnterpriseController extends Controller
         // 1. Validação (Exemplo)
         $validated = $request->validate([
             'nome_empresa' => 'required|string|max:100',
-            'cnpj'         => 'required|string|size:14|unique:empresa_tb,cnpj',
+            'cnpj'         => 'required|string|max:22|unique:empresa_tb,cnpj',
             'email'        => 'required|email|max:100|unique:empresa_tb,email',
-            'telefone'     => 'required|string|min:10|max:11|unique:empresa_tb,tel', // Valida o campo 'telefone'
+            'telefone'     => 'required|string|max:20|unique:empresa_tb,tel', // Valida o campo 'telefone'
             'ramo'         => 'required|string|max:100', 
             'password'     => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -53,7 +53,7 @@ class RegisteredEnterpriseController extends Controller
 
         // 3. Redirecionar para login corporativo
         return redirect()
-            ->route('enterprises.login')
+            ->route('enterprises.dashboard')
             ->with('status', 'Conta criada com sucesso! Faça login para continuar.');
     }
 }

@@ -14,5 +14,5 @@ class Skill extends Model
 
     // Ajuste conforme a coluna de nome na sua tabela habilidades_tb
     // (Ex: 'nome', 'descricao', 'titulo')
-    protected $fillable = ['nome']; 
+    protected $fillable = ['nomeHabilidade']; 
 }

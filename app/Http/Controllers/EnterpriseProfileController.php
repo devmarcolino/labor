@@ -32,15 +32,13 @@ class EnterpriseProfileController extends Controller
 
         // 2. Valida os dados do PERFIL
         $validatedEmpresa = $request->validate([
-            'nome_empresa'      => 'required|string|max:100', 
-            'ramo'      => 'nullable|string|max:100', 
-            'desc_empresa' => 'nullable|string|max:255', // <-- DESCRIÇÃO JÁ ESTAVA AQUI
-            'tel'       => 'nullable|string|max:20',
-            'email'     => ['required', 'email', 'max:100', Rule::unique('empresa_tb')->ignore($empresa->id)],
-            'cnpj'      => ['required', 'string', 'max:18', Rule::unique('empresa_tb')->ignore($empresa->id)],
-            
-            // NOVA VALIDAÇÃO
-            'fotoEmpresa' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // 2MB max
+            'nome_empresa' => 'sometimes|required|string|max:100', 
+            'ramo'         => 'sometimes|nullable|string|max:100', 
+            'desc_empresa' => 'nullable|string|max:255', 
+            'tel'          => 'sometimes|nullable|string|max:20',
+            'email'        => ['sometimes', 'required', 'email', 'max:100', Rule::unique('empresa_tb')->ignore($empresa->id)],
+            'cnpj'         => ['sometimes', 'required', 'string', 'max:18', Rule::unique('empresa_tb')->ignore($empresa->id)],
+            'fotoEmpresa'  => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         // 3. Valida os dados do ENDEREÇO

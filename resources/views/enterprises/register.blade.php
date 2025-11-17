@@ -11,10 +11,11 @@
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
+<x-flash-manager />
 <body class="bg-white dark:bg-gray-900 transition-colors duration-500">
 
     <x-loading/>
-
+    
     
 
     <div x-data="enterpriseForm" x-init="init()" class="flex flex-col justify-between mx-auto items-center self-center min-h-screen text-center">
@@ -34,8 +35,8 @@
             
             <div x-show="step === 1" x-transition class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Dados da Empresa</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">Comece com o básico.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Informações</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Precisamos saber mais sobre sua empresa.</p>
                 </div>
 
                 <div>
@@ -59,8 +60,9 @@
 
             <div x-show="step === 2" x-transition class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Email Corporativo</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">Para login e contato.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Adicione o e-mail</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Ele será seu principal meio de login, contato e 
+recuperação de senha.</p>
                 </div>
 
                 <div>
@@ -78,7 +80,9 @@
 
             <div x-show="step === 3" x-transition class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Contato</h3>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Adicione o telefone</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Usaremos seu número para verificações de 
+segurança e para manter sua conta protegida.</p>
                 </div>
 
                 <div>
@@ -115,8 +119,10 @@
 
             <div x-show="step === 5" x-transition class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Segurança</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">Crie uma senha forte.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Crie sua senha de acesso</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Escolha uma senha forte com letras, números e 
+símbolos. Esta será a chave para proteger sua 
+conta.</p>
                 </div>
 
                 <x-input x-model="fields.password" name="password" type="password" placeholder="*******">
@@ -131,7 +137,7 @@
         </form>
     </div>
 
-    <div class="mt-6 mx-auto w-full max-w-2xl px-5 py-5 sm:py-9 flex flex-col gap-4">
+    <div class="mt-6 mx-auto w-full max-w-2xl px-5 py-5 sm:py-9 flex flex-col gap-1">
         
         <div x-show="step > 1">
             <x-btn-outline type="button" @click="step--" class="w-full">

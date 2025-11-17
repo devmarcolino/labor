@@ -5,7 +5,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Labor</title>
+    <title>Labor for enterprises</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
@@ -28,8 +28,8 @@
         </div>
 
         <div class="my-2">
-          <p class="font-[300] text-gray-900 dark:text-white">{{ $user->username }}</p>
-          <h3 class="font-bold  text-gray-900 dark:text-white">{{ $user->nome_real }}</h3>
+          <p class="font-[300] text-gray-900 dark:text-white">{{ $user->ramo }}</p>
+          <h3 class="font-bold  text-gray-900 dark:text-white">{{ $user->nome_empresa }}</h3>
         </div>
 
         <hr class="border-1.5 border-gray-300 px-[4rem] my-2 dark:border-gray-700">
@@ -82,7 +82,7 @@
           Configurações
         </x-btn-outline-account>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('enterprises/logout') }}">
             @csrf
 
             <x-btn-red type="submit">

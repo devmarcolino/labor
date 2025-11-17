@@ -35,12 +35,20 @@ return [
     |
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
+// Em config/auth.php
+        'guards' => [
+            'web' => [
+                'driver' => 'session',
+                'provider' => 'users', // Este é para Trabalhadores (Users)
+            ],
+
+            // ADICIONE ESTE BLOCO
+            'empresa' => [
+                'driver' => 'session',
+                'provider' => 'empresas', // Vamos criar este provider agora
+            ],
+            // ...
         ],
-    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -59,16 +67,19 @@ return [
     |
     */
 
+    // Em config/auth.php
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\User::class, // Para Trabalhadores
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        // ADICIONE ESTE BLOCO
+        'empresas' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Empresa::class, // Para Empresas
+        ],
+        // ...
     ],
 
     /*

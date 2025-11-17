@@ -33,7 +33,7 @@
   
   <div class="w-full max-w-2xl">
       <x-btn-primary href="{{ url('/workers/auth') }}">Trabalhador</x-btn-primary>
-      <x-btn-outline href="{{ url('') }}">Empresa</x-btn-outline>
+      <x-btn-outline href="{{ url('/enterprises/auth') }}">Empresa</x-btn-outline>
   </div>
 </div>
 </body>

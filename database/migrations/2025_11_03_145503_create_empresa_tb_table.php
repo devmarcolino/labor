@@ -11,9 +11,12 @@ return new class extends Migration {
             $table->id();
             $table->string('nome_empresa', 100);
             $table->string('email', 100)->unique();
-            $table->string('senha');
-            $table->string('tel', 20)->nullable();
+            $table->string('password');
+            $table->string('tel', 20)->unique();
             $table->string('cnpj', 18)->unique();
+            $table->tinyInteger('status')->default(1);
+            $table->string('fotoEmpresa')->nullable();
+            $table->string('ramo', 100)->nullable();
             $table->text('desc_empresa')->nullable();
             $table->unsignedBigInteger('idEnd')->nullable();
             $table->foreign('idEnd')->references('id')->on('end_tb')->onDelete('cascade');

@@ -12,7 +12,6 @@ return new class extends Migration {
             $table->string('cep', 10)->nullable();
             $table->string('rua', 100)->nullable();
             $table->string('numero', 10)->nullable();
-            $table->string('comp', 50)->nullable();
             $table->string('bairro', 50)->nullable();
             $table->string('cidade', 50)->nullable();
             $table->char('uf', 2)->nullable();

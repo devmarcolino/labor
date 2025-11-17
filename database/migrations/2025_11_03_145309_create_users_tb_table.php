@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->string('cpf', 14)->unique();
             $table->date('datanasc')->nullable();
             $table->string('tel', 20)->nullable();
-            $table->string('senha');
+            $table->string('password');
             $table->string('fotoUser')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->string('nome_real', 100)->nullable();

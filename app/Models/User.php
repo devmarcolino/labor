@@ -1,51 +1,48 @@
-<?php
-
+<?php 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+// REMOVA a linha "use Illuminate\Database\Eloquent\Model;"
+// ADICIONE estas duas linhas:
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use App\Models\Skill;
 
+// MUDE AQUI: de "extends Model" para "extends Authenticatable"
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    // ADICIONE Notifiable aqui\\
+    use HasFactory, Notifiable; 
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    protected $table = 'user_tb';
+
     protected $fillable = [
-        'nome',
-        'user',
-        'datanasc',
-        'telefone',
+        'username',
         'email',
         'cpf',
-        'cidade',
-        'estado',
-        'password'
+        'datanasc',
+        'tel',       // Verifique se no seu controller você está salvando como 'tel'
+        'password',
+        'fotoUser',
+        'status',
+        'nome_real',
+        'idEnd',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
-        'remember_token',
+        'remember_token', // É bom adicionar isso
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    public function endereco()
+    {
+        return $this->belongsTo(End::class, 'idEnd');
+    }
+
+    public function skills()
+    {
+        // O Laravel procura a tabela 'skill_user' (nomes em ordem alfabética)
+        // Se sua tabela pivo tiver outro nome, ajuste aqui
+        return $this->belongsToMany(Skill::class, 'skill_user');
+    }
 }

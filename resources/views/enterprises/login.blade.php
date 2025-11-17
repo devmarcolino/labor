@@ -8,6 +8,7 @@
     <title>Labor for workers</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
+    <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
 <body class="bg-white dark:bg-gray-900  transition-colors duration-500">
 
@@ -28,12 +29,12 @@
     
       
 
-      <form id="loginForm" class="flex flex-col justify-between mx-auto w-full max-w-2xl px-5 py-5 sm:py-9" action="{{ route('login') }}" method="POST">
+      <form id="loginForm" class="flex flex-col justify-between mx-auto w-full max-w-2xl px-5 py-5 sm:py-9" action="/enterprises/login" method="POST">
       @csrf
         <div class="flex flex-col gap-3 text-left">
           <div class="text-left mb-6">
-          <h3 class="text-2xl font-bold text-gray-900">Bem-vindo(a) de volta!</h3>
-          <p class="text-sm text-gray-700">Que bom te ver novamente. Faça o login para acessar.</p>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Bem-vindo(a) de volta!</h3>
+          <p class="text-sm text-gray-700 dark:text-gray-400">Que bom te ver novamente. Faça o login para acessar.</p>
           </div>
         
               
@@ -55,7 +56,7 @@
         </div>
             <div class="flex items-center my-5">
                 <input id="remember" name="remember" type="checkbox" value="" class="w-4 h-4 text-sky-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-sky-500 dark:focus:ring-sky-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                <label for="remember" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"><p class="text-gray-600">Lembrar de mim</p></label>
+                <label for="remember" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"><p class="text-gray-600 dark:text-gray-400">Lembrar de mim</p></label>
             </div>
 
             <div class="text-sm text-right">

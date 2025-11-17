@@ -8,7 +8,7 @@
     <title>Labor for workers</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
-    <link rel="shortcut icon" href="img/lb-blue.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-500">
 

@@ -16,10 +16,10 @@ import ptBR from './flowbite-locale-pt.js';
 function cardStack() {
     return {
         cards: [
-            { id: 1, title: 'Garçom', company: 'Adventree Buffet e Eventos', image: '/img/match-example.png' },
-            { id: 2, title: 'Barista', company: 'Café do Bairro', image: '/img/match-example-1.png' },
-            { id: 3, title: 'Recepcionista', company: 'Hotel Central', image: '/img/match-example-2.png' },
-            { id: 4, title: '', company: 'Restaurante Saboroso', image: '/img/match-example-3.jpg' }
+            { id: 1, title: 'Garçom', company: 'Adventree Buffet e Eventos',  ramo: 'Buffet', logo: 'AD',desc: 'Trabalhe como garçom em...', image: '/img/match-example.png' },
+            { id: 2, title: 'Barista', company: 'Café do Bairro', ramo: 'Cafeteria', logo: 'CB', desc: 'Venha trabalhar conosco...', image: '/img/match-example-1.png' },
+            { id: 3, title: 'Recepcionista', company: 'Hotel Central',  ramo: 'Festas e Eventos', logo: 'HC', desc: 'Vaga de recepcionista em...', image: '/img/match-example-2.png' },
+            { id: 4, title: 'Monitor', company: 'Bete Bolinhas Coloridas', ramo: 'Festas e Eventos', logo: 'BC',desc: 'Vaga de monitoria...', image: '/img/match-example-3.jpg' }
         ],
 
         // Ativa o card do topo
@@ -138,7 +138,7 @@ function cardStack() {
 function registrationForm() {
     return {
         step: 1,
-        totalSteps: 6,
+        totalSteps: 5,
         states: [],
         cities: [],
         cep: '',
@@ -152,7 +152,48 @@ function registrationForm() {
         isLoadingCities: false,
         isLoadingCep: false,
         cepError: '',
+        errors: {},       // Para guardar erros (ex: { email: 'Email já em uso' })
+        isChecking: {},
 
+        fields: {
+            nome_real: '',
+            username: '',
+            email: '',
+            telefone: '',
+            datanasc: '',
+            cpf: '',
+            password: '',
+            password_confirmation: ''
+        },
+
+        // --- 3. PROPRIEDADE COMPUTADA (A MÁGICA) ---
+        // Isso aqui é uma função que "calcula" se o botão deve estar desabilitado
+        get isStepInvalid() {
+            // Checa se algum campo da etapa atual está sendo verificado
+            const checking = Object.keys(this.isChecking).some(key => this.isChecking[key]);
+            if (checking) return true; // Bloqueia se estiver verificando
+
+            // Checa se algum campo da etapa atual tem erro
+            const hasError = Object.keys(this.errors).some(key => this.errors[key]);
+            if (hasError) return true; // Bloqueia se tiver erro
+
+            // Checa se os campos da etapa atual estão vazios
+            switch (this.step) {
+                case 1:
+                    return !this.fields.nome_real || !this.fields.username;
+                case 2:
+                    return !this.fields.email;
+                case 3:
+                    return !this.fields.telefone;
+                case 4:
+                    return !this.fields.datanasc || !this.fields.cpf;
+                case 5: // Última etapa (senha)
+                    return !this.fields.password || !this.fields.password_confirmation;
+                default:
+                    return false;
+            }
+        },
+        
         init() {
             this.fetchStates();
             this.$watch('step', () => this.updateProgressBar());
@@ -178,24 +219,62 @@ function registrationForm() {
                 .then(r => r.json())
                 .then(data => { this.cities = data; this.isLoadingCities = false; });
         },
-        fetchAddressByCep() {
-            const cleanCep = this.cep.replace(/\D/g, '');
-            if (cleanCep.length !== 8) { this.cepError = ''; return; }
-            this.isLoadingCep = true;
-            this.cepError = '';
-            fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.erro) {
-                        this.cepError = 'CEP não encontrado.';
-                        this.isLoadingCep = false;
-                        return;
-                    }
-                    const foundState = this.states.find(s => s.sigla === data.uf);
-                    if (foundState) { this.selectedState = foundState; }
-                    this.selectedCity = data.localidade;
-                    this.isLoadingCep = false;
-                });
+
+        validateField(event, field, type = 'user') {
+            const value = event.target.value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            this.errors[field] = '';
+            if (!value) {
+                return;
+            }
+
+            this.isChecking[field] = true;
+
+            fetch('/api/validate-field', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    field: field,
+                    value: value,
+                    type: type 
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Se a resposta for 422, pega o JSON do erro e rejeita
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Deu certo (200 OK), campo é válido
+                this.errors[field] = '';
+            })
+            .catch(errorData => {
+                
+                // === AQUI ESTÁ A CORREÇÃO ===
+                // O 'errorData' é o JSON que o Laravel mandou, ex: { email: ["O email já existe"] }
+                // A chave do erro (ex: 'email') é a mesma variável 'field'
+                
+                if (errorData[field] && errorData[field].length > 0) {
+                    // Se achou o erro, coloca na variável 'errors'
+                    this.errors[field] = errorData[field][0];
+                } else {
+                    // Erro genérico se o JSON vier quebrado
+                    console.error("Resposta de erro 422 inesperada:", errorData);
+                    this.errors[field] = "Erro inesperado ao validar.";
+                }
+                // ==============================
+                
+            })
+            .finally(() => {
+                this.isChecking[field] = false;
+            });
         }
     };
 }
@@ -214,50 +293,6 @@ Alpine.start();
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM Carregado. Executando scripts adicionais.");
 
-    // MÓDULO: VALIDAÇÃO DO FORMULÁRIO DE REGISTRO
-    const registrationForm = document.querySelector('div[x-data="registrationForm"]');
-    if (registrationForm) {
-        function updateButtonState() {
-            const activeStepContainer = Array.from(registrationForm.querySelectorAll('div[x-show]'))
-                .find(div => div.offsetParent !== null);
-            if (!activeStepContainer) return;
-            const inputs = activeStepContainer.querySelectorAll("[validate-input]");
-            const buttons = document.querySelectorAll("[validate-btn]");
-            const allFilled = Array.from(inputs).every((input) => {
-                if (input.type === 'hidden' && (input.name === 'estado' || input.name === 'cidade')) {
-                    return input.value.trim() !== "";
-                }
-                if (input.closest('[data-dropdown-container]')) {
-                    return true;
-                }
-                return input.value.trim() !== "";
-            });
-            buttons.forEach((button) => {
-                if (button.textContent.toLowerCase().includes('voltar')) {
-                    button.disabled = false;
-                    return;
-                }
-                button.disabled = !allFilled;
-            });
-        }
-        registrationForm.addEventListener('input', updateButtonState);
-        registrationForm.addEventListener('click', (e) => {
-            if (e.target.closest('[validate-btn]')) {
-                setTimeout(updateButtonState, 150);
-            }
-        });
-        setTimeout(updateButtonState, 200);
-    }
-
-    // Em: resources/js/app.js
-// Dentro de: document.addEventListener("DOMContentLoaded", () => { ... });
-
-// ======================================================================
-// MÓDULO: TEMA CLARO / ESCURO (VERSÃO FINAL E ROBUSTA)
-// ======================================================================
-
-// 1. A função de aplicar o tema agora fica do lado de fora.
-// Ela vai rodar em TODAS as páginas, independente de existir um botão.
 function applyThemeFromStorage() {
     const savedTheme = localStorage.getItem('theme') || 'light'; // Padrão é 'light'
     const html = document.documentElement;
@@ -269,11 +304,8 @@ function applyThemeFromStorage() {
     }
 }
 
-// 2. Executa a função assim que o script do DOM está pronto.
 applyThemeFromStorage();
 
-// 3. Adiciona o listener para o botão "voltar" do navegador.
-// Isso também vai rodar em TODAS as páginas.
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) {
         console.log("Página restaurada do cache. Re-aplicando tema...");
@@ -281,8 +313,6 @@ window.addEventListener('pageshow', (event) => {
     }
 });
 
-// 4. A lógica do BOTÃO DE CLIQUE agora tem sua própria verificação separada.
-// Ela só vai tentar configurar o botão SE ele existir na página atual.
 const themeToggleBtn = document.getElementById("theme-toggle");
 if (themeToggleBtn) {
     const iconSun = document.getElementById("icon-sun");
@@ -365,7 +395,8 @@ if (pageLoader) {
         '#cpf': '000.000.000-00',
         '#datanasc': '00/00/0000',
         '#telefone': '(00) 00000-0000',
-        '#user': '@aaaaaaaaaaaaaaaaaa'
+        '#cnpj':'00.000.0000/0000-00',
+        '#username': '@aaaaaaaaaaaaaaaaaa'
     };
     for (const selector in fieldsToMask) {
         const element = document.querySelector(selector);

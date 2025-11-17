@@ -8,7 +8,7 @@
     <title>Labor for workers</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
-    <link rel="shortcut icon" href="img/lb-blue.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
 <body class="bg-white dark:bg-gray-900  transition-colors duration-500">
 
@@ -29,7 +29,7 @@
     
       
 
-      <form id="loginForm" class="flex flex-col justify-between mx-auto w-full max-w-2xl px-5 py-5 sm:py-9" action="{{ route('login') }}" method="POST">
+      <form id="loginForm" class="flex flex-col justify-between mx-auto w-full max-w-2xl px-5 py-5 sm:py-9" action="/workers/login" method="POST">
       @csrf
         <div class="flex flex-col gap-3 text-left">
           <div class="text-left mb-6">

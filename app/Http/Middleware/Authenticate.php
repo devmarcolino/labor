@@ -12,6 +12,30 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('login');
+        // Se a requisição for JSON (API), não redireciona, só retorna null.
+        if ($request->expectsJson()) {
+            return null;
+        }
+
+        // === A MÁGICA ESTÁ AQUI ===
+        
+        // Se o usuário estava tentando acessar algo em "enterprises/..."
+        if ($request->is('enterprises/*')) {
+            // Manda ele para a rota de login de EMPRESA
+            return route('enterprises.login');
+        }
+
+        // Se o usuário estava tentando acessar algo em "workers/..."
+        if ($request->is('workers/*')) {
+            // Manda ele para a rota de login de TRABALHADOR
+            return route('workers.login');
+        }
+
+        // === FALBACK (PLANO B) ===
+        
+        // Se não for nenhum dos dois (ex: uma rota /admin ou /perfil genérica),
+        // podemos mandar para a página de "escolha" (/) ou para o login de trabalhador como padrão.
+        // Vou usar 'workers.login' como padrão, mas você pode mudar para url('/choose') se preferir.
+        return route('workers.login');
     }
 }

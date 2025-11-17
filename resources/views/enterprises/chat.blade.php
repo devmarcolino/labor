@@ -5,7 +5,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Labor for workers</title>
+    <title>Labor for enterprises</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
@@ -18,14 +18,14 @@
     <header class="flex items-center justify-between py-3 px-5">
 
         <button class="icon-btn">
-            <a href="{{ url(path: 'workers/chat') }}" class="text-gray-500 dark:text-gray-400">
+            <a href="{{ url(path: 'enterprises/chat') }}" class="text-gray-500 dark:text-gray-400">
                 <svg width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d='M11.953 2.25c-2.317 0-4.118 0-5.52.15-1.418.153-2.541.47-3.437 1.186-.92.736-1.35 1.693-1.553 2.9-.193 1.152-.193 2.618-.193 4.446v.183c0 1.782 0 3.015.2 3.934.108.495.278.925.545 1.323.264.392.6.722 1.001 1.042.631.505 1.375.81 2.254 1V21a.75.75 0 0 0 1.123.65c.586-.335 1.105-.7 1.58-1.044l.304-.221a22 22 0 0 1 1.036-.73c.844-.548 1.65-.905 2.707-.905h.047c2.317 0 4.118 0 5.52-.15 1.418-.153 2.541-.47 3.437-1.186.4-.32.737-.65 1-1.042.268-.398.438-.828.546-1.323.2-.919.2-2.152.2-3.934v-.183c0-1.828 0-3.294-.193-4.445-.203-1.208-.633-2.165-1.553-2.901-.896-.717-2.019-1.033-3.437-1.185-1.402-.151-3.203-.151-5.52-.151z'/></svg>
             </a>
         </button>
 
         <ul class="flex items-center py-1.5 px-2.5 bg-gray-100 dark:bg-gray-800 rounded-full shadow-sm" id="icon-tabs" data-tabs-toggle="#icon-tabs-content" role="tablist">
             <li role="presentation">
-                <a href="{{ url('workers/dashboard') }}" 
+                <a href="{{ url('enterprises/dashboard') }}" 
                 class="group flex px-5 py-2 rounded-full text-gray-500 dark:text-gray-300 aria-selected:bg-white aria-selected:dark:bg-gray-950/85 aria-selected:text-sky-600 aria-selected:shadow-sm transition-all ease-linear duration-200"
                 id="flame-tab" data-tabs-target="#flame" type="button" role="tab" aria-controls="flame" aria-selected="false">
                     
@@ -43,7 +43,7 @@
                 </a>
             </li>
             <li role="presentation">
-                <a href="{{ url('workers/dashboard') }}" 
+                <a href="{{ url('enterprises/dashboard') }}" 
                 class="group flex px-5 py-2 rounded-full text-gray-500 dark:text-gray-300 aria-selected:bg-white aria-selected:dark:bg-gray-950/85 aria-selected:text-sky-600 aria-selected:shadow-sm transition-all ease-linear duration-200" 
                 id="home-tab" data-tabs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="false">
                     
@@ -63,7 +63,7 @@
             </li>
         </ul>
 
-            <a href="{{ url('workers/account') }}" class="text-gray-600 hover:text-gray-900 shadow-labor">
+            <a href="{{ url('enterprises/account') }}" class="text-gray-600 hover:text-gray-900 shadow-labor">
                 <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[40px] h-[40px] rounded-full shadow-md" style="background-image: url('{{ asset('img/Ferreirinha.jpg') }}');">
                 </div>
             </a>

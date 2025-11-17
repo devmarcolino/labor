@@ -8,7 +8,7 @@
     <title>Labor for workers</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
-    <link rel="shortcut icon" href="img/lb-blue.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
 
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-500 h-screen flex flex-col">
@@ -94,12 +94,12 @@
                             <img :src="card.image" :alt="card.title" class="absolute inset-0 h-full w-full object-cover">
                             <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
                                 <h2 class="text-3xl font-bold" x-text="card.title"></h2>
-                                <p class="text-sm text-gray-200">Trabalhe como garçom...</p>
+                                <p class="text-sm text-gray-200" x-text="card.desc"></p>
                                 <div class="mt-4 flex items-center gap-2 w-full rounded-full bg-black/30 py-2 px-3 backdrop-blur-sm">
-                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 text-sm font-semibold text-black">AD</div>
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 text-sm font-semibold text-black" x-text="card.logo"></div>
                                     <div>
                                         <p class="text-sm font-semibold" x-text="card.company"></p>
-                                        <p class="text-xs text-gray-200">Buffet e Eventos</p>
+                                        <p class="text-xs text-gray-200" x-text="card.ramo"></p>
                                     </div>
                                 </div>
                             </div>

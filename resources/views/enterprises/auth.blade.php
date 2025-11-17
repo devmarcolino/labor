@@ -8,6 +8,7 @@
     <title>Labor for workers</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
+    <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-500">
 
@@ -20,14 +21,14 @@
   </div>
 
   <div class="flex flex-col items-center justify-center w-full max-w-2xl gap-8">
-    <img src="../img/auth.svg" class="w-[17rem] h-auto" alt="">
+    <img src="../img/auth-enterprise.png" class="w-[17rem] h-auto" alt="">
 
-    <h2 class="text-3xl font-extrabold">Um clique, <br>uma oportunidade.</h2>
+    <h2 class="text-3xl font-black text-gray-900 dark:text-white">Labor para<br> empresas</h2>
   </div>
 
    <div class="navigation-area mx-auto w-full max-w-2xl">
-      <x-btn-primary href="{{ url('/workers/login') }}">Entrar</x-btn-primary>
-      <x-btn-outline href="{{ url('/workers/register') }}">Criar conta</x-btn-outline>
+      <x-btn-primary href="{{ url('/enterprises/login') }}">Entrar</x-btn-primary>
+      <x-btn-outline href="{{ url('/enterprises/register') }}">Criar conta</x-btn-outline>
   </div>
 </div>
 </body>

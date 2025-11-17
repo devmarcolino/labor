@@ -40,9 +40,12 @@ class User extends Authenticatable
     }
 
     public function skills()
-    {
-        // O Laravel procura a tabela 'skill_user' (nomes em ordem alfabética)
-        // Se sua tabela pivo tiver outro nome, ajuste aqui
-        return $this->belongsToMany(Skill::class, 'skill_user');
-    }
+{
+    return $this->belongsToMany(
+        Skill::class,           // O Model da habilidade
+        'user_habilidades_tb',  // O nome da sua tabela pivo (que você mandou)
+        'idUser',               // A coluna nesta tabela que liga ao User
+        'idHabilidade'          // A coluna nesta tabela que liga à Habilidade
+    );
+}
 }

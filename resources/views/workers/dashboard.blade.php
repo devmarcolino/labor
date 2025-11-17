@@ -71,7 +71,7 @@
 
     <main id="icon-tabs-content" class="relative p-3 flex-1 h-full">
 
-        <div class="h-full" id="flame" role="tabpanel" aria-labelledby="flame-tab">
+        <div class="h-full" id="flame" x-transition role="tabpanel" aria-labelledby="flame-tab">
             <div x-data="cardStack()" x-init="initWatcher()" class="w-full h-full">
 
                 <div x-show="cards.length === 0" class="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
@@ -85,7 +85,7 @@
                     </div>
                 </div>
 
-                <template x-for="(card, index) in cards" :key="card.id">
+                <template x-transition x-for="(card, index) in cards" :key="card.id">
                     <div class="absolute inset-0 flex justify-center items-center p-4"
                         :style="`z-index: ${cards.length - index};`">
                         
@@ -109,7 +109,7 @@
             </div>
         </div>
 
-        <div class="hidden p-2 mx-auto" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="hidden p-2 mx-auto" id="home" role="tabpanel" x-transition aria-labelledby="home-tab">
             <div class="flex flex-col mx-auto items-center justify-center w-full max-w-2xl gap-3">
                 <button class="bg-transparent w-full text-left">
                     <a href="{{ url('workers/schedule') }}">

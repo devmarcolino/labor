@@ -17,83 +17,37 @@
 
     
 
-    <div x-data="registrationForm" x-init="init()" class="flex flex-col justify-between mx-auto items-center self-center min-h-screen text-center">
+    <div x-data="enterpriseForm" x-init="init()" class="flex flex-col justify-between mx-auto items-center self-center min-h-screen text-center">
     
-    
-
     <div class="w-full">
         <div class="flex flex-col my-1 sm:gap-5 sm:pt-5">
             <div class="flex justify-between mx-1 items-center gap-12">
                 <x-btn-back/>
             </div>
-
             <div class="mt-1 w-full bg-gray-200 h-1 dark:bg-gray-700 transition-all duration-300">
-                <div x-ref="progressBar" class="bg-sky-600 h-1"></div>
+                <div x-ref="progressBar" class="bg-sky-600 h-1" style="width: 20%"></div>
             </div>
         </div>
 
-        <form id="registrationForm" x-init="fetchStates(); $watch('selectedState', () => fetchCities())" class="flex flex-col justify-between mx-auto w-full max-w-2xl px-5 py-5 sm:py-9" action="/enterprises/register" method="POST">
+        <form id="registrationForm" class="flex flex-col justify-between mx-auto w-full max-w-2xl px-5 py-5 sm:py-9" action="/enterprises/register" method="POST">
             @csrf
             
-            <div x-show="step === 1" x-cloak class="flex flex-col gap-3 text-left">
+            <div x-show="step === 1" x-transition class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Informações</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">Precisamos saber mais sobre sua empresa.</p>
-                </div>
-                <x-input name="nome_empresa" type="text" placeholder="Esse nome aparecerá para os trabalhadores" value="{{ old('nome_empresa') }}" validate-input>
-                Nome da empresa
-                </x-input>
-
-            </div>
-
-            <div x-show="step === 2" x-cloak class="flex flex-col gap-3 text-left">
-                <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Adicione seu e-mail</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-400 ">Ele será seu principal meio de login, contato e recuperação de senha.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Dados da Empresa</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Comece com o básico.</p>
                 </div>
 
-                <x-input name="email" type="email" placeholder="seu@email.com" value="{{ old('email') }}" validate-input>
-                    E-mail
-                </x-input>
-
-                @error('email')
-                <x-warn>{{ $message }}</x-warn>
-                @enderror
-            </div>
-
-            <div x-show="step === 3" x-cloak class="flex flex-col gap-3 text-left">
-                <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Adicione seu telefone</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">Usaremos seu número para verificações de segurança e para manter sua conta protegida.</p>
+                <div>
+                    <x-input x-model="fields.nome_empresa" name="nome_empresa" type="text" placeholder="Nome Fantasia">
+                        Nome da Empresa
+                    </x-input>
                 </div>
 
-                <x-input name="telefone" type="tel" placeholder="(00)00000-0000" value="{{ old('telefone') }}" validate-input>
-                    Telefone
-                </x-input>
-
-                @error('telefone')
-                    <x-warn>{{ $message }}</x-warn>
-                @enderror
-            </div>
-
-            <div x-show="step === 4" x-cloak class="flex flex-col gap-3 text-left">
-                <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Para sua segurança</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">Esses dados são essenciais para você utilizar nossa plataforma.</p>
-                </div>
-
-                <x-input name="cnpj" type="text" placeholder="00.000.0000/0000-00" value="{{ old('cnpj') }}" validate-input>
-                    CNPJ
-                </x-input>   
-
-                @error('cnpj')
-                    <x-warn>{{ $message }}</x-warn>
-                @enderror
-                
                 <div>
                     <label for="ramo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ramo da empresa</label>
 
-                    <select name="ramo" id="ramo" class="bg-gray-50/85 backdrop-blur-md border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700/85 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder:text-neutral-400 disabled:opacity-50 disabled:bg-gray-200 dark:disabled:bg-gray-800 dark:disabled:text-gray-500">
+                    <select x-model="fields.ramo" name="ramo" id="ramo" class="bg-gray-50/85 backdrop-blur-md border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700/85 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder:text-neutral-400 disabled:opacity-50 disabled:bg-gray-200 dark:disabled:bg-gray-800 dark:disabled:text-gray-500">
                         <option selected="">Selecione o ramo de sua empresa</option>
                         <option value="Buffet e festas">Buffet e festas</option>
                         <option  value="Restaurante">Restaurante</option>
@@ -103,44 +57,107 @@
                 </div>
             </div>
 
-           
+            <div x-show="step === 2" x-transition class="flex flex-col gap-3 text-left">
+                <div class="text-left mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Email Corporativo</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Para login e contato.</p>
+                </div>
 
-            <div x-show="step === 5" x-cloak class="flex flex-col gap-3 text-left">
-            <div class="text-left mb-6">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Crie sua senha de acesso</h3>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">Escolha uma senha forte com letras, números e símbolos. Esta será a chave para proteger sua conta.</p>
-                </div>                   
-            
-                <x-input name="password" type="password" placeholder="*******" validate-input>
-                Senha
-                </x-input>
-
-                <x-input name="password_confirmation" type="password" placeholder="*******" validate-input>
-                Confirme sua senha
-                </x-input>
-
-                @error('password')
-                    <x-warn>{{ $message }}</x-warn>
-                @enderror
+                <div>
+                    <div @blur.capture="validateField('email', 'enterprise')">
+                        <x-input x-model="fields.email" name="email" type="email" placeholder="empresa@email.com">
+                            E-mail
+                        </x-input>
+                    </div>
+                    <p x-show="isChecking.email" class="text-sm text-blue-500 mt-1">Verificando...</p>
+                    <template x-if="errors.email">
+                        <x-warn><span x-text="errors.email"></span></x-warn>
+                    </template>
+                </div>
             </div>
+
+            <div x-show="step === 3" x-transition class="flex flex-col gap-3 text-left">
+                <div class="text-left mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Contato</h3>
+                </div>
+
+                <div>
+                    <div @blur.capture="validateField('telefone', 'enterprise')">
+                        <x-input x-model="fields.telefone" name="telefone" type="tel" placeholder="(00) 00000-0000">
+                            Telefone / WhatsApp
+                        </x-input>
+                    </div>
+                    <p x-show="isChecking.telefone" class="text-sm text-blue-500 mt-1">Verificando...</p>
+                    <template x-if="errors.telefone">
+                        <x-warn><span x-text="errors.telefone"></span></x-warn>
+                    </template>
+                </div>
+            </div>
+
+            <div x-show="step === 4" x-transition class="flex flex-col gap-3 text-left">
+                <div class="text-left mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Documentação</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Insira o CNPJ da empresa.</p>
+                </div>
+
+                <div>
+                    <div @blur.capture="validateField('cnpj', 'enterprise')">
+                        <x-input x-model="fields.cnpj" name="cnpj" type="text" placeholder="00.000.000/0000-00">
+                            CNPJ
+                        </x-input>
+                    </div>
+                    <p x-show="isChecking.cnpj" class="text-sm text-blue-500 mt-1">Verificando...</p>
+                    <template x-if="errors.cnpj">
+                        <x-warn><span x-text="errors.cnpj"></span></x-warn>
+                    </template>
+                </div>
+            </div>
+
+            <div x-show="step === 5" x-transition class="flex flex-col gap-3 text-left">
+                <div class="text-left mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Segurança</h3>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">Crie uma senha forte.</p>
+                </div>
+
+                <x-input x-model="fields.password" name="password" type="password" placeholder="*******">
+                    Senha
+                </x-input>
+
+                <x-input x-model="fields.password_confirmation" name="password_confirmation" type="password" placeholder="*******">
+                    Confirmar Senha
+                </x-input>
+            </div>
+
         </form>
     </div>
 
-        <div class="navigation-area mx-auto w-full max-w-2xl px-5 py-5 sm:py-9">
-                <div x-show="step === 1">
-                    <x-btn-primary x-ref="validateStep1" type="button" @click="step = step + 1" validate-btn>Continuar</x-btn-primary>
-                </div>
-
-                <div x-show="[2, 3, 4].includes(step)">
-                    <x-btn-outline type="button" @click="step = step - 1" validate-btn>Voltar</x-btn-outline>
-                    <x-btn-primary type="button" @click="step = step + 1" validate-btn>Continuar</x-btn-primary>
-                </div>
-
-                <div x-show="step === 5">
-                    <x-btn-outline type="button" @click="step = step - 1" validate-btn>Voltar</x-btn-outline>
-                    <x-btn-primary type="submit" form="registrationForm" validate-btn>Criar conta</x-btn-primary>
-                </div>
+    <div class="mt-6 mx-auto w-full max-w-2xl px-5 py-5 sm:py-9 flex flex-col gap-4">
+        
+        <div x-show="step > 1">
+            <x-btn-outline type="button" @click="step--" class="w-full">
+                Voltar
+            </x-btn-outline>
         </div>
+
+        <template x-if="step < 5">
+            <x-btn-primary type="button" 
+                           @click="step++" 
+                           x-bind:disabled="isStepInvalid" 
+                           class="w-full">
+                Continuar
+            </x-btn-primary>
+        </template>
+
+        <template x-if="step === 5">
+            <x-btn-primary type="submit" 
+                           form="registrationForm"
+                           x-bind:disabled="isStepInvalid"
+                           class="w-full bg-green-600 hover:bg-green-700">
+                Criar Conta Empresarial
+            </x-btn-primary>
+        </template>
+        
     </div>
+</div>
 </body>
 </html>

@@ -138,23 +138,9 @@ function cardStack() {
 function registrationForm() {
     return {
         step: 1,
-        totalSteps: 5,
-        states: [],
-        cities: [],
-        cep: '',
-        selectedState: { sigla: '', nome: 'Selecione um Estado' },
-        selectedCity: '',
-        stateDropdownOpen: false,
-        cityDropdownOpen: false,
-        stateSearch: '',
-        citySearch: '',
-        isLoadingStates: true,
-        isLoadingCities: false,
-        isLoadingCep: false,
-        cepError: '',
-        errors: {},       // Para guardar erros (ex: { email: 'Email já em uso' })
-        isChecking: {},
-
+        totalSteps: 5, // 1:Pessoais, 2:Email, 3:Tel, 4:Docs, 5:Senha
+        
+        // Dados do formulário
         fields: {
             nome_real: '',
             username: '',
@@ -166,124 +152,180 @@ function registrationForm() {
             password_confirmation: ''
         },
 
-        // --- 3. PROPRIEDADE COMPUTADA (A MÁGICA) ---
-        // Isso aqui é uma função que "calcula" se o botão deve estar desabilitado
-        get isStepInvalid() {
-            // Checa se algum campo da etapa atual está sendo verificado
-            const checking = Object.keys(this.isChecking).some(key => this.isChecking[key]);
-            if (checking) return true; // Bloqueia se estiver verificando
+        // Estado de erros e carregamento
+        errors: {},
+        validating: {}, // Para saber se o campo está sendo verificado no banco agora
 
-            // Checa se algum campo da etapa atual tem erro
-            const hasError = Object.keys(this.errors).some(key => this.errors[key]);
-            if (hasError) return true; // Bloqueia se tiver erro
-
-            // Checa se os campos da etapa atual estão vazios
-            switch (this.step) {
-                case 1:
-                    return !this.fields.nome_real || !this.fields.username;
-                case 2:
-                    return !this.fields.email;
-                case 3:
-                    return !this.fields.telefone;
-                case 4:
-                    return !this.fields.datanasc || !this.fields.cpf;
-                case 5: // Última etapa (senha)
-                    return !this.fields.password || !this.fields.password_confirmation;
-                default:
-                    return false;
-            }
-        },
-        
+        // Inicialização
         init() {
-            this.fetchStates();
+            console.log('Registration Form Iniciado');
             this.$watch('step', () => this.updateProgressBar());
-            this.$nextTick(() => this.updateProgressBar());
         },
+
         updateProgressBar() {
             if (this.$refs.progressBar) {
                 const percentage = (this.step / this.totalSteps) * 100;
                 this.$refs.progressBar.style.width = `${percentage}%`;
             }
         },
-        fetchStates() {
-            fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
-                .then(r => r.json())
-                .then(data => { this.states = data; this.isLoadingStates = false; });
-        },
-        fetchCities() {
-            if (!this.selectedState.sigla) return;
-            this.isLoadingCities = true;
-            this.cities = [];
-            this.selectedCity = '';
-            fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${this.selectedState.sigla}/municipios`)
-                .then(r => r.json())
-                .then(data => { this.cities = data; this.isLoadingCities = false; });
-        },
 
-        validateField(event, field, type = 'user') {
-            const value = event.target.value;
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        // Validação Assíncrona (Live)
+        async validateField(field, type = 'user') {
+            const value = this.fields[field];
+            
+            // 1. Limpa erro anterior
+            this.errors[field] = null;
+            
+            // 2. Se vazio, não chama API (mas o botão vai bloquear via isStepInvalid)
+            if (!value) return;
 
-            this.errors[field] = '';
-            if (!value) {
-                return;
-            }
+            // 3. Marca como validando (Bloqueia botão)
+            this.validating[field] = true;
 
-            this.isChecking[field] = true;
+            try {
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+                const response = await fetch('/api/validate-field', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrf
+                    },
+                    body: JSON.stringify({ field, value, type })
+                });
 
-            fetch('/api/validate-field', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    field: field,
-                    value: value,
-                    type: type 
-                })
-            })
-            .then(response => {
+                const data = await response.json();
+
                 if (!response.ok) {
-                    // Se a resposta for 422, pega o JSON do erro e rejeita
-                    return response.json().then(err => Promise.reject(err));
+                    // Se deu erro (422), pega a mensagem
+                    this.errors[field] = data.message || 'Este valor já está em uso.';
                 }
-                return response.json();
-            })
-            .then(data => {
-                // Deu certo (200 OK), campo é válido
-                this.errors[field] = '';
-            })
-            .catch(errorData => {
-                
-                // === AQUI ESTÁ A CORREÇÃO ===
-                // O 'errorData' é o JSON que o Laravel mandou, ex: { email: ["O email já existe"] }
-                // A chave do erro (ex: 'email') é a mesma variável 'field'
-                
-                if (errorData[field] && errorData[field].length > 0) {
-                    // Se achou o erro, coloca na variável 'errors'
-                    this.errors[field] = errorData[field][0];
-                } else {
-                    // Erro genérico se o JSON vier quebrado
-                    console.error("Resposta de erro 422 inesperada:", errorData);
-                    this.errors[field] = "Erro inesperado ao validar.";
-                }
-                // ==============================
-                
-            })
-            .finally(() => {
-                this.isChecking[field] = false;
-            });
+                // Se response.ok, erro continua null (válido)
+
+            } catch (e) {
+                console.error('Erro na validação', e);
+            } finally {
+                // 4. Libera o status de validando
+                this.validating[field] = false;
+            }
+        },
+
+        // Lógica Central do Botão "Continuar"
+        get isStepInvalid() {
+            // A) Se estiver validando qualquer campo no servidor -> Bloqueia
+            if (Object.values(this.validating).some(v => v === true)) return true;
+
+            // B) Se tiver qualquer erro de validação -> Bloqueia
+            if (Object.values(this.errors).some(msg => msg !== null && msg !== '')) return true;
+
+            // C) Validação de campos vazios por etapa
+            switch (this.step) {
+                case 1: // Nome e Username
+                    return !this.fields.nome_real || !this.fields.username;
+                case 2: // Email
+                    return !this.fields.email;
+                case 3: // Telefone
+                    return !this.fields.telefone;
+                case 4: // Data e CPF
+                    return !this.fields.datanasc || !this.fields.cpf;
+                case 5: // Senha e Confirmação
+                    return !this.fields.password || !this.fields.password_confirmation;
+                default:
+                    return false;
+            }
         }
     };
 }
 
+function enterpriseForm() {
+    return {
+        step: 1,
+        totalSteps: 5, // 1:Info, 2:Email, 3:Tel, 4:CNPJ, 5:Senha
+        errors: {},
+        isChecking: {}, // Validação live
+        
+        fields: {
+            nome_empresa: '',
+            ramo: '',
+            email: '',
+            telefone: '',
+            cnpj: '',
+            password: '',
+            password_confirmation: ''
+        },
 
-// --- 3. INICIALIZAÇÃO DO ALPINE ---
+        // Lógica do Botão (Adaptada para Empresa)
+        get isStepInvalid() {
+            if (Object.values(this.isChecking).some(v => v === true)) return true;
+            if (Object.values(this.errors).some(msg => msg !== null && msg !== '')) return true;
+
+            switch (this.step) {
+                case 1: // Nome e Ramo
+                    return !this.fields.nome_empresa || !this.fields.ramo;
+                case 2: // Email
+                    return !this.fields.email;
+                case 3: // Telefone
+                    return !this.fields.telefone;
+                case 4: // CNPJ
+                    return !this.fields.cnpj;
+                case 5: // Senha
+                    return !this.fields.password || !this.fields.password_confirmation;
+                default:
+                    return false;
+            }
+        },
+
+        init() {
+            this.$watch('step', () => this.updateProgressBar());
+        },
+
+        updateProgressBar() {
+            if (this.$refs.progressBar) {
+                const percentage = (this.step / this.totalSteps) * 100;
+                this.$refs.progressBar.style.width = `${percentage}%`;
+            }
+        },
+
+        // Validação Live (Reutiliza a mesma lógica, mudando o type)
+        async validateField(field, type = 'enterprise') {
+            const value = this.fields[field];
+            this.errors[field] = null;
+
+            if (!value) return;
+
+            this.isChecking[field] = true;
+
+            try {
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+                const response = await fetch('/api/validate-field', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrf
+                    },
+                    body: JSON.stringify({ field, value, type }) // Aqui vai 'enterprise'
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    this.errors[field] = data.message || 'Valor inválido ou já em uso.';
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.isChecking[field] = false;
+            }
+        }
+    };
+}
+
+// Registro Global do Alpine
 window.Alpine = Alpine;
 Alpine.data('cardStack', cardStack);
 Alpine.data('registrationForm', registrationForm);
+Alpine.data('enterpriseForm', enterpriseForm);
 Alpine.start();
 
 // --- 4. LÓGICA EXECUTADA APÓS O DOM CARREGAR ---

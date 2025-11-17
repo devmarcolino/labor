@@ -35,13 +35,13 @@
         <form id="registrationForm" x-init="fetchStates(); $watch('selectedState', () => fetchCities())" class="flex flex-col justify-between mx-auto w-full max-w-2xl px-5 py-5 sm:py-9" action="/workers/register" method="POST">
             @csrf
             
-            <div x-show="step === 1" x-cloak class="flex flex-col gap-3 text-left">
+            <div x-show="step === 1" x-transition x-cloak class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Informações pessoais</h3>
                     <p class="text-sm text-gray-700 dark:text-gray-400">Precisamos saber mais sobre você.</p>
                 </div>
 
-                <div>
+                <div @blur.capture="validateField('nome_real', 'user')">
                     <x-input name="nome_real" x-model="fields.nome_real" type="text" placeholder="Insira seu nome completo" value="{{ old('nome_real') }}" validate-input>
                     Nome Completo
                     </x-input>
@@ -53,13 +53,13 @@
                     </template>
                 </div>
  
-                <div>
+                <div @blur.capture="validateField('username', 'user')">
                     <x-input x-model="fields.username" name="username" type="text" placeholder="Crie seu @" value="{{ old('username') }}" validate-input>
                     Usuário
                     </x-input>
                 </div>
                 
-                <span x-show="isChecking.username" class="mt-1 text-sm text-sky-600">
+                <span x-show="validating.username" class="mt-1 text-sm text-sky-600">
                     Verificando...
                 </span>
 
@@ -70,19 +70,19 @@
                 </template>
             </div>
 
-            <div x-show="step === 2" x-cloak class="flex flex-col gap-3 text-left">
+            <div x-show="step === 2" x-transition x-cloak class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Adicione seu e-mail</h3>
                     <p class="text-sm text-gray-700 dark:text-gray-400 ">Ele será seu principal meio de login, contato e recuperação de senha.</p>
                 </div>
 
-                <div>
+                <div @blur.capture="validateField('email', 'user')">
                     <x-input x-model="fields.email" name="email" type="email" placeholder="seu@email.com" value="{{ old('email') }}" validate-input>
                         E-mail
                     </x-input>
                 </div>
 
-                <span x-show="isChecking.email" class="mt-1 text-sm text-sky-600">
+                <span x-show="validating.email" class="mt-1 text-sm text-sky-600">
                     Verificando...
                 </span>
 
@@ -93,19 +93,19 @@
                 </template>
             </div>
 
-            <div x-show="step === 3" x-cloak class="flex flex-col gap-3 text-left">
+            <div x-show="step === 3" x-transition x-cloak class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Adicione seu telefone</h3>
                     <p class="text-sm text-gray-700 dark:text-gray-400">Usaremos seu número para verificações de segurança e para manter sua conta protegida.</p>
                 </div>
 
-                <div>
+                <div @blur.capture="validateField('telefone', 'user')">
                     <x-input x-model="fields.tel" name="telefone" type="tel" placeholder="(00)00000-0000" value="{{ old('telefone') }}" validate-input>
                         Telefone
                     </x-input>
                 </div>
 
-                <span x-show="isChecking.tel" class="mt-1 text-sm text-sky-600">
+                <span x-show="validating.tel" class="mt-1 text-sm text-sky-600">
                     Verificando...
                 </span>
 
@@ -116,7 +116,7 @@
                 </template>
             </div>
 
-            <div x-show="step === 4" x-cloak class="flex flex-col gap-3 text-left">
+            <div x-show="step === 4" x-transition x-cloak class="flex flex-col gap-3 text-left">
                 <div class="text-left mb-6">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Para sua segurança</h3>
                     <p class="text-sm text-gray-700 dark:text-gray-400">Esses dados são essenciais para a segurança do seu perfil e para validar suas candidaturas futuras.</p>
@@ -135,13 +135,13 @@
                     <x-warn>{{ $message }}</x-warn>
                 @enderror
 
-                <di>
+                <div @blur.capture="validateField('cpf', 'user')">
                 <x-input x-model="fields.cpf" name="cpf" type="text" placeholder="000.000.000-00" value="{{ old('cpf') }}" validate-input>
                     CPF
                 </x-input> 
                 </div>  
 
-                <span x-show="isChecking.cpf" class="mt-1 text-sm text-sky-600">
+                <span x-show="validating.cpf" class="mt-1 text-sm text-sky-600">
                     Verificando...
                 </span>
 
@@ -154,7 +154,7 @@
 
            
 
-            <div x-show="step === 5" x-cloak class="flex flex-col gap-3 text-left">
+            <div x-show="step === 5" x-transition x-cloak class="flex flex-col gap-3 text-left">
             <div class="text-left mb-6">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Crie sua senha de acesso</h3>
                     <p class="text-sm text-gray-700 dark:text-gray-400">Escolha uma senha forte com letras, números e símbolos. Esta será a chave para proteger sua conta.</p>
@@ -175,21 +175,38 @@
         </form>
     </div>
 
-        <div class="navigation-area mx-auto w-full max-w-2xl px-5 py-5 sm:py-9">
-                <div x-show="step === 1">
-                    <x-btn-primary x-ref="validateStep1" type="button" @click="step = step + 1" x-bind:disabled="isStepInvalid" validate-btn>Continuar</x-btn-primary>
-                </div>
-
-                <div x-show="[2, 3, 4].includes(step)">
-                    <x-btn-outline type="button" @click="step = step - 1" validate-btn>Voltar</x-btn-outline>
-                    <x-btn-primary type="button" @click="step = step + 1" x-bind:disabled="isStepInvalid" validate-btn>Continuar</x-btn-primary>
-                </div>
-
-                <div x-show="step === 5">
-                    <x-btn-outline type="button" @click="step = step - 1" validate-btn>Voltar</x-btn-outline>
-                    <x-btn-primary type="submit" form="registrationForm" x-bind:disabled="isStepInvalid" validate-btn>Criar conta</x-btn-primary>
-                </div>
+       <div class="navigation-area mx-auto w-full max-w-2xl px-5 py-5 sm:py-9 flex flex-col gap-1">
+        
+        {{-- BOTÃO VOLTAR (Só aparece se step > 1) --}}
+        <div x-show="step > 1">
+            <x-btn-outline type="button" 
+                           @click="step--" 
+                           class="w-full">
+                Voltar
+            </x-btn-outline>
         </div>
+
+        {{-- BOTÃO CONTINUAR (Aparece steps 1 a 4) --}}
+        <template x-if="step < 5">
+            <x-btn-primary type="button" 
+                           @click="step++" 
+                           x-bind:disabled="isStepInvalid" 
+                           class="w-full">
+                Continuar
+            </x-btn-primary>
+        </template>
+
+        {{-- BOTÃO CRIAR CONTA (Aparece step 5) --}}
+        <template x-if="step === 5">
+            <x-btn-primary type="submit" 
+                           x-bind:disabled="isStepInvalid"
+                           class="w-full bg-green-600 hover:bg-green-700">
+                Criar Conta
+            </x-btn-primary>
+        </template>
+        
+    </div>
+</div>
     </div>
 </body>
 </html>

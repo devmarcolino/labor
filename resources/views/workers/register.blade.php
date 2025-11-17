@@ -201,7 +201,7 @@
             <x-btn-primary type="submit" 
                            form="registrationForm"
                            x-bind:disabled="isStepInvalid"
-                           class="w-full bg-green-600 hover:bg-green-700">
+                           class="w-full bg-sky-600 hover:bg-sky-700">
                 Criar Conta
             </x-btn-primary>
         </template>

@@ -74,7 +74,15 @@
         <div class="h-full" id="flame" role="tabpanel" aria-labelledby="flame-tab">
             <div x-data="cardStack()" x-init="initWatcher()" class="w-full h-full">
 
-                <div x-show="cards.length === 0" class="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
+                <div x-show="isLoading" class="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
+                    <p class="text-lg font-semibold">Carregando vagas...</p>
+                </div>
+
+                <div x-show="error" class="flex flex-col items-center justify-center h-full text-center text-red-500">
+                    <p class="text-lg font-semibold" x-text="error"></p>
+                </div>
+
+                <div x-show="!isLoading && cards.length === 0 && !error" class="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
                     <div>
                         <img src="../img/empty-box.png" alt="" class="opacity-50 mx-auto" width="252px" height="165px">
 

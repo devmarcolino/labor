@@ -19,12 +19,18 @@ class RegisteredEnterpriseController extends Controller
 
     public function store(Request $request)
     {
+        // Normaliza entradas que chegam com máscara (., /, -)
+        $request->merge([
+            'cnpj'     => preg_replace('/[^0-9]/', '', $request->input('cnpj', '')),
+            'telefone' => preg_replace('/[^0-9]/', '', $request->input('telefone', '')),
+        ]);
+
         // 1. Validação (Exemplo)
-       $validated = $request->validate([
+        $validated = $request->validate([
             'nome_empresa' => 'required|string|max:100',
-            'cnpj'         => 'required|string|max:22|unique:empresa_tb,cnpj',
+            'cnpj'         => 'required|string|size:14|unique:empresa_tb,cnpj',
             'email'        => 'required|email|max:100|unique:empresa_tb,email',
-            'telefone'     => 'required|string|max:20|unique:empresa_tb,tel', // Valida o campo 'telefone'
+            'telefone'     => 'required|string|min:10|max:11|unique:empresa_tb,tel', // Valida o campo 'telefone'
             'ramo'         => 'required|string|max:100', 
             'password'     => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -45,10 +51,9 @@ class RegisteredEnterpriseController extends Controller
             'status'       => 1, // <-- ADICIONADO (para a modal funcionar)
         ]);
 
-        // 3. Logar a Empresa
-        Auth::guard('empresa')->login($empresa);
-
-        // 4. Redirecionar para o Dashboard da Empresa
-        return redirect()->route('enterprises.dashboard');
+        // 3. Redirecionar para login corporativo
+        return redirect()
+            ->route('enterprises.login')
+            ->with('status', 'Conta criada com sucesso! Faça login para continuar.');
     }
 }

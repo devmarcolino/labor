@@ -10,49 +10,33 @@ import IMask from "imask";
 import "flowbite";
 import { Datepicker } from "flowbite-datepicker";
 import ptBR from "./flowbite-locale-pt.js";
-
-// Em: resources/js/app.js
-
 function cardStack() {
     return {
-        cards: [
-            {
-                id: 1,
-                title: "Garçom",
-                company: "Adventree Buffet e Eventos",
-                ramo: "Buffet",
-                logo: "AD",
-                desc: "Trabalhe como garçom em...",
-                image: "/img/match-example.png",
-            },
-            {
-                id: 2,
-                title: "Barista",
-                company: "Café do Bairro",
-                ramo: "Cafeteria",
-                logo: "CB",
-                desc: "Venha trabalhar conosco...",
-                image: "/img/match-example-1.png",
-            },
-            {
-                id: 3,
-                title: "Recepcionista",
-                company: "Hotel Central",
-                ramo: "Festas e Eventos",
-                logo: "HC",
-                desc: "Vaga de recepcionista em...",
-                image: "/img/match-example-2.png",
-            },
-            {
-                id: 4,
-                title: "Monitor",
-                company: "Bete Bolinhas Coloridas",
-                ramo: "Festas e Eventos",
-                logo: "BC",
-                desc: "Vaga de monitoria...",
-                image: "/img/match-example-3.jpg",
-            },
-        ],
+        cards: [],
+        isLoading: true,
+        error: null,
+
+        async loadCards() {
+            this.isLoading = true;
+            this.error = null;
+
+            try {
+                const response = await fetch("/api/vagas");
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar vagas");
+                }
+
+                const data = await response.json();
+                this.cards = Array.isArray(data) ? data : [];
+            } catch (err) {
+                console.error("Falha ao carregar vagas", err);
+                this.error =
+                    "Não foi possível carregar vagas agora. Tente novamente mais tarde.";
+                this.cards = [];
+            } finally {
+                this.isLoading = false;
+            }
+        },
 
         // Ativa o card do topo
         activateTopCard() {
@@ -67,7 +51,7 @@ function cardStack() {
 
         // Observa mudanças nos cards
         initWatcher() {
-            this.activateTopCard();
+            this.loadCards();
             this.$watch("cards", () => {
                 this.activateTopCard();
             });

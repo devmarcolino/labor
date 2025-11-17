@@ -100,18 +100,18 @@
                 </div>
 
                 <div @blur.capture="validateField('telefone', 'user')">
-                    <x-input x-model="fields.tel" name="telefone" type="tel" placeholder="(00)00000-0000" value="{{ old('telefone') }}" validate-input>
+                    <x-input x-model="fields.telefone" name="telefone" type="tel" placeholder="(00)00000-0000" value="{{ old('telefone') }}" validate-input>
                         Telefone
                     </x-input>
                 </div>
 
-                <span x-show="validating.tel" class="mt-1 text-sm text-sky-600">
+                <span x-show="validating.telefone" class="mt-1 text-sm text-sky-600">
                     Verificando...
                 </span>
 
-                <template x-if="errors.tel">
+                <template x-if="errors.telefone">
                     <x-warn>
-                        <span x-text="errors.tel"></span>
+                        <span x-text="errors.telefone"></span>
                     </x-warn>
                 </template>
             </div>
@@ -122,7 +122,7 @@
                     <p class="text-sm text-gray-700 dark:text-gray-400">Esses dados são essenciais para a segurança do seu perfil e para validar suas candidaturas futuras.</p>
                 </div>
 
-                <x-input type="text" name="datanasc" datepicker datepicker-format="dd/mm/yyyy" placeholder="00/00/0000" value="{{ old('datanasc') }}"  validate-input>
+                <x-input x-model="fields.datanasc" type="text" name="datanasc" datepicker datepicker-format="dd/mm/yyyy" placeholder="00/00/0000" value="{{ old('datanasc') }}"  validate-input>
                 Data de Nascimento
                 <x-slot:icon>
                         <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -160,11 +160,11 @@
                     <p class="text-sm text-gray-700 dark:text-gray-400">Escolha uma senha forte com letras, números e símbolos. Esta será a chave para proteger sua conta.</p>
                 </div>                   
             
-                <x-input name="password" type="password" placeholder="*******" validate-input>
+                <x-input x-model="fields.password" name="password" type="password" placeholder="*******" validate-input>
                 Senha
                 </x-input>
 
-                <x-input name="password_confirmation" type="password" placeholder="*******" validate-input>
+                <x-input x-model="fields.password_confirmation" name="password_confirmation" type="password" placeholder="*******" validate-input>
                 Confirme sua senha
                 </x-input>
 
@@ -199,6 +199,7 @@
         {{-- BOTÃO CRIAR CONTA (Aparece step 5) --}}
         <template x-if="step === 5">
             <x-btn-primary type="submit" 
+                           form="registrationForm"
                            x-bind:disabled="isStepInvalid"
                            class="w-full bg-green-600 hover:bg-green-700">
                 Criar Conta

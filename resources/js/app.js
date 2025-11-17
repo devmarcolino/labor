@@ -3,29 +3,61 @@
 // =================================================================
 
 // --- 1. IMPORTS ---
-import './bootstrap';
-import Alpine from 'alpinejs';
-import interact from 'interactjs';
-import IMask from 'imask';
-import 'flowbite';
-import { Datepicker } from 'flowbite-datepicker';
-import ptBR from './flowbite-locale-pt.js';
+import "./bootstrap";
+import Alpine from "alpinejs";
+import interact from "interactjs";
+import IMask from "imask";
+import "flowbite";
+import { Datepicker } from "flowbite-datepicker";
+import ptBR from "./flowbite-locale-pt.js";
 
 // Em: resources/js/app.js
 
 function cardStack() {
     return {
         cards: [
-            { id: 1, title: 'Garçom', company: 'Adventree Buffet e Eventos',  ramo: 'Buffet', logo: 'AD',desc: 'Trabalhe como garçom em...', image: '/img/match-example.png' },
-            { id: 2, title: 'Barista', company: 'Café do Bairro', ramo: 'Cafeteria', logo: 'CB', desc: 'Venha trabalhar conosco...', image: '/img/match-example-1.png' },
-            { id: 3, title: 'Recepcionista', company: 'Hotel Central',  ramo: 'Festas e Eventos', logo: 'HC', desc: 'Vaga de recepcionista em...', image: '/img/match-example-2.png' },
-            { id: 4, title: 'Monitor', company: 'Bete Bolinhas Coloridas', ramo: 'Festas e Eventos', logo: 'BC',desc: 'Vaga de monitoria...', image: '/img/match-example-3.jpg' }
+            {
+                id: 1,
+                title: "Garçom",
+                company: "Adventree Buffet e Eventos",
+                ramo: "Buffet",
+                logo: "AD",
+                desc: "Trabalhe como garçom em...",
+                image: "/img/match-example.png",
+            },
+            {
+                id: 2,
+                title: "Barista",
+                company: "Café do Bairro",
+                ramo: "Cafeteria",
+                logo: "CB",
+                desc: "Venha trabalhar conosco...",
+                image: "/img/match-example-1.png",
+            },
+            {
+                id: 3,
+                title: "Recepcionista",
+                company: "Hotel Central",
+                ramo: "Festas e Eventos",
+                logo: "HC",
+                desc: "Vaga de recepcionista em...",
+                image: "/img/match-example-2.png",
+            },
+            {
+                id: 4,
+                title: "Monitor",
+                company: "Bete Bolinhas Coloridas",
+                ramo: "Festas e Eventos",
+                logo: "BC",
+                desc: "Vaga de monitoria...",
+                image: "/img/match-example-3.jpg",
+            },
         ],
 
         // Ativa o card do topo
         activateTopCard() {
             this.$nextTick(() => {
-                const cardElements = this.$el.querySelectorAll('.card-item');
+                const cardElements = this.$el.querySelectorAll(".card-item");
                 if (cardElements.length > 0) {
                     const topCard = cardElements[0];
                     this.initInteract(topCard);
@@ -36,7 +68,7 @@ function cardStack() {
         // Observa mudanças nos cards
         initWatcher() {
             this.activateTopCard();
-            this.$watch('cards', () => {
+            this.$watch("cards", () => {
                 this.activateTopCard();
             });
         },
@@ -48,8 +80,9 @@ function cardStack() {
 
         // Inicializa o Interact.js e duplo clique
         initInteract(element) {
-            if (!element || element.classList.contains('interact-enabled')) return;
-            element.classList.add('interact-enabled');
+            if (!element || element.classList.contains("interact-enabled"))
+                return;
+            element.classList.add("interact-enabled");
 
             const component = this;
 
@@ -63,9 +96,12 @@ function cardStack() {
                     { transform: "scale(1)" },
                     { transform: "scale(1.1)" },
                     { transform: "scale(0.98)" },
-                    { transform: "scale(1)" }
+                    { transform: "scale(1)" },
                 ];
-                const pulseAnimation = element.animate(pulse, { duration: 400, iterations: 1 });
+                const pulseAnimation = element.animate(pulse, {
+                    duration: 400,
+                    iterations: 1,
+                });
 
                 // ❤️ Corações
                 for (let i = 0; i < 15; i++) {
@@ -74,9 +110,13 @@ function cardStack() {
                     heart.classList.add("floating-heart");
                     heart.style.left = `${Math.random() * 100}vw`;
                     heart.style.fontSize = `${Math.random() * 30 + 40}px`;
-                    heart.style.animationDuration = `${Math.random() * 1 + 1.5}s`;
+                    heart.style.animationDuration = `${
+                        Math.random() * 1 + 1.5
+                    }s`;
                     document.body.appendChild(heart);
-                    heart.addEventListener("animationend", () => heart.remove());
+                    heart.addEventListener("animationend", () =>
+                        heart.remove()
+                    );
                 }
 
                 // Quando pulsada terminar, anima subida reta e fluida
@@ -84,9 +124,13 @@ function cardStack() {
                     const rise = element.animate(
                         [
                             { transform: "translate(0px, 0px)" },
-                            { transform: "translate(0px, -500px)" }
+                            { transform: "translate(0px, -500px)" },
                         ],
-                        { duration: 500, easing: "ease-in-out", fill: "forwards" }
+                        {
+                            duration: 500,
+                            easing: "ease-in-out",
+                            fill: "forwards",
+                        }
                     );
 
                     // Remove card ao final
@@ -96,19 +140,27 @@ function cardStack() {
 
             // 🧲 Interact.js — arrastar = recusar
             interact(element).draggable({
-                onstart: () => { element.style.transition = 'none'; },
+                onstart: () => {
+                    element.style.transition = "none";
+                },
                 onmove: (event) => {
-                    const x = (parseFloat(element.getAttribute('data-x')) || 0) + event.dx;
-                    const y = (parseFloat(element.getAttribute('data-y')) || 0) + event.dy;
+                    const x =
+                        (parseFloat(element.getAttribute("data-x")) || 0) +
+                        event.dx;
+                    const y =
+                        (parseFloat(element.getAttribute("data-y")) || 0) +
+                        event.dy;
                     const rotation = x * 0.1;
                     element.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
-                    element.setAttribute('data-x', x);
-                    element.setAttribute('data-y', y);
+                    element.setAttribute("data-x", x);
+                    element.setAttribute("data-y", y);
                 },
                 onend: () => {
-                    element.style.transition = 'transform 0.4s ease-in-out';
-                    const totalX = parseFloat(element.getAttribute('data-x')) || 0;
-                    const totalY = parseFloat(element.getAttribute('data-y')) || 0;
+                    element.style.transition = "transform 0.4s ease-in-out";
+                    const totalX =
+                        parseFloat(element.getAttribute("data-x")) || 0;
+                    const totalY =
+                        parseFloat(element.getAttribute("data-y")) || 0;
                     const distance = Math.sqrt(totalX ** 2 + totalY ** 2);
 
                     if (distance > 10) {
@@ -116,20 +168,25 @@ function cardStack() {
                         element.animate(
                             [
                                 { transform: element.style.transform },
-                                { transform: "translate(0px, 500px)" }
+                                { transform: "translate(0px, 500px)" },
                             ],
-                            { duration: 400, easing: "ease-in-out", fill: "forwards" }
+                            {
+                                duration: 400,
+                                easing: "ease-in-out",
+                                fill: "forwards",
+                            }
                         );
                         setTimeout(() => component.removeTopCard(), 400);
                     } else {
-                        element.style.transform = 'translate(0px, 0px) rotate(0deg)';
-                        element.setAttribute('data-x', 0);
-                        element.setAttribute('data-y', 0);
+                        element.style.transform =
+                            "translate(0px, 0px) rotate(0deg)";
+                        element.setAttribute("data-x", 0);
+                        element.setAttribute("data-y", 0);
                     }
-                }
+                },
             });
-        }
-    }
+        },
+    };
 }
 
 /**
@@ -139,17 +196,17 @@ function registrationForm() {
     return {
         step: 1,
         totalSteps: 5, // 1:Pessoais, 2:Email, 3:Tel, 4:Docs, 5:Senha
-        
+
         // Dados do formulário
         fields: {
-            nome_real: '',
-            username: '',
-            email: '',
-            telefone: '',
-            datanasc: '',
-            cpf: '',
-            password: '',
-            password_confirmation: ''
+            nome_real: "",
+            username: "",
+            email: "",
+            telefone: "",
+            datanasc: "",
+            cpf: "",
+            password: "",
+            password_confirmation: "",
         },
 
         // Estado de erros e carregamento
@@ -158,8 +215,8 @@ function registrationForm() {
 
         // Inicialização
         init() {
-            console.log('Registration Form Iniciado');
-            this.$watch('step', () => this.updateProgressBar());
+            console.log("Registration Form Iniciado");
+            this.$watch("step", () => this.updateProgressBar());
         },
 
         updateProgressBar() {
@@ -170,12 +227,12 @@ function registrationForm() {
         },
 
         // Validação Assíncrona (Live)
-        async validateField(field, type = 'user') {
+        async validateField(field, type = "user") {
             const value = this.fields[field];
-            
+
             // 1. Limpa erro anterior
             this.errors[field] = null;
-            
+
             // 2. Se vazio, não chama API (mas o botão vai bloquear via isStepInvalid)
             if (!value) return;
 
@@ -183,27 +240,29 @@ function registrationForm() {
             this.validating[field] = true;
 
             try {
-                const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-                const response = await fetch('/api/validate-field', {
-                    method: 'POST',
+                const csrf = document.querySelector(
+                    'meta[name="csrf-token"]'
+                )?.content;
+                const response = await fetch("/api/validate-field", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrf
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": csrf,
                     },
-                    body: JSON.stringify({ field, value, type })
+                    body: JSON.stringify({ field, value, type }),
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
                     // Se deu erro (422), pega a mensagem
-                    this.errors[field] = data.message || 'Este valor já está em uso.';
+                    this.errors[field] =
+                        data.message || "Este valor já está em uso.";
                 }
                 // Se response.ok, erro continua null (válido)
-
             } catch (e) {
-                console.error('Erro na validação', e);
+                console.error("Erro na validação", e);
             } finally {
                 // 4. Libera o status de validando
                 this.validating[field] = false;
@@ -213,10 +272,16 @@ function registrationForm() {
         // Lógica Central do Botão "Continuar"
         get isStepInvalid() {
             // A) Se estiver validando qualquer campo no servidor -> Bloqueia
-            if (Object.values(this.validating).some(v => v === true)) return true;
+            if (Object.values(this.validating).some((v) => v === true))
+                return true;
 
             // B) Se tiver qualquer erro de validação -> Bloqueia
-            if (Object.values(this.errors).some(msg => msg !== null && msg !== '')) return true;
+            if (
+                Object.values(this.errors).some(
+                    (msg) => msg !== null && msg !== ""
+                )
+            )
+                return true;
 
             // C) Validação de campos vazios por etapa
             switch (this.step) {
@@ -229,11 +294,14 @@ function registrationForm() {
                 case 4: // Data e CPF
                     return !this.fields.datanasc || !this.fields.cpf;
                 case 5: // Senha e Confirmação
-                    return !this.fields.password || !this.fields.password_confirmation;
+                    return (
+                        !this.fields.password ||
+                        !this.fields.password_confirmation
+                    );
                 default:
                     return false;
             }
-        }
+        },
     };
 }
 
@@ -243,21 +311,27 @@ function enterpriseForm() {
         totalSteps: 5, // 1:Info, 2:Email, 3:Tel, 4:CNPJ, 5:Senha
         errors: {},
         isChecking: {}, // Validação live
-        
+
         fields: {
-            nome_empresa: '',
-            ramo: '',
-            email: '',
-            telefone: '',
-            cnpj: '',
-            password: '',
-            password_confirmation: ''
+            nome_empresa: "",
+            ramo: "",
+            email: "",
+            telefone: "",
+            cnpj: "",
+            password: "",
+            password_confirmation: "",
         },
 
         // Lógica do Botão (Adaptada para Empresa)
         get isStepInvalid() {
-            if (Object.values(this.isChecking).some(v => v === true)) return true;
-            if (Object.values(this.errors).some(msg => msg !== null && msg !== '')) return true;
+            if (Object.values(this.isChecking).some((v) => v === true))
+                return true;
+            if (
+                Object.values(this.errors).some(
+                    (msg) => msg !== null && msg !== ""
+                )
+            )
+                return true;
 
             switch (this.step) {
                 case 1: // Nome e Ramo
@@ -269,14 +343,17 @@ function enterpriseForm() {
                 case 4: // CNPJ
                     return !this.fields.cnpj;
                 case 5: // Senha
-                    return !this.fields.password || !this.fields.password_confirmation;
+                    return (
+                        !this.fields.password ||
+                        !this.fields.password_confirmation
+                    );
                 default:
                     return false;
             }
         },
 
         init() {
-            this.$watch('step', () => this.updateProgressBar());
+            this.$watch("step", () => this.updateProgressBar());
         },
 
         updateProgressBar() {
@@ -287,7 +364,7 @@ function enterpriseForm() {
         },
 
         // Validação Live (Reutiliza a mesma lógica, mudando o type)
-        async validateField(field, type = 'enterprise') {
+        async validateField(field, type = "enterprise") {
             const value = this.fields[field];
             this.errors[field] = null;
 
@@ -296,36 +373,39 @@ function enterpriseForm() {
             this.isChecking[field] = true;
 
             try {
-                const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-                const response = await fetch('/api/validate-field', {
-                    method: 'POST',
+                const csrf = document.querySelector(
+                    'meta[name="csrf-token"]'
+                )?.content;
+                const response = await fetch("/api/validate-field", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrf
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": csrf,
                     },
-                    body: JSON.stringify({ field, value, type }) // Aqui vai 'enterprise'
+                    body: JSON.stringify({ field, value, type }), // Aqui vai 'enterprise'
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    this.errors[field] = data.message || 'Valor inválido ou já em uso.';
+                    this.errors[field] =
+                        data.message || "Valor inválido ou já em uso.";
                 }
             } catch (e) {
                 console.error(e);
             } finally {
                 this.isChecking[field] = false;
             }
-        }
+        },
     };
 }
 
 // Registro Global do Alpine
 window.Alpine = Alpine;
-Alpine.data('cardStack', cardStack);
-Alpine.data('registrationForm', registrationForm);
-Alpine.data('enterpriseForm', enterpriseForm);
+Alpine.data("cardStack", cardStack);
+Alpine.data("registrationForm", registrationForm);
+Alpine.data("enterpriseForm", enterpriseForm);
 Alpine.start();
 
 // --- 4. LÓGICA EXECUTADA APÓS O DOM CARREGAR ---
@@ -335,91 +415,99 @@ Alpine.start();
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM Carregado. Executando scripts adicionais.");
 
-function applyThemeFromStorage() {
-    const savedTheme = localStorage.getItem('theme') || 'light'; // Padrão é 'light'
-    const html = document.documentElement;
+    function applyThemeFromStorage() {
+        const savedTheme = localStorage.getItem("theme") || "light"; // Padrão é 'light'
+        const html = document.documentElement;
 
-    if (savedTheme === "dark") {
-        html.classList.add("dark");
-    } else {
-        html.classList.remove("dark");
-    }
-}
-
-applyThemeFromStorage();
-
-window.addEventListener('pageshow', (event) => {
-    if (event.persisted) {
-        console.log("Página restaurada do cache. Re-aplicando tema...");
-        applyThemeFromStorage();
-    }
-});
-
-const themeToggleBtn = document.getElementById("theme-toggle");
-if (themeToggleBtn) {
-    const iconSun = document.getElementById("icon-sun");
-    const iconMoon = document.getElementById("icon-moon");
-
-    // Função para atualizar apenas os ícones sol/lua
-    const updateThemeIcons = () => {
-        const isDark = document.documentElement.classList.contains('dark');
-        if (iconSun && iconMoon) {
-            iconSun.style.display = isDark ? 'block' : 'none';
-            iconMoon.style.display = isDark ? 'none' : 'block';
+        if (savedTheme === "dark") {
+            html.classList.add("dark");
+        } else {
+            html.classList.remove("dark");
         }
-    };
-    
-    // Listener para o clique
-    themeToggleBtn.addEventListener("click", () => {
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        localStorage.setItem("theme", newTheme);
-        
-        // Aplica o tema na página e depois atualiza os ícones
-        applyThemeFromStorage();
-        updateThemeIcons();
+    }
+
+    applyThemeFromStorage();
+
+    window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+            console.log("Página restaurada do cache. Re-aplicando tema...");
+            applyThemeFromStorage();
+        }
     });
 
-    // Atualiza os ícones no carregamento da página
-    updateThemeIcons();
-}
+    const themeToggleBtn = document.getElementById("theme-toggle");
+    if (themeToggleBtn) {
+        const iconSun = document.getElementById("icon-sun");
+        const iconMoon = document.getElementById("icon-moon");
+
+        // Função para atualizar apenas os ícones sol/lua
+        const updateThemeIcons = () => {
+            const isDark = document.documentElement.classList.contains("dark");
+            if (iconSun && iconMoon) {
+                iconSun.style.display = isDark ? "block" : "none";
+                iconMoon.style.display = isDark ? "none" : "block";
+            }
+        };
+
+        // Listener para o clique
+        themeToggleBtn.addEventListener("click", () => {
+            const currentTheme = localStorage.getItem("theme") || "light";
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            localStorage.setItem("theme", newTheme);
+
+            // Aplica o tema na página e depois atualiza os ícones
+            applyThemeFromStorage();
+            updateThemeIcons();
+        });
+
+        // Atualiza os ícones no carregamento da página
+        updateThemeIcons();
+    }
 
     console.log("Procurando por #page-loader...");
-const pageLoader = document.getElementById('page-loader');
-console.log("Elemento encontrado:", pageLoader); // O que aparece aqui?
+    const pageLoader = document.getElementById("page-loader");
+    console.log("Elemento encontrado:", pageLoader); // O que aparece aqui?
 
-if (pageLoader) {
-    pageLoader.style.opacity = '0';
-    setTimeout(() => {
-        pageLoader.style.display = 'none';
-    }, 500);
-}
+    if (pageLoader) {
+        pageLoader.style.opacity = "0";
+        setTimeout(() => {
+            pageLoader.style.display = "none";
+        }, 500);
+    }
 
     // MÓDULO: CARROSSEL E TÍTULO SINCRONIZADO (A LÓGICA QUE FALTAVA)
-    const carouselWrapper = document.getElementById('default-carousel')?.parentElement;
-    const titleElement = document.getElementById('carousel-title');
+    const carouselWrapper =
+        document.getElementById("default-carousel")?.parentElement;
+    const titleElement = document.getElementById("carousel-title");
     if (carouselWrapper && titleElement) {
         const carouselTexts = [
             "A oportunidade na sua mão.",
             "Gostou da vaga? O trampo é seu.",
-            "As vagas que vem até você."
+            "As vagas que vem até você.",
         ];
         let lastUpdatedIndex = -1;
         const updateTitle = (index) => {
             const numericIndex = parseInt(index);
-            if (numericIndex !== lastUpdatedIndex && carouselTexts[numericIndex] !== undefined) {
+            if (
+                numericIndex !== lastUpdatedIndex &&
+                carouselTexts[numericIndex] !== undefined
+            ) {
                 lastUpdatedIndex = numericIndex;
-                titleElement.classList.add('opacity-0');
+                titleElement.classList.add("opacity-0");
                 setTimeout(() => {
                     titleElement.textContent = carouselTexts[numericIndex];
-                    titleElement.classList.remove('opacity-0');
+                    titleElement.classList.remove("opacity-0");
                 }, 300);
             }
         };
         const checkActiveAndSetTitle = () => {
-            const activeButton = carouselWrapper.querySelector('button[data-carousel-slide-to][aria-current="true"]');
+            const activeButton = carouselWrapper.querySelector(
+                'button[data-carousel-slide-to][aria-current="true"]'
+            );
             if (activeButton) {
-                const activeIndex = activeButton.getAttribute('data-carousel-slide-to');
+                const activeIndex = activeButton.getAttribute(
+                    "data-carousel-slide-to"
+                );
                 updateTitle(activeIndex);
             }
         };
@@ -427,18 +515,18 @@ if (pageLoader) {
         observer.observe(carouselWrapper, {
             attributes: true,
             subtree: true,
-            attributeFilter: ['aria-current']
+            attributeFilter: ["aria-current"],
         });
         checkActiveAndSetTitle();
     }
 
     // MÓDULO: MÁSCARAS (IMask)
     const fieldsToMask = {
-        '#cpf': '000.000.000-00',
-        '#datanasc': '00/00/0000',
-        '#telefone': '(00) 00000-0000',
-        '#cnpj':'00.000.0000/0000-00',
-        '#username': '@aaaaaaaaaaaaaaaaaa'
+        "#cpf": "000.000.000-00",
+        "#datanasc": "00/00/0000",
+        "#telefone": "(00) 00000-0000",
+        "#cnpj": "00.000.0000/0000-00",
+        "#username": "@aaaaaaaaaaaaaaaaaa",
     };
     for (const selector in fieldsToMask) {
         const element = document.querySelector(selector);
@@ -448,14 +536,14 @@ if (pageLoader) {
     }
 
     // MÓDULO: DATEPICKER (Flowbite)
-    if (typeof Datepicker !== 'undefined') {
+    if (typeof Datepicker !== "undefined") {
         if (!Datepicker.locales) Datepicker.locales = {};
         Object.assign(Datepicker.locales, ptBR);
-        document.querySelectorAll('[datepicker]').forEach((datepickerEl) => {
+        document.querySelectorAll("[datepicker]").forEach((datepickerEl) => {
             new Datepicker(datepickerEl, {
-                language: 'pt-BR',
+                language: "pt-BR",
                 autohide: true,
-                format: 'dd/mm/yyyy',
+                format: "dd/mm/yyyy",
                 maxDate: new Date(),
                 clearBtn: true,
                 todayBtn: true,

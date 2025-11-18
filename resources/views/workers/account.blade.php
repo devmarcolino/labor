@@ -5,11 +5,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Labor</title>
+    <title>Labor for workers</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
+
+<x-flash-manager />
+
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-500 min-h-screen">
 
   <x-loading/>
@@ -24,7 +27,7 @@
       
 
       <div class="bg-white dark:bg-gray-800 flex flex-col items-center justify-center text-center rounded-[40px] shadow-md w-full max-w-2xl py-5 px-5 mt-[5rem]">
-        <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[120px] h-[120px] rounded-full shadow-md relative mt-[-6rem]" style="background-image: url('{{ Auth::user()->fotoUser ? asset('storage/' . Auth::user()->fotoUser) : '' }}');">
+        <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[120px] h-[120px] rounded-full shadow-md relative mt-[-6rem]" style="background-image: url('{{ Auth::user()->fotoUser ? asset("storage/" . Auth::user()->fotoUser) : '' }}');">
          
         {{-- Se tiver foto, mostra a imagem --}}
         @if(Auth::user()->fotoUser)

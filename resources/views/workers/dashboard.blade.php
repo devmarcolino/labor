@@ -1,13 +1,3 @@
-@if ($errors->any())
-    <div class="fixed top-5 right-5 z-[100] bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg" role="alert">
-        <p class="font-bold">Ocorreu um erro ao salvar:</p>
-        <ul class="mt-1 list-disc list-inside text-sm">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -20,6 +10,7 @@
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
+<x-flash-manager />
 
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-500 h-screen flex flex-col">
     
@@ -167,7 +158,7 @@
                 </button>
 
                 <button class="bg-transparent w-full text-left">
-                    <a href="{{ url('workers/other_jobs') }}">
+                    <a href="{{ route('workers.jobs') }}">
                         <div class="bg-white dark:bg-gray-800 shadow-labor border-btn flex flex-col gap-3 items-center pt-6 pb-4 px-4">
                             <div class="flex w-full justify-between items-center px-4">
                                 <div class="flex gap-5 items-center">

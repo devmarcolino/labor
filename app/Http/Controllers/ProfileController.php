@@ -96,6 +96,6 @@ class ProfileController extends Controller
         return back()->withErrors(['db_error' => 'Erro ao salvar o perfil: ' . $e->getMessage()]);
     }
 
-    return back()->with('status', 'Perfil atualizado com sucesso!');
+    return back()->with('success', 'Perfil atualizado com sucesso!');
 }
 }

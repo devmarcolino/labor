@@ -10,6 +10,7 @@ import IMask from "imask";
 import "flowbite";
 import { Datepicker } from "flowbite-datepicker";
 import ptBR from "./flowbite-locale-pt.js";
+
 function cardStack() {
     return {
         cards: [],
@@ -179,28 +180,40 @@ function cardStack() {
 function registrationForm() {
     return {
         step: 1,
-        totalSteps: 5, // 1:Pessoais, 2:Email, 3:Tel, 4:Docs, 5:Senha
-
-        // Dados do formulário
+        totalSteps: 5, // Ajuste conforme seus steps reais (agora são 2 na modal?)
+        errors: {},
+        isChecking: {},
+        
         fields: {
-            nome_real: "",
-            username: "",
-            email: "",
-            telefone: "",
-            datanasc: "",
-            cpf: "",
-            password: "",
-            password_confirmation: "",
+            nome_real: '',
+            username: '',
+            email: '',
+            telefone: '',
+            datanasc: '',
+            cpf: '',
+            password: '',
+            password_confirmation: ''
         },
 
-        // Estado de erros e carregamento
-        errors: {},
-        validating: {}, // Para saber se o campo está sendo verificado no banco agora
+        // Lógica de Bloqueio do Botão
+        get isStepInvalid() {
+            // Se estiver verificando no servidor ou tiver erro -> Bloqueia
+            if (Object.values(this.isChecking).some(Boolean)) return true;
+            if (Object.values(this.errors).some(Boolean)) return true;
 
-        // Inicialização
+            // Validação de campos vazios (Adapte conforme seus steps reais na View)
+            switch (this.step) {
+                case 1: return !this.fields.nome_real || !this.fields.username;
+                case 2: return !this.fields.email;
+                case 3: return !this.fields.telefone;
+                case 4: return !this.fields.datanasc || !this.fields.cpf;
+                case 5: return !this.fields.password || !this.fields.password_confirmation;
+                default: return false;
+            }
+        },
+
         init() {
-            console.log("Registration Form Iniciado");
-            this.$watch("step", () => this.updateProgressBar());
+            this.$watch('step', () => this.updateProgressBar());
         },
 
         updateProgressBar() {
@@ -210,134 +223,114 @@ function registrationForm() {
             }
         },
 
-        // Validação Assíncrona (Live)
-        async validateField(field, type = "user") {
+        // VALIDAÇÃO COM TOAST
+        async validateField(field, type = 'user') {
             const value = this.fields[field];
+            
+            // 1. Limpa erros anteriores para não ficar vermelho à toa
+            // (Exceto se for senha, pois validamos abaixo)
+            if (field !== 'password' && field !== 'password_confirmation') {
+                this.errors[field] = '';
+            }
+            
+            // === NOVA LÓGICA DE SENHA (LOCAL) ===
+            if (field === 'password' || field === 'password_confirmation') {
+                
+                // A) Valida tamanho da senha (mínimo 8)
+                if (this.fields.password && this.fields.password.length < 8) {
+                    this.errors.password = 'Mínimo de 8 caracteres.';
+                } else {
+                    this.errors.password = ''; // Limpa se estiver OK
+                }
 
-            // 1. Limpa erro anterior
-            this.errors[field] = null;
+                // B) Valida se coincidem (só se já começou a digitar a confirmação)
+                if (this.fields.password_confirmation) {
+                    if (this.fields.password !== this.fields.password_confirmation) {
+                        this.errors.password_confirmation = 'As senhas não conferem.';
+                    } else {
+                        this.errors.password_confirmation = ''; // Limpa se estiver OK
+                    }
+                }
+                
+                // PARE AQUI! Não chame a API/Spinner para senha
+                return; 
+            }
+            // ===========================================
 
-            // 2. Se vazio, não chama API (mas o botão vai bloquear via isStepInvalid)
+            // Para outros campos (email, cpf), se estiver vazio, para aqui.
             if (!value) return;
 
-            // 3. Marca como validando (Bloqueia botão)
-            this.validating[field] = true;
+            this.isChecking[field] = true; // Ativa Spinner
 
             try {
-                const csrf = document.querySelector(
-                    'meta[name="csrf-token"]'
-                )?.content;
-                const response = await fetch("/api/validate-field", {
-                    method: "POST",
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+                const response = await fetch('/api/validate-field', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                        "X-CSRF-TOKEN": csrf,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrf
                     },
-                    body: JSON.stringify({ field, value, type }),
+                    body: JSON.stringify({ field, value, type })
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    // Se deu erro (422), pega a mensagem
-                    this.errors[field] =
-                        data.message || "Este valor já está em uso.";
+                    let msg = data.message || 'Dado inválido.';
+                    this.errors[field] = msg;
+                    
+                    // Dispara o Toast Vermelho
+                    window.dispatchEvent(new CustomEvent('notify', {
+                        detail: { type: 'danger', title: 'Atenção', msg: msg }
+                    }));
+                } else {
+                    // Se validou com sucesso na API, garante que limpa o erro
+                    this.errors[field] = '';
                 }
-                // Se response.ok, erro continua null (válido)
+
             } catch (e) {
-                console.error("Erro na validação", e);
+                console.error(e);
             } finally {
-                // 4. Libera o status de validando
-                this.validating[field] = false;
+                this.isChecking[field] = false;
             }
-        },
-
-        // Lógica Central do Botão "Continuar"
-        get isStepInvalid() {
-            // A) Se estiver validando qualquer campo no servidor -> Bloqueia
-            if (Object.values(this.validating).some((v) => v === true))
-                return true;
-
-            // B) Se tiver qualquer erro de validação -> Bloqueia
-            if (
-                Object.values(this.errors).some(
-                    (msg) => msg !== null && msg !== ""
-                )
-            )
-                return true;
-
-            // C) Validação de campos vazios por etapa
-            switch (this.step) {
-                case 1: // Nome e Username
-                    return !this.fields.nome_real || !this.fields.username;
-                case 2: // Email
-                    return !this.fields.email;
-                case 3: // Telefone
-                    return !this.fields.telefone;
-                case 4: // Data e CPF
-                    return !this.fields.datanasc || !this.fields.cpf;
-                case 5: // Senha e Confirmação
-                    return (
-                        !this.fields.password ||
-                        !this.fields.password_confirmation
-                    );
-                default:
-                    return false;
-            }
-        },
+        }
     };
 }
 
 function enterpriseForm() {
     return {
         step: 1,
-        totalSteps: 5, // 1:Info, 2:Email, 3:Tel, 4:CNPJ, 5:Senha
+        totalSteps: 5,
         errors: {},
-        isChecking: {}, // Validação live
-
+        isChecking: {},
+        
         fields: {
-            nome_empresa: "",
-            ramo: "",
-            email: "",
-            telefone: "",
-            cnpj: "",
-            password: "",
-            password_confirmation: "",
+            nome_empresa: '',
+            ramo: '',
+            email: '',
+            telefone: '',
+            cnpj: '',
+            password: '',
+            password_confirmation: ''
         },
 
-        // Lógica do Botão (Adaptada para Empresa)
         get isStepInvalid() {
-            if (Object.values(this.isChecking).some((v) => v === true))
-                return true;
-            if (
-                Object.values(this.errors).some(
-                    (msg) => msg !== null && msg !== ""
-                )
-            )
-                return true;
+            if (Object.values(this.isChecking).some(Boolean)) return true;
+            if (Object.values(this.errors).some(Boolean)) return true;
 
             switch (this.step) {
-                case 1: // Nome e Ramo
-                    return !this.fields.nome_empresa || !this.fields.ramo;
-                case 2: // Email
-                    return !this.fields.email;
-                case 3: // Telefone
-                    return !this.fields.telefone;
-                case 4: // CNPJ
-                    return !this.fields.cnpj;
-                case 5: // Senha
-                    return (
-                        !this.fields.password ||
-                        !this.fields.password_confirmation
-                    );
-                default:
-                    return false;
+                case 1: return !this.fields.nome_empresa || !this.fields.ramo;
+                case 2: return !this.fields.email;
+                case 3: return !this.fields.telefone;
+                case 4: return !this.fields.cnpj;
+                case 5: return !this.fields.password || !this.fields.password_confirmation;
+                default: return false;
             }
         },
 
         init() {
-            this.$watch("step", () => this.updateProgressBar());
+            this.$watch('step', () => this.updateProgressBar());
         },
 
         updateProgressBar() {
@@ -347,41 +340,78 @@ function enterpriseForm() {
             }
         },
 
-        // Validação Live (Reutiliza a mesma lógica, mudando o type)
-        async validateField(field, type = "enterprise") {
+        // VALIDAÇÃO COM TOAST (EMPRESA)
+        async validateField(field, type = 'enterprise') {
             const value = this.fields[field];
-            this.errors[field] = null;
+            
+            // 1. Limpa erros anteriores para não ficar vermelho à toa
+            // (Exceto se for senha, pois validamos abaixo)
+            if (field !== 'password' && field !== 'password_confirmation') {
+                this.errors[field] = '';
+            }
+            
+            // === NOVA LÓGICA DE SENHA (LOCAL) ===
+            if (field === 'password' || field === 'password_confirmation') {
+                
+                // A) Valida tamanho da senha (mínimo 8)
+                if (this.fields.password && this.fields.password.length < 8) {
+                    this.errors.password = 'Mínimo de 8 caracteres.';
+                } else {
+                    this.errors.password = ''; // Limpa se estiver OK
+                }
 
+                // B) Valida se coincidem (só se já começou a digitar a confirmação)
+                if (this.fields.password_confirmation) {
+                    if (this.fields.password !== this.fields.password_confirmation) {
+                        this.errors.password_confirmation = 'As senhas não conferem.';
+                    } else {
+                        this.errors.password_confirmation = ''; // Limpa se estiver OK
+                    }
+                }
+                
+                // PARE AQUI! Não chame a API/Spinner para senha
+                return; 
+            }
+            // ===========================================
+
+            // Para outros campos (email, cpf), se estiver vazio, para aqui.
             if (!value) return;
 
-            this.isChecking[field] = true;
+            this.isChecking[field] = true; // Ativa Spinner
 
             try {
-                const csrf = document.querySelector(
-                    'meta[name="csrf-token"]'
-                )?.content;
-                const response = await fetch("/api/validate-field", {
-                    method: "POST",
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+                const response = await fetch('/api/validate-field', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                        "X-CSRF-TOKEN": csrf,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrf
                     },
-                    body: JSON.stringify({ field, value, type }), // Aqui vai 'enterprise'
+                    body: JSON.stringify({ field, value, type })
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    this.errors[field] =
-                        data.message || "Valor inválido ou já em uso.";
+                    let msg = data.message || 'Dado inválido.';
+                    this.errors[field] = msg;
+                    
+                    // Dispara o Toast Vermelho
+                    window.dispatchEvent(new CustomEvent('notify', {
+                        detail: { type: 'danger', title: 'Atenção', msg: msg }
+                    }));
+                } else {
+                    // Se validou com sucesso na API, garante que limpa o erro
+                    this.errors[field] = '';
                 }
+
             } catch (e) {
                 console.error(e);
             } finally {
                 this.isChecking[field] = false;
             }
-        },
+        }
     };
 }
 

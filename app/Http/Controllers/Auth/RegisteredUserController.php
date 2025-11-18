@@ -9,6 +9,7 @@ use Illuminate\Http\Request; // <<< VAMOS USAR A REQUEST PADRÃO
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth; // <<< PARA LOGAR O USUÁRIO
 use Illuminate\Validation\Rules; // <<< Para regras de senha
+use App\Rules\ValidaCpf;
 
 class RegisteredUserController extends Controller
 {
@@ -28,10 +29,10 @@ class RegisteredUserController extends Controller
         $validated = $request->validate([
             'nome_real' => 'required|string|max:100',
             'username'  => 'required|string|max:50|unique:user_tb,username',
-            'email'     => 'required|email|max:100|unique:user_tb,email',
-            'cpf'       => 'required|string|max:14|unique:user_tb,cpf',
+            'email'        => 'required|email:rfc,dns|max:100|unique:empresa_tb,email',
+            'cpf' => ['required', 'string', 'max:14', 'unique:user_tb,cpf', new ValidaCpf], // Adicione new ValidaCpf
+            'telefone' => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'], // Adicione Regex
             'datanasc'  => 'required|date_format:d/m/Y', // Recebe 'd/m/Y'
-            'telefone'  => 'required|string|max:20', // O form manda 'telefone'
             'password'  => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -54,7 +55,7 @@ class RegisteredUserController extends Controller
 
         // 4. Redirecionar para o Dashboard
         // (Aqui a sua modal obrigatória vai entrar em ação)
-        return redirect()->route('workers.dashboard');
+        return redirect()->route('workers.dashboard')->with('success', 'Conta criada com sucesso!');
     }
 
     // ... (Apague os métodos registerEndereco e registerUser antigos)

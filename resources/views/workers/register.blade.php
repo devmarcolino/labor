@@ -46,12 +46,6 @@
                     <x-input name="nome_real" x-model="fields.nome_real" type="text" placeholder="Insira seu nome completo" value="{{ old('nome_real') }}" validate-input>
                     Nome Completo
                     </x-input>
-
-                    <template x-if="errors.nome_real">
-                        <x-warn>
-                            <span x-text="errors.nome_real"></span>
-                        </x-warn>
-                    </template>
                 </div>
  
                 <div @blur.capture="validateField('username', 'user')">
@@ -60,15 +54,6 @@
                     </x-input>
                 </div>
                 
-                <span x-show="validating.username" class="mt-1 text-sm text-sky-600">
-                    Verificando...
-                </span>
-
-                <template x-if="errors.username">
-                    <x-warn>
-                        <span x-text="errors.username"></span>
-                    </x-warn>
-                </template>
             </div>
 
             <div x-show="step === 2" x-transition x-cloak class="flex flex-col gap-3 text-left">
@@ -78,20 +63,10 @@
                 </div>
 
                 <div @blur.capture="validateField('email', 'user')">
-                    <x-input x-model="fields.email" name="email" type="email" placeholder="seu@email.com" value="{{ old('email') }}" validate-input>
-                        E-mail
+                    <x-input x-model="fields.email" name="email" type="email" placeholder="Crie seu @" value="{{ old('email') }}" validate-input>
+                    E-Mail
                     </x-input>
                 </div>
-
-                <span x-show="validating.email" class="mt-1 text-sm text-sky-600">
-                    Verificando...
-                </span>
-
-                <template x-if="errors.email">
-                    <x-warn>
-                        <span x-text="errors.email"></span>
-                    </x-warn>
-                </template>
             </div>
 
             <div x-show="step === 3" x-transition x-cloak class="flex flex-col gap-3 text-left">
@@ -106,15 +81,6 @@
                     </x-input>
                 </div>
 
-                <span x-show="validating.telefone" class="mt-1 text-sm text-sky-600">
-                    Verificando...
-                </span>
-
-                <template x-if="errors.telefone">
-                    <x-warn>
-                        <span x-text="errors.telefone"></span>
-                    </x-warn>
-                </template>
             </div>
 
             <div x-show="step === 4" x-transition x-cloak class="flex flex-col gap-3 text-left">
@@ -132,25 +98,12 @@
                     </x-slot:icon>
                 </x-input>
 
-                @error('datanasc')
-                    <x-warn>{{ $message }}</x-warn>
-                @enderror
-
                 <div @blur.capture="validateField('cpf', 'user')">
-                <x-input x-model="fields.cpf" name="cpf" type="text" placeholder="000.000.000-00" value="{{ old('cpf') }}" validate-input>
-                    CPF
-                </x-input> 
+                    <x-input x-model="fields.cpf" name="cpf" type="text" placeholder="000.000.000-00" value="{{ old('cpf') }}" validate-input>
+                        CPF
+                    </x-input> 
                 </div>  
 
-                <span x-show="validating.cpf" class="mt-1 text-sm text-sky-600">
-                    Verificando...
-                </span>
-
-                <template x-if="errors.cpf">
-                    <x-warn>
-                        <span x-text="errors.cpf"></span>
-                    </x-warn>
-                </template>
             </div>
 
            
@@ -159,19 +112,27 @@
             <div class="text-left mb-6">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Crie sua senha de acesso</h3>
                     <p class="text-sm text-gray-700 dark:text-gray-400">Escolha uma senha forte com letras, números e símbolos. Esta será a chave para proteger sua conta.</p>
-                </div>                   
-            
-                <x-input x-model="fields.password" name="password" type="password" placeholder="*******" validate-input>
-                Senha
-                </x-input>
+                </div>  
 
+                <div>
+                <div @blur.capture="validateField('password', 'user')">
+                    <x-input x-model="fields.password" name="password" type="password" placeholder="*******" validate-input>
+                    Senha
+                    </x-input>
+                </div>
+                <p x-show="errors.password" x-text="errors.password" class="text-xs text-red-500 mt-1"></p>
+                </div>
+                
+
+                <div>
+                <div @blur.capture="validateField('password_confirmation', 'user')">
                 <x-input x-model="fields.password_confirmation" name="password_confirmation" type="password" placeholder="*******" validate-input>
                 Confirme sua senha
                 </x-input>
+                </div>
+                <p x-show="errors.password_confirmation" x-text="errors.password_confirmation" class="text-xs text-red-500 mt-1"></p>
+                </div>
 
-                @error('password')
-                    <x-warn>{{ $message }}</x-warn>
-                @enderror
             </div>
         </form>
     </div>

@@ -71,10 +71,7 @@ recuperação de senha.</p>
                             E-mail
                         </x-input>
                     </div>
-                    <p x-show="isChecking.email" class="text-sm text-blue-500 mt-1">Verificando...</p>
-                    <template x-if="errors.email">
-                        <x-warn><span x-text="errors.email"></span></x-warn>
-                    </template>
+                    
                 </div>
             </div>
 
@@ -88,13 +85,9 @@ segurança e para manter sua conta protegida.</p>
                 <div>
                     <div @blur.capture="validateField('telefone', 'enterprise')">
                         <x-input x-model="fields.telefone" name="telefone" type="tel" placeholder="(00) 00000-0000">
-                            Telefone / WhatsApp
+                            Telefone
                         </x-input>
                     </div>
-                    <p x-show="isChecking.telefone" class="text-sm text-blue-500 mt-1">Verificando...</p>
-                    <template x-if="errors.telefone">
-                        <x-warn><span x-text="errors.telefone"></span></x-warn>
-                    </template>
                 </div>
             </div>
 
@@ -110,10 +103,6 @@ segurança e para manter sua conta protegida.</p>
                             CNPJ
                         </x-input>
                     </div>
-                    <p x-show="isChecking.cnpj" class="text-sm text-blue-500 mt-1">Verificando...</p>
-                    <template x-if="errors.cnpj">
-                        <x-warn><span x-text="errors.cnpj"></span></x-warn>
-                    </template>
                 </div>
             </div>
 
@@ -125,13 +114,24 @@ símbolos. Esta será a chave para proteger sua
 conta.</p>
                 </div>
 
-                <x-input x-model="fields.password" name="password" type="password" placeholder="*******">
+                <div>
+                <div @blur.capture="validateField('password', 'enterprise')">
+                    <x-input x-model="fields.password" name="password" type="password" placeholder="*******" validate-input>
                     Senha
-                </x-input>
+                    </x-input>
+                </div>
+                <p x-show="errors.password" x-text="errors.password" class="text-xs text-red-500 mt-1"></p>
+                </div>
+                
 
-                <x-input x-model="fields.password_confirmation" name="password_confirmation" type="password" placeholder="*******">
-                    Confirmar Senha
+                <div>
+                <div @blur.capture="validateField('password_confirmation', 'enterprise')">
+                <x-input x-model="fields.password_confirmation" name="password_confirmation" type="password" placeholder="*******" validate-input>
+                Confirme sua senha
                 </x-input>
+                </div>
+                <p x-show="errors.password_confirmation" x-text="errors.password_confirmation" class="text-xs text-red-500 mt-1"></p>
+                </div>
             </div>
 
         </form>

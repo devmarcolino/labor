@@ -57,7 +57,7 @@ class EnterpriseVagaController extends Controller
 
         return redirect()
             ->route('enterprises.dashboard')
-            ->with('status', 'Vaga criada com sucesso!');
+            ->with('sucess', 'Vaga criada com sucesso!');
     }
 
     // Deleta uma vaga
@@ -66,6 +66,6 @@ class EnterpriseVagaController extends Controller
         $empresaId = Auth::guard('empresa')->id();
         $vaga = Vaga::where('id', $id)->where('idEmpresa', $empresaId)->firstOrFail();
         $vaga->delete();
-        return redirect()->route('enterprises.vagas.list')->with('status', 'Vaga deletada com sucesso!');
+        return redirect()->route('enterprises.vagas.list')->with('success', 'Vaga deletada com sucesso!');
     }
 }

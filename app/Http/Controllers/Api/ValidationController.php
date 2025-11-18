@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+// IMPORTE AS NOVAS REGRAS
+use App\Rules\ValidaCpf;
+use App\Rules\ValidaCnpj;
 
 class ValidationController extends Controller
 {
@@ -12,34 +15,59 @@ class ValidationController extends Controller
     {
         $field = $request->input('field');
         $value = $request->input('value');
-        $type  = $request->input('type', 'user'); // 'user' ou 'enterprise'
+        $type  = $request->input('type', 'user');
 
         if (!$field || !$value) {
-            return response()->json(['valid' => true]); // Ignora campos vazios (o front cuida disso)
+            return response()->json(['valid' => true]);
         }
 
         $table = ($type === 'enterprise') ? 'empresa_tb' : 'user_tb';
         
-        // Mapeamento: Nome do campo no Front => Nome da coluna no Banco
-        $columnMap = [
-            'email'    => 'email',
-            'username' => 'username', // Só user tem
-            'cpf'      => 'cpf',      // Só user tem
-            'cnpj'     => 'cnpj',     // Só empresa tem
-            'telefone' => 'tel',      // Front manda 'telefone', banco é 'tel'
-        ];
+        // Regras Básicas
+        $rules = [];
 
-        if (!array_key_exists($field, $columnMap)) {
+        switch ($field) {
+            case 'email':
+                // Valida formato real de email E se é único
+                $rules = [$field => ["required", "email:rfc,dns", "unique:{$table},email"]];
+                break;
+            
+            case 'cpf':
+                // Valida algoritmo de CPF E se é único
+                $rules = [$field => ["required", new ValidaCpf, "unique:user_tb,cpf"]];
+                break;
+
+            case 'cnpj':
+                // Valida algoritmo de CNPJ E se é único
+                $rules = [$field => ["required", new ValidaCnpj, "unique:empresa_tb,cnpj"]];
+                break;
+
+            case 'telefone':
+                // Regex para: (11) 99999-9999 ou (11) 9999-9999
+                // Formato: Parenteses, Espaço, Hífen
+                $rules = [$field => [
+                    "required", 
+                    "unique:{$table},tel",
+                    "regex:/^\(\d{2}\) \d{4,5}-\d{4}$/" 
+                ]];
+                break;
+
+            case 'username':
+                $rules = [$field => ["required", "string", "unique:user_tb,username"]];
+                break;
+        }
+
+        if (empty($rules)) {
             return response()->json(['valid' => true]);
         }
 
-        $dbColumn = $columnMap[$field];
-        $rules = [$field => "unique:{$table},{$dbColumn}"];
-
-        $validator = Validator::make([$field => $value], $rules);
+        // Faz a validação
+        $validator = Validator::make([$field => $value], $rules, [
+            'email.email' => 'O formato do e-mail é inválido.',
+            'telefone.regex' => 'O telefone deve estar no formato (99) 99999-9999.',
+        ]);
 
         if ($validator->fails()) {
-            // Retorna a primeira mensagem de erro
             return response()->json([
                 'valid' => false,
                 'message' => $validator->errors()->first($field)

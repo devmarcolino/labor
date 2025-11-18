@@ -64,7 +64,7 @@ Route::middleware('auth:web')->group(function () {
     // === ROTAS DAS OUTRAS PÁGINAS (Baseado na sua foto) ===
     Route::view('/workers/settings', 'workers.settings')->name('workers.settings');
     Route::view('/workers/schedule', 'workers.schedule')->name('workers.schedule');
-    Route::view('/workers/jobs', 'workers.other_jobs')->name('workers.jobs'); // nome do arquivo é 'other_jobs'
+    Route::view('/workers/other_jobs', 'workers.other_jobs')->name('workers.jobs'); // nome do arquivo é 'other_jobs'
     Route::view('/workers/rating', 'workers.rating')->name('workers.rating');
     Route::view('/workers/skills', 'workers.skills')->name('workers.skills');
     Route::view('/workers/address', 'workers.adress')->name('workers.address'); // 'adress' com um D só, conforme sua pasta

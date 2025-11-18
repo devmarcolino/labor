@@ -20,20 +20,36 @@ class VagaController extends Controller
             ->get()
             ->map(function (Vaga $vaga) {
                 $empresa = $vaga->empresa;
-                $companyName = optional($empresa)->nome_empresa ?? 'Empresa confidencial';
+                $companyName = $empresa->nome_empresa ?? 'Empresa confidencial';
+                $ramoEmpresa = $empresa->ramo ?? 'Setor não informado';
+                $fotoEmpresa = $empresa->fotoEmpresa ?? null;
 
                 return [
                     'id' => $vaga->id,
                     'title' => $vaga->funcVaga ?? $vaga->tipoVaga,
                     'company' => $companyName,
-                    'ramo' => optional($empresa)->ramo ?? 'Setor não informado',
+                    'ramo' => $ramoEmpresa,
                     'logo' => $this->makeLogoLetters($companyName),
                     'desc' => $vaga->descVaga ?? 'Descrição indisponível no momento.',
                     'image' => $this->resolveImagePath($vaga->imgVaga),
+                    'fotoEmpresa' => $this->resolveEmpresaImagePath($fotoEmpresa),
                 ];
             });
 
         return response()->json($vagas);
+    }
+
+    private function resolveEmpresaImagePath(?string $path): string
+    {
+        if (empty($path) || $path === 'null' || $path === null) {
+            return asset('img/match-example.png');
+        }
+
+        if (Str::startsWith($path, ['http://', 'https://'])) {
+            return $path;
+        }
+
+        return asset('storage/' . ltrim($path, '/'));
     }
 
     private function makeLogoLetters(string $name): string
@@ -54,6 +70,10 @@ class VagaController extends Controller
 
         if (Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
+        }
+
+        if (Str::startsWith($path, 'vagas_img/')) {
+            return asset('storage/' . ltrim($path, '/'));
         }
 
         return asset(ltrim($path, '/'));

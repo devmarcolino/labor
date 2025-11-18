@@ -91,10 +91,19 @@ Route::middleware('guest')->group(function () {
 
 // --- AUTH (Logado como Empresa) ---
 Route::middleware('auth:empresa')->group(function () {
+        // Minhas vagas (lista)
+        Route::get('/enterprises/vagas', [\App\Http\Controllers\EnterpriseVagaController::class, 'list'])->name('enterprises.vagas.list');
     
-    // Dashboard (Modal de onboarding entra via @include na view, não precisa de dados aqui)
+    // Dashboard
     Route::get('/enterprises/dashboard', fn() => view('enterprises.dashboard'))
         ->name('enterprises.dashboard');
+
+    // Criar vaga
+    Route::get('/enterprises/vagas/create', [\App\Http\Controllers\EnterpriseVagaController::class, 'create'])->name('enterprises.vagas.create');
+    Route::post('/enterprises/vagas', [\App\Http\Controllers\EnterpriseVagaController::class, 'store'])->name('enterprises.vagas.store');
+    
+    // Excluir vaga
+    Route::delete('/enterprises/vagas/delete/{id}', [\App\Http\Controllers\EnterpriseVagaController::class, 'destroy'])->name('enterprises.vagas.delete');
     
     // Chat & Perfil
     Route::get('/enterprises/chat', fn() => view('enterprises.chat'))->name('enterprises.chat');

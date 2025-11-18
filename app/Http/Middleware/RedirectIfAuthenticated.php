@@ -21,10 +21,25 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                return $this->redirectForGuard($guard);
             }
         }
 
+        // Garantimos que o guard de empresa também seja verificado mesmo
+        // quando o middleware for chamado sem parâmetros (guest padrão).
+        if (!in_array('empresa', $guards, true) && Auth::guard('empresa')->check()) {
+            return $this->redirectForGuard('empresa');
+        }
+
         return $next($request);
+    }
+
+    protected function redirectForGuard(?string $guard)
+    {
+        if ($guard === 'empresa') {
+            return redirect()->route('enterprises.dashboard');
+        }
+
+        return redirect(RouteServiceProvider::HOME);
     }
 }

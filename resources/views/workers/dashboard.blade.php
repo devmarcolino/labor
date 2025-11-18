@@ -74,15 +74,14 @@
         </ul>
 
             <a href="{{ route('workers.account') }}" class="text-gray-600 hover:text-gray-900 shadow-labor rounded-full">
-    <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[40px] h-[40px] rounded-full shadow-md flex items-center justify-center overflow-hidden" 
-         style="background-image: url('{{ Auth::user()->fotoUser ? asset('storage/' . Auth::user()->fotoUser) : '' }}');">
-         
-         {{-- Se NÃO tiver foto, mostra um ícone padrão --}}
-         @if(!Auth::user()->fotoUser)
+    <div class="bg-gray-200 flex items-center justify-center w-[40px] h-[40px] rounded-full shadow-md overflow-hidden">
+        @if(Auth::user()->fotoUser)
+            <img src="{{ asset('storage/' . Auth::user()->fotoUser) }}" alt="Foto de perfil" class="object-cover w-full h-full rounded-full" />
+        @else
             <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
-         @endif
+        @endif
     </div>
 </a>
     </header>
@@ -115,14 +114,15 @@
                     <div class="absolute inset-0 flex justify-center items-center p-4"
                         :style="`z-index: ${cards.length - index};`">
                         
-                        <div class="relative w-full h-full max-w-md mx-auto border-match overflow-hidden shadow-2xl bg-gray-200 card-item">
-                            
+                        <div class="relative w-full h-full max-w-md mx-auto border-match overflow-hidden shadow-2xl card-item bg-gray-200">
                             <img :src="card.image" :alt="card.title" class="absolute inset-0 h-full w-full object-cover">
                             <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
                                 <h2 class="text-3xl font-bold" x-text="card.title"></h2>
                                 <p class="text-sm text-gray-200" x-text="card.desc"></p>
                                 <div class="mt-4 flex items-center gap-2 w-full rounded-full bg-black/30 py-2 px-3 backdrop-blur-sm">
-                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 text-sm font-semibold text-black" x-text="card.logo"></div>
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 border border-white overflow-hidden">
+                                        <img :src="card.fotoEmpresa" alt="Foto da empresa" class="object-cover w-full h-full rounded-full" />
+                                    </div>
                                     <div>
                                         <p class="text-sm font-semibold" x-text="card.company"></p>
                                         <p class="text-xs text-gray-200" x-text="card.ramo"></p>

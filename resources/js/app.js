@@ -415,11 +415,42 @@ function enterpriseForm() {
     };
 }
 
+function dashboardView() {
+    return {
+        featuredJob: null, // Aqui vamos guardar a vaga destaque
+        loading: true,
+
+        init() {
+            this.fetchFeaturedJob();
+        },
+
+        async fetchFeaturedJob() {
+            try {
+                // Chama a nova rota que criamos
+                const response = await fetch('/api/vagas/destaque');
+                
+                if (response.ok) {
+                    // Se achou vaga (não é null), guarda na variável
+                    const data = await response.json();
+                    if (data) {
+                        this.featuredJob = data;
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao buscar destaque:', error);
+            } finally {
+                this.loading = false;
+            }
+        }
+    }
+}
+
 // Registro Global do Alpine
 window.Alpine = Alpine;
 Alpine.data("cardStack", cardStack);
 Alpine.data("registrationForm", registrationForm);
 Alpine.data("enterpriseForm", enterpriseForm);
+Alpine.data('dashboardView', dashboardView);
 Alpine.start();
 
 // --- 4. LÓGICA EXECUTADA APÓS O DOM CARREGAR ---

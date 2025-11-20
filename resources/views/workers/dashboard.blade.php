@@ -128,6 +128,7 @@
 
         <div class="hidden p-2 mx-auto" id="home" role="tabpanel" x-transition aria-labelledby="home-tab">
             <div class="flex flex-col mx-auto items-center justify-center w-full max-w-2xl gap-3">
+
                 <button class="bg-transparent w-full text-left">
                     <a href="{{ url('workers/schedule') }}">
                         <div class="bg-white dark:bg-gray-800 shadow-labor border-btn flex justify-between items-center py-6 px-8">
@@ -157,74 +158,74 @@
                     </a>
                 </button>
 
-                <button class="bg-transparent w-full text-left">
-                    <a href="{{ route('workers.jobs') }}">
-                        <div class="bg-white dark:bg-gray-800 shadow-labor border-btn flex flex-col gap-3 items-center pt-6 pb-4 px-4">
-                            <div class="flex w-full justify-between items-center px-4">
-                                <div class="flex gap-5 items-center">
-                                    <svg class="text-gray-900 dark:text-gray-200" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11 19.5C15.4183 19.5 19 15.9183 19 11.5C19 7.08172 15.4183 3.5 11 3.5C6.58172 3.5 3 7.08172 3 11.5C3 15.9183 6.58172 19.5 11 19.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M21 21.4999L16.65 17.1499" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M11 8.5V14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M8 11.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
+                <div x-data="dashboardView()" class="w-full mt-6 bg-white dark:bg-gray-800 shadow-labor rounded-[45px] pt-6 pb-4 px-4">
 
-
-                                    <div class="flex flex-col">
-                                        <h1 class="text-xl text-gray-900 dark:text-gray-200">Outras <span class="font-bold text-sky-600 dark:text-sky-500">vagas</span></h1>
-                                        <p class="text-md text-gray-400">Mais vagas para você</p>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <svg class="text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <div class="flex w-full py-2 justify-center gap-3 items-center bg-gray-100 shadow-sm rounded-full dark:bg-gray-900/85">
-                                <svg class="text-gray-800 dark:text-gray-300" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 10C20 16 12 22 12 22C12 22 4 16 4 10C4 7.87827 4.84285 5.84344 6.34315 4.34315C7.84344 2.84285 9.87827 2 12 2C14.1217 2 16.1566 2.84285 17.6569 4.34315C19.1571 5.84344 20 7.87827 20 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="CurrentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-
-                                <div class="text-left">
-                                    <h2 class="text-base font-bold text-gray-800 dark:text-gray-300">Vagas na região de:</h2>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">São Caetano do Sul, SP</p>
-                                </div>
-                            </div>
-
-                            <hr class="border-1.5 border-gray-300 px-[4rem] my-2 dark:border-gray-700">
-
-                            
-
-                            <div class="flex flex-col gap-2 text-left bg-gray-100 dark:bg-gray-900/85 p-3 border-btn shadow-sm">
-                                <div class="flex gap-2 p-2 w-full bg-sky-700/5 border-sky-600/10 rounded-full border-[1.5px] text-center justify-center">
-                                    <img src="../img/ia.svg" alt="" width="24" height="24">
-
-                                    <h2 class="font-bold text-gray-900 dark:text-gray-200">Vaga <span class="text-sky-600 dark:text-sky-500">destaque:</span></h2>
-                                </div>
-
-                                <div class="flex items-center gap-2 p-2 w-full rounded-full">
-                                    <div class="flex h-8 w-8 items-center justify-center bg-gray-300 rounded-full text-sm font-semibold text-black">AD</div>
-                                    <div>
-                                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-200">@adventree</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-300">Alameda das cidades, 832 (0.5km)</p>
-                                    </div>
-                                </div>
-
-                                <div class="px-2 pb-3">
-                                <p class="text-sm font-semibold text-gray-900 dark:text-gray-200">Garçom</p>
-                                <p class="text-xs font-light text-gray-400 dark:text-gray-300">Abra pra ver descrição</p>
-                                </div>
-
-                                <img src="../img/small-example-two.jpg" alt="" class="object-cover border-btn">
-
+                    <div class="flex w-full justify-between items-center px-4">
+                        <div class="flex gap-5 items-center">
+                            <svg class="text-gray-900 dark:text-gray-200" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 19.5C15.4183 19.5 19 15.9183 19 11.5C19 7.08172 15.4183 3.5 11 3.5C6.58172 3.5 3 7.08172 3 11.5C3 15.9183 6.58172 19.5 11 19.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 21.4999L16.65 17.1499" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 8.5V14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <div class="flex flex-col text-left">
+                                <h1 class="text-xl text-gray-900 dark:text-gray-200">Outras <span class="font-bold text-sky-600 dark:text-sky-500">vagas</span></h1>
+                                <p class="text-md text-gray-400">Mais vagas para você</p>
                             </div>
                         </div>
-                    </a>
-                </button>
+                        <div>
+                            <svg class="text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="flex w-full py-2 justify-center gap-3 items-center bg-gray-100 shadow-sm rounded-full dark:bg-gray-900/85 mt-4">
+                        <svg class="text-gray-800 dark:text-gray-300" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 10C20 16 12 22 12 22C12 22 4 16 4 10C4 7.87827 4.84285 5.84344 6.34315 4.34315C7.84344 2.84285 9.87827 2 12 2C14.1217 2 16.1566 2.84285 17.6569 4.34315C19.1571 5.84344 20 7.87827 20 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="CurrentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <div class="text-left">
+                            <h2 class="text-base font-bold text-gray-800 dark:text-gray-300">Vagas na região de:</h2>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                {{ Auth::user()->endereco->cidade ?? 'Sua Localização' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr class="border-1.5 border-gray-300 px-[4rem] my-4 dark:border-gray-700">
+
+                    <div x-show="loading" class="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
+
+                    <div x-show="!loading && !featuredJob" class="text-center py-4 text-gray-500">
+                        Nenhuma vaga destaque compatível encontrada.
+                    </div>
+
+                    <template x-if="!loading && featuredJob">
+                        <button class="bg-transparent w-full text-left cursor">
+                            <a :href="'/vagas/' + featuredJob.id">
+                                <div class="bg-white dark:bg-gray-800 shadow-labor border-btn flex flex-col gap-3 items-center pt-6 pb-4 px-4 rounded-xl"> <div class="flex gap-2 p-2 w-full bg-sky-700/5 border-sky-600/10 rounded-full border-[1.5px] text-center justify-center items-center">
+                                        <img src="../img/ia.svg" alt="" width="24" height="24">
+                                        <h2 class="font-bold text-gray-900 dark:text-gray-200">Vaga <span class="text-sky-600 dark:text-sky-500">destaque:</span></h2>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 p-2 w-full rounded-full">
+                                        <div class="flex h-10 w-10 items-center justify-center bg-gray-300 rounded-full overflow-hidden border border-gray-200">
+                                            <img :src="featuredJob.fotoEmpresa" class="w-full h-full object-cover">
+                                        </div>
+                                        
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-200" x-text="'@' + featuredJob.company"></p>
+                                            
+                                            <p class="text-xs text-gray-500 dark:text-gray-300">
+                                                <span x-text="featuredJob.distance"></span> de você
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="px-2 pb-1 w-full text-left">
+                                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-200" x-text="featuredJob.title"></p>
+                                        <p class="text-xs font-light text-gray-400 dark:text-gray-300">Abra pra ver descrição</p>
+                                    </div>
+
+                                    <img :src="featuredJob.image" alt="" class="object-cover border-btn w-full h-40 rounded-lg">
+
+                                </div>
+                            </a>
+                        </button>
+                    </template>
+
+                </div>
             </div>
         </div>
     </main>

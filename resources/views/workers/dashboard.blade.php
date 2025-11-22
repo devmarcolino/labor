@@ -125,7 +125,7 @@
                                         <img :src="card.fotoEmpresa" alt="Foto da empresa" class="object-cover w-full h-full rounded-full" />
                                     </div>
                                     <div>
-                                        <p class="text-sm font-semibold" x-text="card.company"></p>
+                                        <p class="text-sm font-semibold" x-text="card.company + (card.distance ? ' - ' + card.distance : '')"></p>
                                         <p class="text-xs text-gray-200" x-text="card.ramo"></p>
                                     </div>
                                 </div>
@@ -201,7 +201,7 @@
                         Nenhuma vaga destaque compatível encontrada.
                     </div>
 
-                    <template x-if="!loading && featuredJob">
+                    <template x-if="!loading && featuredJob && featuredJob.id">
                         <button class="bg-transparent w-full text-left cursor">
                             <a :href="'/vagas/' + featuredJob.id">
                                 <div class="bg-white dark:bg-gray-800 shadow-labor border-btn flex flex-col gap-3 items-center pt-6 pb-4 px-4 rounded-xl"> <div class="flex gap-2 p-2 w-full bg-sky-700/5 border-sky-600/10 rounded-full border-[1.5px] text-center justify-center items-center">

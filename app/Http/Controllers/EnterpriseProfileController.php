@@ -56,9 +56,11 @@ class EnterpriseProfileController extends Controller
                 
                 // LÓGICA DO ENDEREÇO (continua a mesma)
                 if ($empresa->idEnd) {
-                    $empresa->endereco->update($validatedEnd);
+                    $endereco = $empresa->endereco;
+                    $endereco->fill($validatedEnd);
+                    $endereco->save(); // dispara o hook e salva lat/long
                 } else {
-                    $newEnd = End::create($validatedEnd);
+                    $newEnd = End::create($validatedEnd); // já dispara o hook
                     $validatedEmpresa['idEnd'] = $newEnd->id;
                     $validatedEmpresa['status'] = 2; 
                 }

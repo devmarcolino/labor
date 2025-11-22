@@ -38,7 +38,7 @@ class VagaController extends Controller
 
         // 3. Buscar Vagas com o Filtro (MATCH)
         $vagas = Vaga::with('empresa')
-            ->whereIn('funcVaga', $skillNames) // <--- A MÁGICA ACONTECE AQUI
+            ->whereIn('funcVaga', $skillNames)
             ->latest('created_at')
             ->take($limit)
             ->get()
@@ -47,6 +47,17 @@ class VagaController extends Controller
                 $companyName = $empresa->nome_empresa ?? 'Empresa confidencial';
                 $ramoEmpresa = $empresa->ramo ?? 'Setor não informado';
                 $fotoEmpresa = $empresa->fotoEmpresa ?? null;
+
+                // Cálculo da distância
+                $user = auth()->user();
+                $userLat = $user && $user->endereco ? $user->endereco->latitude : null;
+                $userLon = $user && $user->endereco ? $user->endereco->longitude : null;
+                $empresaLat = $empresa && $empresa->endereco ? $empresa->endereco->latitude : null;
+                $empresaLon = $empresa && $empresa->endereco ? $empresa->endereco->longitude : null;
+                $distance = null;
+                if ($userLat && $userLon && $empresaLat && $empresaLon) {
+                    $distance = $this->calculateDistance($userLat, $userLon, $empresaLat, $empresaLon);
+                }
 
                 return [
                     'id' => $vaga->id,
@@ -57,16 +68,38 @@ class VagaController extends Controller
                     'desc' => $vaga->descVaga ?? 'Descrição indisponível no momento.',
                     'image' => $this->resolveImagePath($vaga->imgVaga),
                     'fotoEmpresa' => $this->resolveEmpresaImagePath($fotoEmpresa),
-                    
+                    'distance' => $distance,
                     // Debug (Opcional: pra você ver porque deu match)
-                    'match_skill' => $vaga->tipoVaga 
+                    'match_skill' => $vaga->tipoVaga
                 ];
-            });
+            })
+            ->filter(function ($vaga) {
+                // Filtra vagas com distância <= 5 km
+                if (!$vaga['distance']) return false;
+                // Remove ' km' para comparar
+                $distValue = floatval(str_replace(' km', '', $vaga['distance']));
+                return $distValue <= 5;
+            })
+            ->values();
 
         return response()->json($vagas);
     }
 
     // --- MÉTODOS AUXILIARES (MANTIDOS IGUAIS) ---
+
+    // Calcula a distância entre dois pontos (Haversine)
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // km
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        $a = sin($dLat/2) * sin($dLat/2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon/2) * sin($dLon/2);
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+        $distance = $earthRadius * $c;
+        return number_format($distance, 1) . ' km';
+    }
 
     private function resolveEmpresaImagePath(?string $path): string
     {
@@ -126,33 +159,31 @@ class VagaController extends Controller
         }
 
         // 3. A Query "Haversine"
-        $vaga = Vaga::select('vagas.*')
-            // Junta com empresa para chegar no endereço dela
-            ->join('empresa_tb', 'vagas.idEmpresa', '=', 'empresa_tb.id')
-            ->join('end_tb', 'empresa_tb.idEnd', '=', 'end_tb.id')
-            
-            // Filtra pelas habilidades (Match)
-            ->whereIn('vagas.funcVaga', $skillIds)
-            
-            // CALCULA A DISTÂNCIA (Fórmula Mágica)
-            // 6371 é o raio da terra em KM
-            ->selectRaw("
-                ( 6371 * acos( cos( radians(?) ) *
-                  cos( radians( end_tb.latitude ) ) *
-                  cos( radians( end_tb.longitude ) - radians(?) ) +
-                  sin( radians(?) ) *
-                  sin( radians( end_tb.latitude ) ) )
-                ) AS distance", 
-                [$lat, $lon, $lat]
-            )
-            
-            // Ordena: Mais perto primeiro
-            ->orderBy('distance', 'asc')
-            
-            // Pega só a campeã
-            ->first();
+                $vaga = Vaga::from('vagas_tb as vagas')
+                        ->select('vagas.*')
+                        // Junta com empresa para chegar no endereço dela
+                        ->join('empresa_tb', 'vagas.idEmpresa', '=', 'empresa_tb.id')
+                        ->join('end_tb', 'empresa_tb.idEnd', '=', 'end_tb.id')
+                        // Filtra pelas habilidades (Match)
+                        ->whereIn('vagas.funcVaga', $skillIds)
+                        // CALCULA A DISTÂNCIA (Fórmula Mágica)
+                        // 6371 é o raio da terra em KM
+                        ->selectRaw("
+                                ( 6371 * acos( cos( radians(?) ) *
+                                    cos( radians( end_tb.latitude ) ) *
+                                    cos( radians( end_tb.longitude ) - radians(?) ) +
+                                    sin( radians(?) ) *
+                                    sin( radians( end_tb.latitude ) ) )
+                                ) AS distance", 
+                                [$lat, $lon, $lat]
+                        )
+                            ->having('distance', '<=', 5)
+                        // Ordena: Mais perto primeiro
+                        ->orderBy('distance', 'asc')
+                        // Pega só a campeã
+                        ->first();
 
-        if (!$vaga) {
+        if (!$vaga || !$vaga->id) {
             return response()->json(null);
         }
 
@@ -161,16 +192,14 @@ class VagaController extends Controller
         $companyName = $empresa->nome_empresa ?? 'Confidencial';
 
         $data = [
-            'id' => $vaga->id,
-            'title' => $vaga->funcVaga, // Lembre-se que aqui pode vir o ID, ideal é carregar a relação da Skill para mostrar o nome
-            'company' => $companyName,
-            'logo' => $this->makeLogoLetters($companyName),
-            'image' => $this->resolveImagePath($vaga->imgVaga),
-            'fotoEmpresa' => $this->resolveEmpresaImagePath($empresa->fotoEmpresa),
-            
-            // Formata a distância (Ex: "2.5 km")
-            'distance' => number_format($vaga->distance, 1) . ' km',
-            'location' => $empresa->endereco->cidade . ', ' . $empresa->endereco->uf,
+              'id' => $vaga->id ?? 0,
+              'title' => $vaga->funcVaga ?? $vaga->tipoVaga ?? 'Vaga',
+              'company' => $companyName ?? 'Confidencial',
+              'logo' => $this->makeLogoLetters($companyName ?? 'Confidencial'),
+              'image' => $this->resolveImagePath($vaga->imgVaga ?? null),
+              'fotoEmpresa' => $this->resolveEmpresaImagePath($empresa->fotoEmpresa ?? null),
+              'distance' => isset($vaga->distance) ? number_format($vaga->distance, 1) . ' km' : '',
+              'location' => ($empresa->endereco->cidade ?? '') . ', ' . ($empresa->endereco->uf ?? ''),
         ];
 
         return response()->json($data);

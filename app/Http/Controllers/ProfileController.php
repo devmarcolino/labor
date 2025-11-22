@@ -65,11 +65,12 @@ class ProfileController extends Controller
             
             // LÓGICA DO ENDEREÇO
             if ($user->idEnd) {
-                $user->endereco->update($validatedEnd);
-                // Garante que o status seja atualizado para 2 (cadastro completo)
+                $endereco = $user->endereco;
+                $endereco->fill($validatedEnd);
+                $endereco->save(); // dispara o hook e salva lat/long
                 $validatedUser['status'] = 2;
             } else {
-                $newEnd = End::create($validatedEnd);
+                $newEnd = End::create($validatedEnd); // já dispara o hook
                 $validatedUser['idEnd'] = $newEnd->id;
                 $validatedUser['status'] = 2; 
             }

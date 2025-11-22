@@ -43,12 +43,12 @@
     <!-- Controle dos modais de deletar -->
     <div x-data="{ openDelete: false, vagaId: null }" x-init="$watch('openDelete', value => { $root.modalOpen = value })">
         @foreach($vagas as $vaga)
-        <div class="bg-gray-800 rounded-2xl shadow-md p-4 mb-6 dark:bg-gray-800">
+        <div class="bg-white rounded-2xl shadow-md p-4 mb-6 dark:bg-gray-800">
             <div class="flex items-center gap-2 mb-2">
                 @if(!empty($vaga->empresa->fotoEmpresa))
                     <img src="{{ asset('storage/' . $vaga->empresa->fotoEmpresa) }}" alt="Logo empresa" class="w-8 h-8 rounded-full object-cover">
                 @else
-                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-xs">?</div>
+                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs dark:bg-gray-200">?</div>
                 @endif
                 <div>
                     <span class="font-semibold text-gray-900 dark:text-white">{{ $vaga->empresa->nome_empresa ?? '' }}</span>
@@ -62,11 +62,11 @@
                         <img src="{{ asset('storage/' . $vaga->imgVaga) }}" alt="Foto da vaga" class="h-full object-contain vaga-img" style="max-width:100%; max-height:100%;">
                     </div>
                 @else
-                    <div class="w-full h-32 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">Sem imagem da vaga</div>
+                    <div class="w-full h-32 bg-gray-50 flex items-center justify-center text-gray-400 text-sm dark:bg-gray-100">Sem imagem da vaga</div>
                 @endif
             </div>
 
-            <div class="font-bold text-md text-gray-900 mb-1">
+            <div class="font-bold text-md text-gray-900 mb-1 dark:text-white">
                 <span class="font-bold text-md text-gray-900 dark:text-white mb-1">{{ $vaga->funcVaga ?? '' }} ({{ $vaga->horario ?? 'horario da vaga' }})</span>
             </div>
 
@@ -93,7 +93,7 @@
                 });
                 </script>
                 @endif
-                <div class="flex items-center gap-1 text-gray-400">
+                <div class="flex items-center gap-1 text-gray-400 dark:text-gray-200">
                     <img src="/img/heart-handshake.svg" alt="Gostaram" class="w-4 h-4">
                     <span class="text-xs">{{ $vaga->gostaram ?? 0 }} gostaram</span>
                 </div>
@@ -103,7 +103,7 @@
                 @if(isset($vaga->candidatos) && count($vaga->candidatos) > 0 && !empty($vaga->candidatos[0]->foto))
                     <img src="{{ asset('storage/' . $vaga->candidatos[0]->foto) }}" alt="Candidato" class="w-8 h-8 rounded-full object-cover">
                 @else
-                    <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-xs">?</div>
+                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs dark:bg-gray-200">?</div>
                 @endif
                 <div>
                     <span class="font-semibold text-gray-900 dark:text-white">Candidatos</span>

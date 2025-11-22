@@ -58,7 +58,9 @@
 
             <div class="rounded-xl overflow-hidden mb-3">
                 @if(!empty($vaga->imgVaga))
-                    <img src="{{ asset('storage/' . $vaga->imgVaga) }}" alt="Foto da vaga" class="w-full h-32 object-cover">
+                    <div class="w-full h-32 flex items-center justify-center rounded-xl overflow-hidden vaga-img-bg" style="background: #fff;">
+                        <img src="{{ asset('storage/' . $vaga->imgVaga) }}" alt="Foto da vaga" class="h-full object-contain vaga-img" style="max-width:100%; max-height:100%;">
+                    </div>
                 @else
                     <div class="w-full h-32 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">Sem imagem da vaga</div>
                 @endif
@@ -151,5 +153,33 @@
         @endforeach
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.vaga-img').forEach(function(img) {
+        img.addEventListener('load', function() {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                let r = 0, g = 0, b = 0, count = 0;
+                for(let i = 0; i < data.length; i += 4*100) { // Amostra pixels para performance
+                    r += data[i];
+                    g += data[i+1];
+                    b += data[i+2];
+                    count++;
+                }
+                r = Math.round(r/count);
+                g = Math.round(g/count);
+                b = Math.round(b/count);
+                const bgColor = `rgb(${r},${g},${b})`;
+                img.parentElement.style.background = bgColor;
+            } catch(e) {}
+        });
+    });
+});
+</script>
 </body>
 </html>

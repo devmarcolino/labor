@@ -8,6 +8,7 @@
     @vite('resources/js/app.js')
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 flex flex-col min-h-screen items-center justify-center">
+        <x-btn-back />
     <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
         <div class="bg-white dark:bg-gray-800 shadow-labor border-match w-full max-w-xl p-8">
             <h2 class="text-3xl font-bold mb-8 text-sky-600 dark:text-sky-400 text-center">Criar nova vaga</h2>

@@ -12,6 +12,7 @@
 </head>
 <x-flash-manager />
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-500 h-screen flex flex-col">
+        <x-btn-back />
     
     <x-loading/>
 </body>

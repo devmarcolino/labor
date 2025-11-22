@@ -7,19 +7,29 @@
 
     <style>
         [x-cloak] { display: none !important; }
+        body.modal-open {
+            overflow: hidden !important;
+            touch-action: none;
+        }
     </style>
 
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
 </head>
-<body class="bg-gray-50 min-h-screen">
-<div class="container mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-4">
+<body class="bg-gray-50 min-h-screen" x-data="{ modalOpen: false }" x-init="
+    $watch('modalOpen', value => {
+        if(value) document.body.classList.add('modal-open');
+        else document.body.classList.remove('modal-open');
+    });
+">
+<div class="container mx-auto px-2 py-4 max-w-md">
+    <div class="flex items-center gap-2 mb-4">
+        <x-btn-back />
         <h1 class="text-xl font-bold text-gray-900">Minhas Vagas</h1>
     </div>
 
     <!-- Controle do modal de criar vaga -->
-    <div x-data="{ openVagaModal: false }">
+    <div x-data="{ openVagaModal: false }" x-init="$watch('openVagaModal', value => { $root.modalOpen = value })">
         <button @click="openVagaModal = true" class="w-full bg-sky-600 text-white font-semibold py-3 rounded-full mb-5 flex items-center justify-center gap-2 shadow">
             <span>+ Criar nova vaga</span>
         </button>
@@ -31,7 +41,7 @@
     </div>
 
     <!-- Controle dos modais de deletar -->
-    <div x-data="{ openDelete: false, vagaId: null }">
+    <div x-data="{ openDelete: false, vagaId: null }" x-init="$watch('openDelete', value => { $root.modalOpen = value })">
         @foreach($vagas as $vaga)
         <div class="bg-white rounded-2xl shadow-md p-4 mb-6">
             <div class="flex items-center gap-2 mb-2">

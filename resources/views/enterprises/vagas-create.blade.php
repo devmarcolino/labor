@@ -19,7 +19,12 @@
                 </div>
                 <div>
                     <label class="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Função</label>
-                    <input type="text" name="funcVaga" class="input-labor" required>
+                    <select name="funcVaga" class="input-labor" required>
+                        <option value="">Selecione uma habilidade</option>
+                        @foreach($skills as $skill)
+                            <option value="{{ $skill->nomeHabilidade }}">{{ $skill->nomeHabilidade }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div>
                     <label class="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Descrição</label>

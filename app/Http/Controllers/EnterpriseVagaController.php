@@ -24,7 +24,8 @@ class EnterpriseVagaController extends Controller
     // Exibe o formulário de criação de vaga
     public function create()
     {
-        return view('enterprises.vagas-create');
+        $skills = \App\Models\Skill::all();
+        return view('enterprises.vagas-create', compact('skills'));
     }
 
     // Salva a vaga no banco

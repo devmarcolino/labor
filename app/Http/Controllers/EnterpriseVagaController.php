@@ -18,7 +18,8 @@ class EnterpriseVagaController extends Controller
     {
         $empresaId = Auth::guard('empresa')->id();
         $vagas = Vaga::where('idEmpresa', $empresaId)->latest('created_at')->get();
-        return view('enterprises.vagas-list', compact('vagas'));
+        $skills = \App\Models\Skill::all();
+        return view('enterprises.vagas-list', compact('vagas', 'skills'));
     }
 
     // Exibe o formulário de criação de vaga

@@ -16,7 +16,7 @@
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
 </head>
-<body class="bg-gray-50 min-h-screen" x-data="{ modalOpen: false }" x-init="
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen" x-data="{ modalOpen: false }" x-init="
     $watch('modalOpen', value => {
         if(value) document.body.classList.add('modal-open');
         else document.body.classList.remove('modal-open');
@@ -43,7 +43,7 @@
     <!-- Controle dos modais de deletar -->
     <div x-data="{ openDelete: false, vagaId: null }" x-init="$watch('openDelete', value => { $root.modalOpen = value })">
         @foreach($vagas as $vaga)
-        <div class="bg-white rounded-2xl shadow-md p-4 mb-6">
+        <div class="bg-gray-800 rounded-2xl shadow-md p-4 mb-6 dark:bg-gray-800">
             <div class="flex items-center gap-2 mb-2">
                 @if(!empty($vaga->empresa->fotoEmpresa))
                     <img src="{{ asset('storage/' . $vaga->empresa->fotoEmpresa) }}" alt="Logo empresa" class="w-8 h-8 rounded-full object-cover">
@@ -51,8 +51,8 @@
                     <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-xs">?</div>
                 @endif
                 <div>
-                    <span class="font-semibold text-gray-900">{{ $vaga->empresa->nome_empresa ?? '' }}</span>
-                    <div class="text-xs text-gray-400">{{ $vaga->empresa->cidade ?? '' }}</div>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ $vaga->empresa->nome_empresa ?? '' }}</span>
+                    <div class="text-xs text-gray-400 dark:text-gray-300">{{ $vaga->empresa->cidade ?? '' }}</div>
                 </div>
             </div>
 
@@ -67,15 +67,15 @@
             </div>
 
             <div class="font-bold text-md text-gray-900 mb-1">
-                {{ $vaga->funcVaga ?? '' }} ({{ $vaga->horario ?? 'horario da vaga' }})
+                <span class="font-bold text-md text-gray-900 dark:text-white mb-1">{{ $vaga->funcVaga ?? '' }} ({{ $vaga->horario ?? 'horario da vaga' }})</span>
             </div>
 
             <ul class="text-sm text-gray-500 mb-2 list-disc pl-5">
-                <li>{{ $vaga->descVaga ?? '' }}</li>
+                <li class="text-gray-500 dark:text-gray-300">{{ $vaga->descVaga ?? '' }}</li>
             </ul>
 
             <div class="flex gap-6 mb-2">
-                <div class="flex items-center gap-1 text-gray-400">
+                <div class="flex items-center gap-1 text-gray-400 dark:text-gray-200">
                     <img src="/img/eye.svg" alt="Visualizações" class="w-4 h-4">
                     <span class="text-xs">{{ $vaga->visualizacoes ?? 0 }} visualizações</span>
                 </div>
@@ -106,10 +106,10 @@
                     <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-xs">?</div>
                 @endif
                 <div>
-                    <span class="font-semibold text-gray-900">Candidatos</span>
-                    <div class="text-xs text-gray-400">Ver informações</div>
+                    <span class="font-semibold text-gray-900 dark:text-white">Candidatos</span>
+                    <div class="text-xs text-gray-400 dark:text-gray-300">Ver informações</div>
                 </div>
-                <span class="ml-auto text-gray-400 text-xs">{{ isset($vaga->candidatos) ? count($vaga->candidatos) : 0 }}</span>
+                <span class="ml-auto text-gray-400 dark:text-gray-200 text-xs">{{ isset($vaga->candidatos) ? count($vaga->candidatos) : 0 }}</span>
             </div>
 
             <div class="flex gap-2">
@@ -150,7 +150,7 @@
                         <svg class="w-12 h-12 text-red-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
-                        <h2 class="text-lg font-bold text-gray-900 mb-1">Confirmar exclusão</h2>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Confirmar exclusão</h2>
                         <p class="text-gray-500 mb-2 text-center text-sm">Tem certeza que deseja deletar esta vaga? Esta ação não poderá ser desfeita.</p>
                     </div>
                     <div class="flex flex-col gap-2 w-full mt-2">

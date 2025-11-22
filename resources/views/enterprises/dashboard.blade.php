@@ -158,18 +158,18 @@
                 </button>
 
                 <!-- Card novo conforme modelo do anexo -->
-                <button onclick="window.location.href='{{ route('enterprises.vagas.list') }}'" class="bg-white rounded-2xl shadow-md mb-6 p-5 flex flex-col w-full text-left focus:outline-none transition hover:shadow-lg" style="max-width: 100%;">
+                <button onclick="window.location.href='{{ route('enterprises.vagas.list') }}'" class="bg-white dark:bg-gray-800 rounded-2xl shadow-md mb-6 p-5 flex flex-col w-full text-left focus:outline-none transition hover:shadow-lg" style="max-width: 100%;">
                     <div class="flex items-center gap-2 mb-1">
-                        <img src="/img/folder-closed.svg" alt="Minhas vagas" class="w-5 h-5">
-                        <h2 class="text-lg font-bold text-gray-900">Minhas <span class="text-sky-600">vagas</span></h2>
-                        <svg class="ml-auto text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <img src="/img/folder-closed.svg" alt="Minhas vagas" class="w-5 h-5">
+                                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Minhas <span class="text-sky-600 dark:text-sky-300">vagas</span></h2>
+                                        <svg class="ml-auto text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
-                    <p class="text-sm text-gray-400 mb-2">Vagas postadas por mim</p>
-                    <div class="w-full flex justify-center mb-2">
-                        <div class="w-2/3 h-[2px] bg-gray-100 rounded-full"></div>
-                    </div>
+                                    <p class="text-sm text-gray-400 dark:text-gray-300 mb-2">Vagas postadas por mim</p>
+                                    <div class="w-full flex justify-center mb-2">
+                                        <div class="w-2/3 h-[2px] bg-gray-100 dark:bg-gray-700 rounded-full"></div>
+                                    </div>
                     @php
                         $ultimaVaga = \App\Http\Controllers\EnterpriseVagaController::ultimaVaga(Auth::guard('empresa')->id());
                             $empresaId = Auth::guard('empresa')->id();
@@ -178,27 +178,26 @@
                                 ->join('visualizacao_vaga', 'vagas_tb.id', '=', 'visualizacao_vaga.idVaga')
                                 ->count();
                     @endphp
-                    <div class="bg-white rounded-2xl shadow p-4 flex flex-col gap-2" style="border: 1.5px solid #F3F4F6;">
+                                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 flex flex-col gap-2 border border-gray-100 dark:border-gray-700">
                         @if($ultimaVaga)
                             <div class="flex items-center gap-2 mb-1">
                                 <img src="/img/gauge.svg" alt="Relógio" class="w-4 h-4">
-                                <span class="text-gray-500 text-xs">Ultima vaga postada: ({{ $ultimaVaga->created_at->diffForHumans() }})</span>
+                                                <span class="text-gray-500 dark:text-gray-300 text-xs">Ultima vaga postada: ({{ $ultimaVaga->created_at->diffForHumans() }})</span>
                             </div>
-                            <div class="font-bold text-md text-gray-900 mb-1">{{ $ultimaVaga->funcVaga }} ({{ $ultimaVaga->dataVaga }})</div>
-                            <div class="flex gap-6 mt-2">
-                                <div class="flex items-center gap-1 text-gray-400">
-                                    <img src="/img/eye.svg" alt="Visualizações" class="w-4 h-4">
-                                    <span class="text-xs">Visualizações</span>
-                                    <span class="text-xs font-bold text-sky-700">{{ $totalVisualizacoes }}</span>
-                                </div>
-                                <div class="flex items-center gap-1 text-gray-400">
-                                    <img src="/img/heart-handshake.svg" alt="Gostaram" class="w-4 h-4">
-                                    <span class="text-xs">2 gostaram</span>
-                                </div>
-                            </div>
-                               
+                                            <div class="font-bold text-md text-gray-900 dark:text-white mb-1">{{ $ultimaVaga->funcVaga }} ({{ $ultimaVaga->dataVaga }})</div>
+                                            <div class="flex gap-6 mt-2">
+                                                <div class="flex items-center gap-1 text-gray-400 dark:text-gray-200">
+                                                    <img src="/img/eye.svg" alt="Visualizações" class="w-4 h-4">
+                                                    <span class="text-xs">Visualizações</span>
+                                                    <span class="text-xs font-bold text-sky-700 dark:text-sky-300">{{ $totalVisualizacoes }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1 text-gray-400 dark:text-gray-200">
+                                                    <img src="/img/heart-handshake.svg" alt="Gostaram" class="w-4 h-4">
+                                                    <span class="text-xs">2 gostaram</span>
+                                                </div>
+                                            </div>
                         @else
-                            <div class="text-gray-500">Nenhuma vaga cadastrada.</div>
+                                            <div class="text-gray-500 dark:text-gray-300">Nenhuma vaga cadastrada.</div>
                         @endif
                     </div>
                 </button>

@@ -172,6 +172,11 @@
                     </div>
                     @php
                         $ultimaVaga = \App\Http\Controllers\EnterpriseVagaController::ultimaVaga(Auth::guard('empresa')->id());
+                            $empresaId = Auth::guard('empresa')->id();
+                            $totalVisualizacoes = \DB::table('vagas_tb')
+                                ->where('idEmpresa', $empresaId)
+                                ->join('visualizacao_vaga', 'vagas_tb.id', '=', 'visualizacao_vaga.idVaga')
+                                ->count();
                     @endphp
                     <div class="bg-white rounded-2xl shadow p-4 flex flex-col gap-2" style="border: 1.5px solid #F3F4F6;">
                         @if($ultimaVaga)
@@ -183,13 +188,15 @@
                             <div class="flex gap-6 mt-2">
                                 <div class="flex items-center gap-1 text-gray-400">
                                     <img src="/img/eye.svg" alt="Visualizações" class="w-4 h-4">
-                                    <span class="text-xs">15 visualizações</span>
+                                    <span class="text-xs">Visualizações</span>
+                                    <span class="text-xs font-bold text-sky-700">{{ $totalVisualizacoes }}</span>
                                 </div>
                                 <div class="flex items-center gap-1 text-gray-400">
                                     <img src="/img/heart-handshake.svg" alt="Gostaram" class="w-4 h-4">
                                     <span class="text-xs">2 gostaram</span>
                                 </div>
                             </div>
+                               
                         @else
                             <div class="text-gray-500">Nenhuma vaga cadastrada.</div>
                         @endif

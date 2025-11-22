@@ -18,6 +18,10 @@ class EnterpriseVagaController extends Controller
     {
         $empresaId = Auth::guard('empresa')->id();
         $vagas = Vaga::where('idEmpresa', $empresaId)->latest('created_at')->get();
+        // Adiciona visualizações reais em cada vaga
+        foreach ($vagas as $vaga) {
+            $vaga->visualizacoes = $vaga->visualizacoesCount();
+        }
         $skills = \App\Models\Skill::all();
         return view('enterprises.vagas-list', compact('vagas', 'skills'));
     }

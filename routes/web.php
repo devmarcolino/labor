@@ -13,16 +13,16 @@ use App\Http\Controllers\ProfileController; // Perfil User
 use App\Http\Controllers\EnterpriseProfileController; // Perfil Empresa
 
 // Models
-use App\Models\Skill; 
+use App\Models\Skill;
 
 /*
 |--------------------------------------------------------------------------
 | 🏠 PÚBLICO
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', fn() => view('index'))->name('home');
 Route::get('/choose', fn() => view('choose'))->name('choose');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -37,23 +37,23 @@ Route::middleware('guest')->group(function () {
     // Login & Registro
     Route::get('/workers/login', [AuthenticatedSessionController::class, 'create'])->name('workers.login');
     Route::post('/workers/login', [AuthenticatedSessionController::class, 'store']);
-    
+
     Route::get('/workers/register', [RegisteredUserController::class, 'create'])->name('workers.register');
     Route::post('/workers/register', [RegisteredUserController::class, 'store']);
 });
 
 // --- AUTH (Logado) ---
 Route::middleware('auth:web')->group(function () {
-    
+
     // Dashboard (+ Habilidades para a Modal de Onboarding)
     Route::get('/workers/dashboard', function () {
-        $habilidades = Skill::all(); 
+        $habilidades = Skill::all();
         return view('workers.dashboard', ['habilidades' => $habilidades]);
     })->name('workers.dashboard');
 
     // Chat & Perfil
     Route::get('/workers/chat', fn() => view('workers.chat'))->name('workers.chat');
-    
+
     // Conta/Perfil (Onboarding usa isso)
     Route::get('/workers/account', [ProfileController::class, 'edit'])->name('workers.account');
     Route::patch('/workers/account', [ProfileController::class, 'update'])->name('workers.profile.update');
@@ -61,15 +61,25 @@ Route::middleware('auth:web')->group(function () {
     // Logout
     Route::post('/workers/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-    // === ROTAS DAS OUTRAS PÁGINAS (Baseado na sua foto) ===
+    // === OUTRAS PÁGINAS ===
     Route::view('/workers/settings', 'workers.settings')->name('workers.settings');
     Route::view('/workers/schedule', 'workers.schedule')->name('workers.schedule');
-    Route::view('/workers/other_jobs', 'workers.other_jobs')->name('workers.jobs'); // nome do arquivo é 'other_jobs'
+    Route::view('/workers/other_jobs', 'workers.other_jobs')->name('workers.jobs'); // nome correto do arquivo é 'other_jobs'
     Route::view('/workers/rating', 'workers.rating')->name('workers.rating');
     Route::view('/workers/skills', 'workers.skills')->name('workers.skills');
-    Route::view('/workers/address', 'workers.adress')->name('workers.address'); // 'adress' com um D só, conforme sua pasta
-});
+    Route::view('/workers/address', 'workers.adress')->name('workers.address'); // 'adress' com um D só
 
+    /*
+    |--------------------------------------------------------------------------
+    | 🚨 ROTA DE REGISTRO DE VISUALIZAÇÃO
+    | SOMENTE O WORKER DEVE TER ACESSO
+    |--------------------------------------------------------------------------
+    */
+    Route::post(
+        '/vagas/visualizar',
+        [\App\Http\Controllers\VisualizacaoVagaController::class, 'registrar']
+    )->name('vagas.visualizar');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -91,31 +101,38 @@ Route::middleware('guest')->group(function () {
 
 // --- AUTH (Logado como Empresa) ---
 Route::middleware('auth:empresa')->group(function () {
-        // Minhas vagas (lista)
-        Route::get('/enterprises/vagas', [\App\Http\Controllers\EnterpriseVagaController::class, 'list'])->name('enterprises.vagas.list');
-    
+
+    // Minhas vagas (lista)
+    Route::get('/enterprises/vagas', [\App\Http\Controllers\EnterpriseVagaController::class, 'list'])
+        ->name('enterprises.vagas.list');
+
+    // ⚠️ IMPORTANTE: rota de visualizar vaga NÃO fica aqui!
+
     // Dashboard
     Route::get('/enterprises/dashboard', fn() => view('enterprises.dashboard'))
         ->name('enterprises.dashboard');
 
     // Criar vaga
-    Route::get('/enterprises/vagas/create', [\App\Http\Controllers\EnterpriseVagaController::class, 'create'])->name('enterprises.vagas.create');
-    Route::post('/enterprises/vagas', [\App\Http\Controllers\EnterpriseVagaController::class, 'store'])->name('enterprises.vagas.store');
-    
+    Route::get('/enterprises/vagas/create', [\App\Http\Controllers\EnterpriseVagaController::class, 'create'])
+        ->name('enterprises.vagas.create');
+
+    Route::post('/enterprises/vagas', [\App\Http\Controllers\EnterpriseVagaController::class, 'store'])
+        ->name('enterprises.vagas.store');
+
     // Excluir vaga
-    Route::delete('/enterprises/vagas/delete/{id}', [\App\Http\Controllers\EnterpriseVagaController::class, 'destroy'])->name('enterprises.vagas.delete');
-    
+    Route::delete('/enterprises/vagas/delete/{id}', [\App\Http\Controllers\EnterpriseVagaController::class, 'destroy'])
+        ->name('enterprises.vagas.delete');
+
     // Chat & Perfil
     Route::get('/enterprises/chat', fn() => view('enterprises.chat'))->name('enterprises.chat');
 
-    // Conta/Perfil (Onboarding usa isso)
     Route::get('/enterprises/account', [EnterpriseProfileController::class, 'edit'])->name('enterprises.account');
     Route::patch('/enterprises/account', [EnterpriseProfileController::class, 'update'])->name('enterprises.profile.update');
 
     // Logout
     Route::post('/enterprises/logout', [EnterpriseLoginController::class, 'destroy'])->name('enterprises.logout');
 
-    // === ROTAS DAS OUTRAS PÁGINAS (Baseado na sua foto) ===
+    // === OUTRAS PÁGINAS ===
     Route::view('/enterprises/settings', 'enterprises.settings')->name('enterprises.settings');
     Route::view('/enterprises/schedule', 'enterprises.schedule')->name('enterprises.schedule');
     Route::view('/enterprises/jobs', 'enterprises.jobs')->name('enterprises.jobs');

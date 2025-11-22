@@ -66,9 +66,10 @@ class ProfileController extends Controller
             // LÓGICA DO ENDEREÇO
             if ($user->idEnd) {
                 $user->endereco->update($validatedEnd);
+                // Garante que o status seja atualizado para 2 (cadastro completo)
+                $validatedUser['status'] = 2;
             } else {
                 $newEnd = End::create($validatedEnd);
-                // Adiciona o ID e STATUS manualmente ao array de update
                 $validatedUser['idEnd'] = $newEnd->id;
                 $validatedUser['status'] = 2; 
             }
@@ -96,6 +97,8 @@ class ProfileController extends Controller
         return back()->withErrors(['db_error' => 'Erro ao salvar o perfil: ' . $e->getMessage()]);
     }
 
+    // Atualiza o usuário logado na sessão para refletir o novo status
+    Auth::guard('web')->setUser($user->fresh());
     return back()->with('success', 'Perfil atualizado com sucesso!');
 }
 }

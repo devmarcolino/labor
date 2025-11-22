@@ -79,6 +79,20 @@
                     <img src="/img/eye.svg" alt="Visualizações" class="w-4 h-4">
                     <span class="text-xs">{{ $vaga->visualizacoes ?? 0 }} visualizações</span>
                 </div>
+                @if(Auth::guard('empresa')->id() !== $vaga->idEmpresa)
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    fetch("{{ route('vagas.visualizar') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ vaga_id: {{ $vaga->id }} })
+                    });
+                });
+                </script>
+                @endif
                 <div class="flex items-center gap-1 text-gray-400">
                     <img src="/img/heart-handshake.svg" alt="Gostaram" class="w-4 h-4">
                     <span class="text-xs">{{ $vaga->gostaram ?? 0 }} gostaram</span>

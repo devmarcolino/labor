@@ -103,10 +103,20 @@
 
                 <template x-transition x-for="(card, index) in cards" :key="card.id">
                     <div class="absolute inset-0 flex justify-center items-center p-4"
-                        :style="`z-index: ${cards.length - index};`">
-                        
+                        :style="`z-index: ${cards.length - index};`"
+                        x-init="
+                            fetch('{{ route('vagas.visualizar') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ vaga_id: card.id })
+                            });
+                        "
+                    >
                         <div class="relative w-full h-full max-w-md mx-auto border-match overflow-hidden shadow-2xl card-item bg-gray-200">
-                            <img :src="card.image" :alt="card.title" class="absolute inset-0 h-full w-full object-cover">
+                            <img :src="card.image" :alt="card.title" class="absolute inset-0 h-full w-full object-cover" />
                             <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
                                 <h2 class="text-3xl font-bold" x-text="card.title"></h2>
                                 <p class="text-sm text-gray-200" x-text="card.desc"></p>

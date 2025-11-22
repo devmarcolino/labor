@@ -30,4 +30,8 @@ class Vaga extends Model
     {
         return $this->belongsTo(Empresa::class, 'idEmpresa');
     }
+    public function visualizacoesCount()
+    {
+        return \DB::table('visualizacao_vaga')->where('idVaga', $this->id)->count();
+    }
 }

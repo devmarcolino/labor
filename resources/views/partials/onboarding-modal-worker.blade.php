@@ -118,6 +118,7 @@ function onboardingWorkerForm() {
         step: 1,
         photoPreview: null, 
         cep: '', rua: '', bairro: '', cidade: '', uf: '', loading: false,
+        isChecking: {},
 
         init() {},
 

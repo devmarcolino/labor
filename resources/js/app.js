@@ -23,47 +23,71 @@ function cardStack() {
 
             try {
                 const response = await fetch("/api/vagas");
-                if (!response.ok) {
-                    throw new Error("Erro ao buscar vagas");
-                }
+                if (!response.ok) throw new Error("Erro ao buscar vagas");
 
                 const data = await response.json();
-                this.cards = Array.isArray(data) ? data : [];
+
+                // Buscar curtidas
+                const curtidas = await fetch(
+                    "/workers/vagas-curtidas-json"
+                ).then((res) => res.json());
+                const curtidasIds = curtidas.map((v) => v.vaga_id);
+
+                // Filtrar vagas não curtidas
+                this.cards = Array.isArray(data)
+                    ? data.filter((v) => !curtidasIds.includes(v.id))
+                    : [];
             } catch (err) {
-                console.error("Falha ao carregar vagas", err);
-                this.error =
-                    "Não foi possível carregar vagas agora. Tente novamente mais tarde.";
+                this.error = "Não foi possível carregar vagas.";
                 this.cards = [];
             } finally {
                 this.isLoading = false;
             }
         },
 
-        // Ativa o card do topo
-        activateTopCard() {
-            this.$nextTick(() => {
-                const cardElements = this.$el.querySelectorAll(".card-item");
-                if (cardElements.length > 0) {
-                    const topCard = cardElements[0];
-                    this.initInteract(topCard);
-                }
-            });
-        },
-
-        // Observa mudanças nos cards
+        // Reativa o topo quando muda o array
         initWatcher() {
             this.loadCards();
-            this.$watch("cards", () => {
+            this.$watch("cards", () => this.activateTopCard());
+        },
+
+        // Remove o topo e ativa o próximo
+        removeTopCard() {
+            this.cards = this.cards.slice(1);
+
+            this.$nextTick(() => {
                 this.activateTopCard();
             });
         },
 
-        // Remove o card do topo
-        removeTopCard() {
-            this.cards = this.cards.slice(1);
+        // Inicializa Interact + anima entrada do próximo card
+        activateTopCard() {
+            this.$nextTick(() => {
+                const cards = this.$el.querySelectorAll(
+                    ".card-item:not(.interact-enabled)"
+                );
+                if (cards.length === 0) return;
+
+                const top = cards[0];
+
+                // animação de entrada suave
+                top.animate(
+                    [
+                        { transform: "scale(0.95)", opacity: 0 },
+                        { transform: "scale(1)", opacity: 1 },
+                    ],
+                    {
+                        duration: 300,
+                        easing: "ease-out",
+                        fill: "forwards",
+                    }
+                );
+
+                this.initInteract(top);
+            });
         },
 
-        // Inicializa o Interact.js e duplo clique
+        // Inicializa interações
         initInteract(element) {
             if (!element || element.classList.contains("interact-enabled"))
                 return;
@@ -71,12 +95,13 @@ function cardStack() {
 
             const component = this;
 
-            // 🎯 Duplo clique = curtir
+            /******************************************************
+             *                       LIKE
+             ******************************************************/
             element.addEventListener("dblclick", () => {
-                // Borda vermelha
                 element.style.border = "4px solid #e63946";
 
-                // Pulsada
+                // pulsada
                 const pulse = [
                     { transform: "scale(1)" },
                     { transform: "scale(1.1)" },
@@ -88,7 +113,7 @@ function cardStack() {
                     iterations: 1,
                 });
 
-                // ❤️ Corações
+                // corações
                 for (let i = 0; i < 15; i++) {
                     const heart = document.createElement("div");
                     heart.innerHTML = "❤️";
@@ -104,72 +129,57 @@ function cardStack() {
                     );
                 }
 
-                // NOVO: Salvar curtida no backend e só remover o card se salvar com sucesso
                 const vagaId = element.getAttribute("data-vaga-id");
-                if (vagaId) {
-                    fetch("/vagas/curtir", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": document
-                                .querySelector('meta[name="csrf-token"]')
-                                .getAttribute("content"),
-                        },
-                        body: JSON.stringify({ vaga_id: vagaId }),
-                    })
-                        .then((res) => res.json())
-                        .then((data) => {
-                            if (data.success) {
-                                // Quando pulsada terminar, anima subida reta e fluida
-                                pulseAnimation.onfinish = () => {
-                                    const rise = element.animate(
-                                        [
-                                            {
-                                                transform:
-                                                    "translate(0px, 0px)",
-                                            },
-                                            {
-                                                transform:
-                                                    "translate(0px, -500px)",
-                                            },
-                                        ],
-                                        {
-                                            duration: 500,
-                                            easing: "ease-in-out",
-                                            fill: "forwards",
-                                        }
-                                    );
-                                    // Remove card ao final
-                                    rise.onfinish = () =>
-                                        component.removeTopCard();
-                                };
-                            } else {
-                                console.error("Erro ao curtir vaga:", data);
-                            }
-                        })
-                        .catch((err) => {
-                            console.error("Falha ao curtir vaga:", err);
-                        });
-                } else {
-                    // Se não tem vagaId, só faz animação normal
-                    pulseAnimation.onfinish = () => {
-                        const rise = element.animate(
-                            [
-                                { transform: "translate(0px, 0px)" },
-                                { transform: "translate(0px, -500px)" },
-                            ],
-                            {
-                                duration: 500,
-                                easing: "ease-in-out",
-                                fill: "forwards",
-                            }
-                        );
-                        rise.onfinish = () => component.removeTopCard();
+
+                const finalizeRemoval = () => {
+                    const rise = element.animate(
+                        [
+                            { transform: "translate(0px, 0px)" },
+                            { transform: "translate(0px, -550px)" },
+                        ],
+                        {
+                            duration: 550,
+                            easing: "ease-in-out",
+                            fill: "forwards",
+                        }
+                    );
+
+                    rise.onfinish = () => {
+                        component.removeTopCard();
                     };
+                };
+
+                if (!vagaId) {
+                    pulseAnimation.onfinish = finalizeRemoval;
+                    return;
                 }
+
+                // salvar curtida
+                fetch("/vagas/curtir", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                    },
+                    body: JSON.stringify({ vaga_id: vagaId }),
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (data.success) {
+                            pulseAnimation.onfinish = finalizeRemoval;
+                            if (pulseAnimation.playState === "finished") {
+                                finalizeRemoval();
+                            }
+                        }
+                    })
+                    .catch(console.error);
             });
 
-            // 🧲 Interact.js — arrastar = recusar
+            /******************************************************
+             *                    RECUSAR (DRAG)
+             ******************************************************/
             interact(element).draggable({
                 onstart: () => {
                     element.style.transition = "none";
@@ -181,7 +191,9 @@ function cardStack() {
                     const y =
                         (parseFloat(element.getAttribute("data-y")) || 0) +
                         event.dy;
+
                     const rotation = x * 0.1;
+
                     element.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
                     element.setAttribute("data-x", x);
                     element.setAttribute("data-y", y);
@@ -192,14 +204,15 @@ function cardStack() {
                         parseFloat(element.getAttribute("data-x")) || 0;
                     const totalY =
                         parseFloat(element.getAttribute("data-y")) || 0;
+
                     const distance = Math.sqrt(totalX ** 2 + totalY ** 2);
 
                     if (distance > 10) {
-                        // Sai para baixo reto
+                        // sai para baixo suave
                         element.animate(
                             [
                                 { transform: element.style.transform },
-                                { transform: "translate(0px, 500px)" },
+                                { transform: "translate(0px, 600px)" },
                             ],
                             {
                                 duration: 400,
@@ -207,6 +220,7 @@ function cardStack() {
                                 fill: "forwards",
                             }
                         );
+
                         setTimeout(() => component.removeTopCard(), 400);
                     } else {
                         element.style.transform =

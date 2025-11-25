@@ -86,6 +86,12 @@ Route::middleware('auth:web')->group(function () {
 
     // Página de Vagas Curtidas
     Route::get('/workers/vagas-curtidas', [VagaCurtidaController::class, 'index'])->name('workers.vagasCurtidas');
+
+    // Rota para retornar vagas curtidas em JSON
+    Route::get('/workers/vagas-curtidas-json', function() {
+        $userId = auth()->id();
+        return \App\Models\VagaCurtida::where('user_id', $userId)->get(['vaga_id']);
+    })->middleware('auth:web');
 });
 
 /*

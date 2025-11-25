@@ -25,7 +25,7 @@
 <div class="container mx-auto px-2 py-4 max-w-md">
     <div class="flex items-center gap-2 mb-4">
         <x-btn-back />
-        <h1 class="text-xl font-bold text-gray-900">Minhas Vagas</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Minhas Vagas</h1>
     </div>
 
     <!-- Controle do modal de criar vaga -->

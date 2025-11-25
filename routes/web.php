@@ -14,6 +14,7 @@ use App\Http\Controllers\EnterpriseProfileController; // Perfil Empresa
 
 // Models
 use App\Models\Skill;
+use App\Http\Controllers\VagaCurtidaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +80,12 @@ Route::middleware('auth:web')->group(function () {
         '/vagas/visualizar',
         [\App\Http\Controllers\VisualizacaoVagaController::class, 'registrar']
     )->name('vagas.visualizar');
+
+    // Rota para curtir vaga
+    Route::post('/vagas/curtir', [VagaCurtidaController::class, 'store'])->name('vagas.curtir');
+
+    // Página de Vagas Curtidas
+    Route::get('/workers/vagas-curtidas', [VagaCurtidaController::class, 'index'])->name('workers.vagasCurtidas');
 });
 
 /*

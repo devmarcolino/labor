@@ -104,23 +104,69 @@ function cardStack() {
                     );
                 }
 
-                // Quando pulsada terminar, anima subida reta e fluida
-                pulseAnimation.onfinish = () => {
-                    const rise = element.animate(
-                        [
-                            { transform: "translate(0px, 0px)" },
-                            { transform: "translate(0px, -500px)" },
-                        ],
-                        {
-                            duration: 500,
-                            easing: "ease-in-out",
-                            fill: "forwards",
-                        }
-                    );
-
-                    // Remove card ao final
-                    rise.onfinish = () => component.removeTopCard();
-                };
+                // NOVO: Salvar curtida no backend e só remover o card se salvar com sucesso
+                const vagaId = element.getAttribute("data-vaga-id");
+                if (vagaId) {
+                    fetch("/vagas/curtir", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document
+                                .querySelector('meta[name="csrf-token"]')
+                                .getAttribute("content"),
+                        },
+                        body: JSON.stringify({ vaga_id: vagaId }),
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.success) {
+                                // Quando pulsada terminar, anima subida reta e fluida
+                                pulseAnimation.onfinish = () => {
+                                    const rise = element.animate(
+                                        [
+                                            {
+                                                transform:
+                                                    "translate(0px, 0px)",
+                                            },
+                                            {
+                                                transform:
+                                                    "translate(0px, -500px)",
+                                            },
+                                        ],
+                                        {
+                                            duration: 500,
+                                            easing: "ease-in-out",
+                                            fill: "forwards",
+                                        }
+                                    );
+                                    // Remove card ao final
+                                    rise.onfinish = () =>
+                                        component.removeTopCard();
+                                };
+                            } else {
+                                console.error("Erro ao curtir vaga:", data);
+                            }
+                        })
+                        .catch((err) => {
+                            console.error("Falha ao curtir vaga:", err);
+                        });
+                } else {
+                    // Se não tem vagaId, só faz animação normal
+                    pulseAnimation.onfinish = () => {
+                        const rise = element.animate(
+                            [
+                                { transform: "translate(0px, 0px)" },
+                                { transform: "translate(0px, -500px)" },
+                            ],
+                            {
+                                duration: 500,
+                                easing: "ease-in-out",
+                                fill: "forwards",
+                            }
+                        );
+                        rise.onfinish = () => component.removeTopCard();
+                    };
+                }
             });
 
             // 🧲 Interact.js — arrastar = recusar
@@ -183,16 +229,16 @@ function registrationForm() {
         totalSteps: 5, // Ajuste conforme seus steps reais (agora são 2 na modal?)
         errors: {},
         isChecking: {},
-        
+
         fields: {
-            nome_real: '',
-            username: '',
-            email: '',
-            telefone: '',
-            datanasc: '',
-            cpf: '',
-            password: '',
-            password_confirmation: ''
+            nome_real: "",
+            username: "",
+            email: "",
+            telefone: "",
+            datanasc: "",
+            cpf: "",
+            password: "",
+            password_confirmation: "",
         },
 
         // Lógica de Bloqueio do Botão
@@ -203,17 +249,26 @@ function registrationForm() {
 
             // Validação de campos vazios (Adapte conforme seus steps reais na View)
             switch (this.step) {
-                case 1: return !this.fields.nome_real || !this.fields.username;
-                case 2: return !this.fields.email;
-                case 3: return !this.fields.telefone;
-                case 4: return !this.fields.datanasc || !this.fields.cpf;
-                case 5: return !this.fields.password || !this.fields.password_confirmation;
-                default: return false;
+                case 1:
+                    return !this.fields.nome_real || !this.fields.username;
+                case 2:
+                    return !this.fields.email;
+                case 3:
+                    return !this.fields.telefone;
+                case 4:
+                    return !this.fields.datanasc || !this.fields.cpf;
+                case 5:
+                    return (
+                        !this.fields.password ||
+                        !this.fields.password_confirmation
+                    );
+                default:
+                    return false;
             }
         },
 
         init() {
-            this.$watch('step', () => this.updateProgressBar());
+            this.$watch("step", () => this.updateProgressBar());
         },
 
         updateProgressBar() {
@@ -224,36 +279,39 @@ function registrationForm() {
         },
 
         // VALIDAÇÃO COM TOAST
-        async validateField(field, type = 'user') {
+        async validateField(field, type = "user") {
             const value = this.fields[field];
-            
+
             // 1. Limpa erros anteriores para não ficar vermelho à toa
             // (Exceto se for senha, pois validamos abaixo)
-            if (field !== 'password' && field !== 'password_confirmation') {
-                this.errors[field] = '';
+            if (field !== "password" && field !== "password_confirmation") {
+                this.errors[field] = "";
             }
-            
+
             // === NOVA LÓGICA DE SENHA (LOCAL) ===
-            if (field === 'password' || field === 'password_confirmation') {
-                
+            if (field === "password" || field === "password_confirmation") {
                 // A) Valida tamanho da senha (mínimo 8)
                 if (this.fields.password && this.fields.password.length < 8) {
-                    this.errors.password = 'Mínimo de 8 caracteres.';
+                    this.errors.password = "Mínimo de 8 caracteres.";
                 } else {
-                    this.errors.password = ''; // Limpa se estiver OK
+                    this.errors.password = ""; // Limpa se estiver OK
                 }
 
                 // B) Valida se coincidem (só se já começou a digitar a confirmação)
                 if (this.fields.password_confirmation) {
-                    if (this.fields.password !== this.fields.password_confirmation) {
-                        this.errors.password_confirmation = 'As senhas não conferem.';
+                    if (
+                        this.fields.password !==
+                        this.fields.password_confirmation
+                    ) {
+                        this.errors.password_confirmation =
+                            "As senhas não conferem.";
                     } else {
-                        this.errors.password_confirmation = ''; // Limpa se estiver OK
+                        this.errors.password_confirmation = ""; // Limpa se estiver OK
                     }
                 }
-                
+
                 // PARE AQUI! Não chame a API/Spinner para senha
-                return; 
+                return;
             }
             // ===========================================
 
@@ -263,38 +321,45 @@ function registrationForm() {
             this.isChecking[field] = true; // Ativa Spinner
 
             try {
-                const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-                const response = await fetch('/api/validate-field', {
-                    method: 'POST',
+                const csrf = document.querySelector(
+                    'meta[name="csrf-token"]'
+                )?.content;
+                const response = await fetch("/api/validate-field", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrf
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": csrf,
                     },
-                    body: JSON.stringify({ field, value, type })
+                    body: JSON.stringify({ field, value, type }),
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    let msg = data.message || 'Dado inválido.';
+                    let msg = data.message || "Dado inválido.";
                     this.errors[field] = msg;
-                    
+
                     // Dispara o Toast Vermelho
-                    window.dispatchEvent(new CustomEvent('notify', {
-                        detail: { type: 'danger', title: 'Atenção', msg: msg }
-                    }));
+                    window.dispatchEvent(
+                        new CustomEvent("notify", {
+                            detail: {
+                                type: "danger",
+                                title: "Atenção",
+                                msg: msg,
+                            },
+                        })
+                    );
                 } else {
                     // Se validou com sucesso na API, garante que limpa o erro
-                    this.errors[field] = '';
+                    this.errors[field] = "";
                 }
-
             } catch (e) {
                 console.error(e);
             } finally {
                 this.isChecking[field] = false;
             }
-        }
+        },
     };
 }
 
@@ -304,15 +369,15 @@ function enterpriseForm() {
         totalSteps: 5,
         errors: {},
         isChecking: {},
-        
+
         fields: {
-            nome_empresa: '',
-            ramo: '',
-            email: '',
-            telefone: '',
-            cnpj: '',
-            password: '',
-            password_confirmation: ''
+            nome_empresa: "",
+            ramo: "",
+            email: "",
+            telefone: "",
+            cnpj: "",
+            password: "",
+            password_confirmation: "",
         },
 
         get isStepInvalid() {
@@ -320,17 +385,26 @@ function enterpriseForm() {
             if (Object.values(this.errors).some(Boolean)) return true;
 
             switch (this.step) {
-                case 1: return !this.fields.nome_empresa || !this.fields.ramo;
-                case 2: return !this.fields.email;
-                case 3: return !this.fields.telefone;
-                case 4: return !this.fields.cnpj;
-                case 5: return !this.fields.password || !this.fields.password_confirmation;
-                default: return false;
+                case 1:
+                    return !this.fields.nome_empresa || !this.fields.ramo;
+                case 2:
+                    return !this.fields.email;
+                case 3:
+                    return !this.fields.telefone;
+                case 4:
+                    return !this.fields.cnpj;
+                case 5:
+                    return (
+                        !this.fields.password ||
+                        !this.fields.password_confirmation
+                    );
+                default:
+                    return false;
             }
         },
 
         init() {
-            this.$watch('step', () => this.updateProgressBar());
+            this.$watch("step", () => this.updateProgressBar());
         },
 
         updateProgressBar() {
@@ -341,36 +415,39 @@ function enterpriseForm() {
         },
 
         // VALIDAÇÃO COM TOAST (EMPRESA)
-        async validateField(field, type = 'enterprise') {
+        async validateField(field, type = "enterprise") {
             const value = this.fields[field];
-            
+
             // 1. Limpa erros anteriores para não ficar vermelho à toa
             // (Exceto se for senha, pois validamos abaixo)
-            if (field !== 'password' && field !== 'password_confirmation') {
-                this.errors[field] = '';
+            if (field !== "password" && field !== "password_confirmation") {
+                this.errors[field] = "";
             }
-            
+
             // === NOVA LÓGICA DE SENHA (LOCAL) ===
-            if (field === 'password' || field === 'password_confirmation') {
-                
+            if (field === "password" || field === "password_confirmation") {
                 // A) Valida tamanho da senha (mínimo 8)
                 if (this.fields.password && this.fields.password.length < 8) {
-                    this.errors.password = 'Mínimo de 8 caracteres.';
+                    this.errors.password = "Mínimo de 8 caracteres.";
                 } else {
-                    this.errors.password = ''; // Limpa se estiver OK
+                    this.errors.password = ""; // Limpa se estiver OK
                 }
 
                 // B) Valida se coincidem (só se já começou a digitar a confirmação)
                 if (this.fields.password_confirmation) {
-                    if (this.fields.password !== this.fields.password_confirmation) {
-                        this.errors.password_confirmation = 'As senhas não conferem.';
+                    if (
+                        this.fields.password !==
+                        this.fields.password_confirmation
+                    ) {
+                        this.errors.password_confirmation =
+                            "As senhas não conferem.";
                     } else {
-                        this.errors.password_confirmation = ''; // Limpa se estiver OK
+                        this.errors.password_confirmation = ""; // Limpa se estiver OK
                     }
                 }
-                
+
                 // PARE AQUI! Não chame a API/Spinner para senha
-                return; 
+                return;
             }
             // ===========================================
 
@@ -380,38 +457,45 @@ function enterpriseForm() {
             this.isChecking[field] = true; // Ativa Spinner
 
             try {
-                const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-                const response = await fetch('/api/validate-field', {
-                    method: 'POST',
+                const csrf = document.querySelector(
+                    'meta[name="csrf-token"]'
+                )?.content;
+                const response = await fetch("/api/validate-field", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrf
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": csrf,
                     },
-                    body: JSON.stringify({ field, value, type })
+                    body: JSON.stringify({ field, value, type }),
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    let msg = data.message || 'Dado inválido.';
+                    let msg = data.message || "Dado inválido.";
                     this.errors[field] = msg;
-                    
+
                     // Dispara o Toast Vermelho
-                    window.dispatchEvent(new CustomEvent('notify', {
-                        detail: { type: 'danger', title: 'Atenção', msg: msg }
-                    }));
+                    window.dispatchEvent(
+                        new CustomEvent("notify", {
+                            detail: {
+                                type: "danger",
+                                title: "Atenção",
+                                msg: msg,
+                            },
+                        })
+                    );
                 } else {
                     // Se validou com sucesso na API, garante que limpa o erro
-                    this.errors[field] = '';
+                    this.errors[field] = "";
                 }
-
             } catch (e) {
                 console.error(e);
             } finally {
                 this.isChecking[field] = false;
             }
-        }
+        },
     };
 }
 
@@ -427,8 +511,8 @@ function dashboardView() {
         async fetchFeaturedJob() {
             try {
                 // Chama a nova rota que criamos
-                const response = await fetch('/api/vagas/destaque');
-                
+                const response = await fetch("/api/vagas/destaque");
+
                 if (response.ok) {
                     // Se achou vaga (não é null), guarda na variável
                     const data = await response.json();
@@ -437,12 +521,12 @@ function dashboardView() {
                     }
                 }
             } catch (error) {
-                console.error('Erro ao buscar destaque:', error);
+                console.error("Erro ao buscar destaque:", error);
             } finally {
                 this.loading = false;
             }
-        }
-    }
+        },
+    };
 }
 
 // Registro Global do Alpine
@@ -450,7 +534,7 @@ window.Alpine = Alpine;
 Alpine.data("cardStack", cardStack);
 Alpine.data("registrationForm", registrationForm);
 Alpine.data("enterpriseForm", enterpriseForm);
-Alpine.data('dashboardView', dashboardView);
+Alpine.data("dashboardView", dashboardView);
 Alpine.start();
 
 // --- 4. LÓGICA EXECUTADA APÓS O DOM CARREGAR ---

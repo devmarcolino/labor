@@ -9,6 +9,7 @@
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <x-flash-manager />
 
@@ -115,7 +116,7 @@
                             });
                         "
                     >
-                        <div class="relative w-full h-full max-w-md mx-auto border-match overflow-hidden shadow-2xl card-item bg-gray-200">
+                        <div class="relative w-full h-full max-w-md mx-auto border-match overflow-hidden shadow-2xl card-item bg-gray-200" :data-vaga-id="card.id">
                             <img :src="card.image" :alt="card.title" class="absolute inset-0 h-full w-full object-cover" />
                             <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
                                 <h2 class="text-3xl font-bold" x-text="card.title"></h2>
@@ -172,29 +173,21 @@
 
                     <div class="flex w-full justify-between items-center px-4">
                         <div class="flex gap-5 items-center">
-                            <svg class="text-gray-900 dark:text-gray-200" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 19.5C15.4183 19.5 19 15.9183 19 11.5C19 7.08172 15.4183 3.5 11 3.5C6.58172 3.5 3 7.08172 3 11.5C3 15.9183 6.58172 19.5 11 19.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 21.4999L16.65 17.1499" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 8.5V14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11.5H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <svg class="text-gray-900 dark:text-gray-200" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
                             <div class="flex flex-col text-left">
-                                <h1 class="text-xl text-gray-900 dark:text-gray-200">Outras <span class="font-bold text-sky-600 dark:text-sky-500">vagas</span></h1>
-                                <p class="text-md text-gray-400">Mais vagas para você</p>
+                                <h1 class="text-xl text-gray-900 dark:text-gray-200">Vagas <span class="font-bold text-sky-600 dark:text-sky-500">curtidas</span></h1>
+                                <p class="text-md text-gray-400">Vagas que você curtiu</p>
                             </div>
                         </div>
                         <div>
-                            <svg class="text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <a href="{{ route('workers.vagasCurtidas') }}">
+                                <svg class="text-gray-900 dark:text-gray-200 cursor-pointer" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </a>
                         </div>
                     </div>
 
-                    <div class="flex w-full py-2 justify-center gap-3 items-center bg-gray-100 shadow-sm rounded-full dark:bg-gray-900/85 mt-4">
-                        <svg class="text-gray-800 dark:text-gray-300" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 10C20 16 12 22 12 22C12 22 4 16 4 10C4 7.87827 4.84285 5.84344 6.34315 4.34315C7.84344 2.84285 9.87827 2 12 2C14.1217 2 16.1566 2.84285 17.6569 4.34315C19.1571 5.84344 20 7.87827 20 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="CurrentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        <div class="text-left">
-                            <h2 class="text-base font-bold text-gray-800 dark:text-gray-300">Vagas na região de:</h2>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                {{ Auth::user()->endereco->cidade ?? 'Sua Localização' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <hr class="border-1.5 border-gray-300 px-[4rem] my-4 dark:border-gray-700">
-
+                  
+                   
                     <div x-show="loading" class="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
 
                     <div x-show="!loading && !featuredJob" class="text-center py-4 text-gray-500">

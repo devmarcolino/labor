@@ -118,15 +118,38 @@
                     >
                         <div class="relative w-full h-full max-w-md mx-auto border-match overflow-hidden shadow-2xl card-item bg-gray-200" :data-vaga-id="card.id">
                             <img :src="card.image" :alt="card.title" class="absolute inset-0 h-full w-full object-cover" />
+
+                            <div class="absolute top-5 left-5 right-5 z-20"> <div class="flex justify-center items-center gap-3 bg-gray-900/60 backdrop-blur-md border border-white/10 rounded-full px-4 py-4 shadow-lg">
+        
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="text-sm font-bold text-white tracking-wide" x-text="card.salary"></span>
+                                </div>
+
+                                <div class="w-px h-4 bg-white/20"></div>
+
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span class="text-xs font-medium text-gray-200" x-text="card.distance"></span>
+                                </div>
+
+                            </div>
+
+                        </div>
                             <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
                                 <h2 class="text-3xl font-bold" x-text="card.title"></h2>
                                 <p class="text-sm text-gray-200" x-text="card.desc"></p>
-                                <div class="mt-4 flex items-center gap-2 w-full rounded-full bg-black/30 py-2 px-3 backdrop-blur-sm">
-                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 border border-white overflow-hidden">
+                                <div class="mt-4 flex items-center gap-2 w-full py-2 px-3 bg-gray-900/30 backdrop-blur-md border border-white/10 rounded-full ">
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-full border border-white overflow-hidden">
                                         <img :src="card.fotoEmpresa" alt="Foto da empresa" class="object-cover w-full h-full rounded-full" />
                                     </div>
                                     <div>
-                                        <p class="text-sm font-semibold" x-text="card.company + (card.distance ? ' - ' + card.distance : '')"></p>
+                                        <p class="text-sm font-semibold" x-text="card.company"></p>
                                         <p class="text-xs text-gray-200" x-text="card.ramo"></p>
                                     </div>
                                 </div>

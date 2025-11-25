@@ -23,22 +23,25 @@ function cardStack() {
 
             try {
                 const response = await fetch("/api/vagas");
-                if (!response.ok) throw new Error("Erro ao buscar vagas");
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar vagas");
+                }
 
                 const data = await response.json();
-
-                // Buscar curtidas
-                const curtidas = await fetch(
-                    "/workers/vagas-curtidas-json"
+                // Filtra vagas já interagidas
+                const interacoes = await fetch(
+                    "/workers/vagas-interacoes-json"
                 ).then((res) => res.json());
-                const curtidasIds = curtidas.map((v) => v.vaga_id);
-
-                // Filtrar vagas não curtidas
+                const interagidasIds = Object.keys(interacoes).map((id) =>
+                    parseInt(id)
+                );
                 this.cards = Array.isArray(data)
-                    ? data.filter((v) => !curtidasIds.includes(v.id))
+                    ? data.filter((v) => !interagidasIds.includes(v.id))
                     : [];
             } catch (err) {
-                this.error = "Não foi possível carregar vagas.";
+                console.error("Falha ao carregar vagas", err);
+                this.error =
+                    "Não foi possível carregar vagas agora. Tente novamente mais tarde.";
                 this.cards = [];
             } finally {
                 this.isLoading = false;
@@ -129,7 +132,24 @@ function cardStack() {
                     );
                 }
 
+                // Salvar curtida no banco (já implementado)
+                // Salvar interação no cache
                 const vagaId = element.getAttribute("data-vaga-id");
+                if (vagaId) {
+                    fetch("/vagas/interagir", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document
+                                .querySelector('meta[name="csrf-token"]')
+                                .getAttribute("content"),
+                        },
+                        body: JSON.stringify({
+                            vaga_id: vagaId,
+                            tipo: "curtida",
+                        }),
+                    });
+                }
 
                 const finalizeRemoval = () => {
                     const rise = element.animate(
@@ -177,9 +197,7 @@ function cardStack() {
                     .catch(console.error);
             });
 
-            /******************************************************
-             *                    RECUSAR (DRAG)
-             ******************************************************/
+            // 🧲 Interact.js — arrastar = recusar
             interact(element).draggable({
                 onstart: () => {
                     element.style.transition = "none";
@@ -208,6 +226,26 @@ function cardStack() {
                     const distance = Math.sqrt(totalX ** 2 + totalY ** 2);
 
                     if (distance > 10) {
+                        // Salvar interação de rejeitada no cache
+                        const vagaId = element.getAttribute("data-vaga-id");
+                        if (vagaId) {
+                            fetch("/vagas/interagir", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRF-TOKEN": document
+                                        .querySelector(
+                                            'meta[name="csrf-token"]'
+                                        )
+                                        .getAttribute("content"),
+                                },
+                                body: JSON.stringify({
+                                    vaga_id: vagaId,
+                                    tipo: "rejeitada",
+                                }),
+                            });
+                        }
+
                         // sai para baixo suave
                         element.animate(
                             [

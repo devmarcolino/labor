@@ -92,6 +92,15 @@ Route::middleware('auth:web')->group(function () {
         $userId = auth()->id();
         return \App\Models\VagaCurtida::where('user_id', $userId)->get(['vaga_id']);
     })->middleware('auth:web');
+
+    // Rota para registrar interações do usuário com a vaga (curtir ou rejeitar) no cache.
+    Route::post('/vagas/interagir', [VagaCurtidaController::class, 'interagir'])->middleware('auth:web');
+
+    // Rota para retornar interações do usuário em JSON
+    Route::get('/workers/vagas-interacoes-json', function() {
+        $userId = auth()->id();
+        return \Illuminate\Support\Facades\Cache::get('interacoes_user_' . $userId, []);
+    })->middleware('auth:web');
 });
 
 /*

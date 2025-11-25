@@ -29,7 +29,9 @@
             </div>
 
             <div class="mt-1 w-full bg-gray-200 h-1 dark:bg-gray-700 transition-all duration-300">
-                <div x-ref="progressBar" class="bg-sky-600 h-1"></div>
+                <div class="bg-sky-600 h-1 transition-all duration-300" 
+                    :style="'width: ' + ((step / totalSteps) * 100) + '%'">
+                </div>
             </div>
         </div>
 

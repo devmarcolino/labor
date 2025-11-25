@@ -169,13 +169,13 @@
                     </a>
                 </button>
 
-                <div x-data="dashboardView()" class="w-full mt-6 bg-white dark:bg-gray-800 shadow-labor rounded-[45px] pt-6 pb-4 px-4">
+                <div class="w-full flex flex-col gap-4 mt-6 bg-white dark:bg-gray-800 shadow-labor rounded-[45px] pt-6 pb-4 px-4">
 
                     <div class="flex w-full justify-between items-center px-4">
                         <div class="flex gap-5 items-center">
                             <svg class="text-gray-900 dark:text-gray-200" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
                             <div class="flex flex-col text-left">
-                                <h1 class="text-xl text-gray-900 dark:text-gray-200">Vagas <span class="font-bold text-sky-600 dark:text-sky-500">curtidas</span></h1>
+                                <h1 class="text-xl text-gray-900 dark:text-gray-200">Suas <span class="font-bold text-sky-600 dark:text-sky-500">candidaturas</span></h1>
                                 <p class="text-md text-gray-400">Vagas que você curtiu</p>
                             </div>
                         </div>
@@ -186,47 +186,9 @@
                         </div>
                     </div>
 
-                  
-                   
-                    <div x-show="loading" class="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
-
-                    <div x-show="!loading && !featuredJob" class="text-center py-4 text-gray-500">
-                        Nenhuma vaga destaque compatível encontrada.
+                    <div class="flex justify-center items-center rounded-full bg-gray-100/80 py-3">
+                        <p class="text-gray-400 font-light">Nenhuma vaga curtida</p>
                     </div>
-
-                    <template x-if="!loading && featuredJob && featuredJob.id">
-                        <button class="bg-transparent w-full text-left cursor">
-                            <a :href="'/vagas/' + featuredJob.id">
-                                <div class="bg-white dark:bg-gray-800 shadow-labor border-btn flex flex-col gap-3 items-center pt-6 pb-4 px-4 rounded-xl"> <div class="flex gap-2 p-2 w-full bg-sky-700/5 border-sky-600/10 rounded-full border-[1.5px] text-center justify-center items-center">
-                                        <img src="../img/ia.svg" alt="" width="24" height="24">
-                                        <h2 class="font-bold text-gray-900 dark:text-gray-200">Vaga <span class="text-sky-600 dark:text-sky-500">destaque:</span></h2>
-                                    </div>
-
-                                    <div class="flex items-center gap-2 p-2 w-full rounded-full">
-                                        <div class="flex h-10 w-10 items-center justify-center bg-gray-300 rounded-full overflow-hidden border border-gray-200">
-                                            <img :src="featuredJob.fotoEmpresa" class="w-full h-full object-cover">
-                                        </div>
-                                        
-                                        <div>
-                                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-200" x-text="'@' + featuredJob.company"></p>
-                                            
-                                            <p class="text-xs text-gray-500 dark:text-gray-300">
-                                                <span x-text="featuredJob.distance"></span> de você
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="px-2 pb-1 w-full text-left">
-                                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-200" x-text="featuredJob.title"></p>
-                                        <p class="text-xs font-light text-gray-400 dark:text-gray-300">Abra pra ver descrição</p>
-                                    </div>
-
-                                    <img :src="featuredJob.image" alt="" class="object-cover border-btn w-full h-40 rounded-lg">
-
-                                </div>
-                            </a>
-                        </button>
-                    </template>
 
                 </div>
             </div>

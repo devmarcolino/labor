@@ -135,12 +135,13 @@ class VagaController extends Controller
         if (empty($path) || $path === 'null') {
             return asset('img/match-example.png');
         }
-        
+
         // Aceita links da internet para o seu vídeo pitch
         if (Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
         }
-        
-        return asset(ltrim($path, '/')); // Tenta carregar da pasta public
+
+        // Se for arquivo salvo no storage, retorna o asset correto
+        return asset('storage/vagas_img/' . basename($path));
     }
 }

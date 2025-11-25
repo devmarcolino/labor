@@ -192,28 +192,52 @@
                     </a>
                 </button>
 
-                <div class="w-full flex flex-col gap-4 mt-6 bg-white dark:bg-gray-800 shadow-labor rounded-[45px] pt-6 pb-4 px-4">
+               <div class="w-full flex flex-col gap-4 mt-6 bg-white dark:bg-gray-800 shadow-labor rounded-[45px] pt-6 pb-4 px-4">
 
-                    <div class="flex w-full justify-between items-center px-4">
-                        <div class="flex gap-5 items-center">
-                            <svg class="text-gray-900 dark:text-gray-200" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-                            <div class="flex flex-col text-left">
-                                <h1 class="text-xl text-gray-900 dark:text-gray-200">Suas <span class="font-bold text-sky-600 dark:text-sky-500">candidaturas</span></h1>
-                                <p class="text-md text-gray-400">Vagas que você curtiu</p>
-                            </div>
-                        </div>
-                        <div>
-                            <a href="{{ route('workers.vagasCurtidas') }}">
-                                <svg class="text-gray-900 dark:text-gray-200 cursor-pointer" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            </a>
+    <div class="flex w-full justify-between items-center px-4">
+        <div class="flex gap-5 items-center">
+            <svg class="text-gray-900 dark:text-gray-200" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+            <div class="flex flex-col text-left">
+                <h1 class="text-xl text-gray-900 dark:text-gray-200">Suas <span class="font-bold text-sky-600 dark:text-sky-500">candidaturas</span></h1>
+                <p class="text-md text-gray-400">Vagas que você curtiu</p>
+            </div>
+        </div>
+        <div>
+            <a href="{{ route('workers.vagasCurtidas') }}">
+                <svg class="text-gray-900 dark:text-gray-200 cursor-pointer" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+        </div>
+    </div>
+
+    @php
+        use Carbon\Carbon;
+        $vagasCurtidas = \App\Models\VagaCurtida::where('user_id', Auth::id())->with('vaga.empresa')->latest()->take(3)->get();
+    @endphp
+
+    {{-- LISTA OU MENSAGEM --}}
+    @if($vagasCurtidas->count() > 0)
+        <div class="w-full flex flex-col gap-2 py-3 rounded-full">
+            @foreach($vagasCurtidas as $curtida)
+                @if($curtida->vaga)
+                    <div class="flex items-center gap-2 px-4 py-2 rounded-[33px] bg-[#F0F0F0]/[0.29] h-[62px]">
+                        <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        <div class="flex flex-col flex-1">
+                            <span class="text-sm text-gray-900 font-medium">Você curtiu {{ $curtida->vaga->tipoVaga ?? '' }} ({{ Carbon::parse($curtida->created_at)->diffForHumans() }})</span>
+                            <span class="text-xs text-gray-500">{{ $curtida->vaga->empresa->nome_empresa ?? '' }}</span>
                         </div>
                     </div>
+                @endif
+            @endforeach
+        </div>
+    @else
+        <div class="w-full flex justify-center items-center bg-gray-100/80 rounded-full py-3">
+            <p class="text-gray-400 font-light">Nenhuma vaga curtida</p>
+        </div>
+    @endif
+</div>
 
-                    <div class="flex justify-center items-center rounded-full bg-gray-100/80 py-3">
-                        <p class="text-gray-400 font-light">Nenhuma vaga curtida</p>
-                    </div>
-
-                </div>
             </div>
         </div>
     </main>

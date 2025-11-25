@@ -41,7 +41,7 @@ class EnterpriseVagaController extends Controller
             'valor_vaga' => 'required|numeric',
             'dataVaga' => 'required|date',
             'descVaga' => 'required|string|max:255',
-            'funcVaga' => 'required|string|max:100',
+            'funcVaga' => 'required|integer|exists:habilidades_tb,id',
             'imgVaga' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 

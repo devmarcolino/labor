@@ -23,7 +23,7 @@
                     <select name="funcVaga" class="input-labor border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500" required>
                         <option value="">Selecione uma habilidade</option>
                         @foreach($skills as $skill)
-                            <option value="{{ $skill->nomeHabilidade }}">{{ $skill->nomeHabilidade }}</option>
+                            <option value="{{ $skill->id }}">{{ $skill->nomeHabilidade }}</option>
                         @endforeach
                     </select>
                 </div>

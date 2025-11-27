@@ -45,6 +45,14 @@ Route::middleware('guest')->group(function () {
 
 // --- AUTH (Logado) ---
 Route::middleware('auth:web')->group(function () {
+        // Página de configurações do worker
+        Route::get('/workers/settings', function() {
+            return view('workers.settings');
+        })->name('workers.settings');
+    // Perguntas por habilidade (AJAX)
+    Route::post('/workers/perguntas-habilidade', [ProfileController::class, 'perguntasPorHabilidade'])->name('workers.perguntas.habilidade');
+    // Salvar respostas das perguntas
+    Route::post('/workers/salvar-respostas-perguntas', [ProfileController::class, 'salvarRespostasPerguntas'])->name('workers.salvar.respostas.perguntas');
 
     // Dashboard (+ Habilidades para a Modal de Onboarding)
     Route::get('/workers/dashboard', function () {
@@ -57,6 +65,7 @@ Route::middleware('auth:web')->group(function () {
 
     // Conta/Perfil (Onboarding usa isso)
     Route::get('/workers/account', [ProfileController::class, 'edit'])->name('workers.account');
+    Route::post('/workers/update-skills', [ProfileController::class, 'updateSkills'])->name('workers.update.skills');
     Route::patch('/workers/account', [ProfileController::class, 'update'])->name('workers.profile.update');
 
     // Logout

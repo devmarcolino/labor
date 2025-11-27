@@ -51,5 +51,6 @@
             <x-btn-primary href="{{ url('/choose') }}">Começar</x-btn-primary>
             </div>
     </div>
+
 </body>
 </html>

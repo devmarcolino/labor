@@ -45,16 +45,14 @@
     <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-1">
         @foreach($habilidades as $skill)
             <label class="relative flex items-center p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-sky-50 transition-colors dark:border-gray-700 dark:hover:bg-gray-700">
-                
                 <input type="checkbox" 
                        name="habilidades[]" 
                        value="{{ $skill->id }}" 
-                       class="w-4 h-4 text-sky-600 bg-gray-100 border-gray-300 rounded focus:ring-sky-500 dark:focus:ring-sky-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                
+                       class="w-4 h-4 text-sky-600 bg-gray-100 border-gray-300 rounded focus:ring-sky-500 dark:focus:ring-sky-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                       onchange="abrirPerguntasOnboarding({{ $skill->id }})">
                 <span class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                     {{ $skill->nomeHabilidade }}
                 </span>
-
             </label>
         @endforeach
     </div>
@@ -110,6 +108,21 @@
             </div>
         </form>
     </div>
+</div>
+
+<!-- Modal de perguntas Onboarding -->
+<div id="modal-perguntas-onboarding" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 w-full max-w-md relative">
+    <button onclick="document.getElementById('modal-perguntas-onboarding').classList.add('hidden')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-900">&times;</button>
+    <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Responda as perguntas</h2>
+    <form id="form-perguntas-onboarding">
+      <div id="perguntas-container-onboarding"></div>
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" onclick="document.getElementById('modal-perguntas-onboarding').classList.add('hidden')" class="px-4 py-2 rounded bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white">Cancelar</button>
+        <button type="submit" class="px-4 py-2 rounded bg-sky-600 text-white font-bold hover:bg-sky-700">Salvar</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -169,5 +182,45 @@ function onboardingWorkerForm() {
             }
         }
     }
+}
+
+function abrirPerguntasOnboarding(idHabilidade) {
+  fetch('{{ route('workers.perguntas.habilidade') }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    },
+    body: JSON.stringify({ idHabilidade })
+  })
+  .then(res => res.json())
+  .then(perguntas => {
+    let html = '';
+    perguntas.forEach(p => {
+      html += `<div class=\"mb-3\">
+        <label class=\"block text-gray-800 dark:text-gray-200 font-semibold mb-1\">${p.texto}</label>
+        <input type=\"text\" name=\"respostas[${p.id}]\" class=\"input-labor w-full border rounded px-3 py-2\" required>
+      </div>`;
+    });
+    document.getElementById('perguntas-container-onboarding').innerHTML = html;
+    document.getElementById('modal-perguntas-onboarding').classList.remove('hidden');
+    document.getElementById('form-perguntas-onboarding').onsubmit = function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      formData.append('idHabilidade', idHabilidade);
+      fetch('{{ route('workers.salvar.respostas.perguntas') }}', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        body: formData
+      })
+      .then(res => res.json())
+      .then(resp => {
+        if (resp.success) {
+          alert('Respostas salvas!');
+          document.getElementById('modal-perguntas-onboarding').classList.add('hidden');
+        }
+      });
+    };
+  });
 }
 </script>

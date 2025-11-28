@@ -11,6 +11,7 @@ class Candidatura extends Model
         'idVaga',
         'dataCandidatura',
         'status',
+        'nota_ia',
     ];
 
     public function user()

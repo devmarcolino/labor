@@ -94,8 +94,8 @@
                 </script>
                 @endif
                 <div class="flex items-center gap-1 text-gray-400 dark:text-gray-200">
-                    <img src="/img/heart-handshake.svg" alt="Gostaram" class="w-4 h-4">
-                    <span class="text-xs">{{ $vaga->gostaram ?? 0 }} gostaram</span>
+                    <img src="/img/heart-handshake.svg" alt="Candidaturas" class="w-4 h-4">
+                    <span class="text-xs">{{ $vaga->candidaturasCount() }} candidaturas</span>
                 </div>
             </div>
 

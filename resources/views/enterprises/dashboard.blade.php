@@ -81,7 +81,6 @@
 
         <div class="h-full" id="flame" role="tabpanel" aria-labelledby="flame-tab">
             <div x-data="cardStack()" x-init="initWatcher()" class="w-full h-full">
-
                 <div x-show="isLoading" class="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
                     <p class="text-lg font-semibold">Carregando vagas...</p>
                 </div>
@@ -93,7 +92,6 @@
                 <div x-show="!isLoading && cards.length === 0 && !error" class="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
                     <div>
                         <img src="../img/empty-box.png" alt="" class="opacity-50 mx-auto" width="252px" height="165px">
-
                         <div class="mt-5">
                             <p class="text-2xl font-bold">É tudo por agora!</p>
                             <p>Não há mais vagas por perto no momento.</p>
@@ -104,7 +102,6 @@
                 <template x-for="(card, index) in cards" :key="card.id">
                     <div class="absolute inset-0 flex justify-center items-center p-4"
                         :style="`z-index: ${cards.length - index};`">
-                        
                         <div class="relative w-full h-full max-w-md mx-auto border-match overflow-hidden shadow-2xl card-item bg-gray-200">
                             <img :src="card.image" :alt="card.title" class="absolute inset-0 h-full w-full object-cover" />
                             <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
@@ -192,8 +189,8 @@
                                                     <span class="text-xs font-bold text-sky-700 dark:text-sky-300">{{ $totalVisualizacoes }}</span>
                                                 </div>
                                                 <div class="flex items-center gap-1 text-gray-400 dark:text-gray-200">
-                                                    <img src="/img/heart-handshake.svg" alt="Gostaram" class="w-4 h-4">
-                                                    <span class="text-xs">2 gostaram</span>
+                                                    <img src="/img/heart-handshake.svg" alt="Candidaturas" class="w-4 h-4">
+                                                    <span class="text-xs">{{ $ultimaVaga->candidaturas()->count() }} candidaturas</span>
                                                 </div>
                                             </div>
                         @else

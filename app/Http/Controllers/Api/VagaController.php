@@ -32,7 +32,7 @@ class VagaController extends Controller
         $limit = $limit > 0 ? min($limit, 50) : 20;
 
         // 3. Buscar Vagas
-        $vagas = Vaga::with('empresa')
+        $vagas = Vaga::with(['empresa', 'candidaturas.user'])
             ->whereIn('funcVaga', $skillIds)
             ->latest('created_at')
             ->take($limit)
@@ -40,47 +40,45 @@ class VagaController extends Controller
             ->map(function (Vaga $vaga) {
                 $empresa = $vaga->empresa;
                 $companyName = $empresa->nome_empresa ?? 'Empresa confidencial';
-                
-                // Busca o nome da habilidade para o título ficar bonito (Ex: "Garçom")
                 $nomeHabilidade = Skill::find($vaga->funcVaga)?->nome ?? $vaga->tipoVaga ?? 'Vaga';
-
-                // Cálculo da distância (Mantendo sua lógica PHP)
                 $user = auth()->user();
                 $userLat = $user && $user->endereco ? $user->endereco->latitude : null;
                 $userLon = $user && $user->endereco ? $user->endereco->longitude : null;
                 $empresaLat = $empresa && $empresa->endereco ? $empresa->endereco->latitude : null;
                 $empresaLon = $empresa && $empresa->endereco ? $empresa->endereco->longitude : null;
-                
                 $distance = null;
                 if ($userLat && $userLon && $empresaLat && $empresaLon) {
                     $distance = $this->calculateDistance($userLat, $userLon, $empresaLat, $empresaLon);
                 }
 
+                // Monta array de candidatos
+                $candidates = $vaga->candidaturas->map(function($candidatura) {
+                    $user = $candidatura->user;
+                    return [
+                        'id' => $user->id ?? null,
+                        'nome' => $user->nome_real ?? $user->username ?? 'Candidato',
+                        'foto' => $user->fotoUser ? asset('storage/' . $user->fotoUser) : null,
+                    ];
+                })->filter()->values();
+
                 return [
                     'id' => $vaga->id,
-                    'title' => $nomeHabilidade, // Título corrigido
+                    'title' => $nomeHabilidade,
                     'company' => $companyName,
                     'ramo' => $empresa->ramo ?? 'Geral',
-                    
-                    // Gera as letras (Ex: MD para Madero)
                     'logo_letters' => $this->makeLogoLetters($companyName),
-                    
                     'desc' => $vaga->descVaga ?? 'Descrição indisponível.',
-                    
-                    // Imagem da Vaga (Aceita Links)
                     'image' => $this->resolveImagePath($vaga->imgVaga),
-                    
-                    // Logo da Empresa (Retorna NULL se não tiver, para ativar as letras)
                     'fotoEmpresa' => $this->resolveEmpresaImagePath($empresa->fotoEmpresa ?? null),
-                    
                     'salary' => 'R$ ' . number_format($vaga->valor_vaga, 2, ',', '.'),
                     'distance' => $distance,
+                    'candidates' => $candidates,
                 ];
             })
             ->filter(function ($vaga) {
                 if (!$vaga['distance']) return false;
                 $distValue = floatval(str_replace(' km', '', $vaga['distance']));
-                return $distValue <= 500; // Aumentei o raio para 500km pro vídeo não falhar
+                return $distValue <= 500;
             })
             ->values();
 

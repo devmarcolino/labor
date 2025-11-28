@@ -91,7 +91,7 @@ Route::middleware('auth:web')->group(function () {
     )->name('vagas.visualizar');
 
     // Rota para curtir vaga
-    Route::post('/vagas/curtir', [VagaCurtidaController::class, 'store'])->name('vagas.curtir');
+    Route::post('/vagas/curtir', [\App\Http\Controllers\CandidaturaController::class, 'store'])->name('vagas.curtir');
 
     // Página de Vagas Curtidas
     Route::get('/workers/vagas-curtidas', [VagaCurtidaController::class, 'index'])->name('workers.vagasCurtidas');

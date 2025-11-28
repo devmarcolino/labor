@@ -26,12 +26,29 @@ class Vaga extends Model
         'valor_vaga' => 'decimal:2',
     ];
 
+    // Relacionamento: Vaga tem muitas Candidaturas
+    public function candidaturas()
+    {
+        return $this->hasMany(\App\Models\Candidatura::class, 'idVaga');
+    }
+
+    // Relacionamento: Vaga pertence a uma Empresa
     public function empresa()
     {
         return $this->belongsTo(Empresa::class, 'idEmpresa');
     }
+
+    // Contador de visualizações
     public function visualizacoesCount()
     {
-        return \DB::table('visualizacao_vaga')->where('idVaga', $this->id)->count();
+        return \DB::table('visualizacao_vaga')
+            ->where('idVaga', $this->id)
+            ->count();
+    }
+
+    // Contador de candidaturas
+    public function candidaturasCount()
+    {
+        return $this->candidaturas()->count();
     }
 }

@@ -4,17 +4,99 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vaga;
-use App\Models\Skill; // Adicionei o Model Skill
+use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
+use App\Services\GeminiService;
 
 class VagaController extends Controller
 {
+    /**
+     * Recomendação IA: retorna melhor candidato e lista ordenada
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function melhorCandidato(int $id)
+    {
+        $vaga = Vaga::with(['candidaturas.user.skills', 'candidaturas.respostas'])->findOrFail($id);
+
+        $candidatos = $vaga->candidaturas->map(function ($candidatura) use ($vaga) {
+            $user = $candidatura->user;
+
+            // 1. Compatibilidade de skills
+            // Aqui eu assumo que $vaga->funcVaga guarda um id de skill ou array/string — adapte conforme seu modelo
+            $skillsVaga = is_array($vaga->funcVaga) ? $vaga->funcVaga : [$vaga->funcVaga];
+            $skillsVaga = array_filter($skillsVaga); // remove nulls
+
+            $skillsUser = $user->skills->pluck('id')->toArray();
+            $skillsMatch = count(array_intersect($skillsVaga, $skillsUser));
+            $skillsScore = (count($skillsVaga) > 0) ? ($skillsMatch / count($skillsVaga)) * 40 : 0;
+
+            // 2. Experiência (simples: quantidade de experiências) — adaptar conforme seu relacionamento
+            $expScore = 0;
+            if (method_exists($user, 'experiencia') && is_countable($user->experiencia)) {
+                $expScore = min(count($user->experiencia) * 10, 20);
+            } elseif (property_exists($user, 'experiencia') && is_countable($user->experiencia)) {
+                $expScore = min(count($user->experiencia) * 10, 20);
+            }
+
+            // 3. Qualidade das respostas (se existir campo 'nota' nas respostas)
+            $respostas = $candidatura->respostas ?? collect();
+            $mediaNota = 0;
+            if ($respostas->isNotEmpty() && $respostas->first()->offsetExists('nota')) {
+                // tenta calcular média se existir nota
+                $mediaNota = $respostas->avg('nota') ?? 0;
+            } else {
+                // fallback simples: comprimento do texto das respostas
+                $textoTotal = $respostas->pluck('texto')->implode(' ');
+                $mediaNota = min(intval(strlen($textoTotal) / 20), 20); // heurística simples
+            }
+            $formScore = min($mediaNota, 20);
+
+            // 4. Pontuação geral de perfil
+            $perfilScore = 0;
+            $perfilScore += !empty($user->fotoUser) ? 10 : 0;
+            $perfilScore += (isset($user->status) && $user->status == 1) ? 10 : 0;
+
+            // Total e explicação
+            $total = $skillsScore + $expScore + $formScore + $perfilScore;
+            $total = min(round($total, 1), 100);
+
+            $explicacao = [];
+            if ($skillsScore > 0) $explicacao[] = "Skills compatíveis ({$skillsMatch})";
+            if ($expScore > 0) $explicacao[] = "Experiência relevante";
+            if ($formScore > 0) $explicacao[] = "Boas respostas no formulário";
+            if ($perfilScore > 0) $explicacao[] = "Perfil completo";
+
+            return [
+                'id' => $user->id,
+                'nome' => $user->nome_real ?? $user->username ?? 'Candidato',
+                'foto' => !empty($user->fotoUser) ? asset('storage/' . ltrim($user->fotoUser, '/')) : null,
+                'porcentagem' => $total,
+                'explicacao' => implode(', ', $explicacao),
+            ];
+        });
+
+        $ordenados = $candidatos->sortByDesc('porcentagem')->values();
+        $melhor = $ordenados->first();
+
+        return response()->json([
+            'melhor' => $melhor,
+            'candidatos' => $ordenados,
+        ]);
+    }
+
+    /**
+     * Lista vagas recomendadas para o usuário (index)
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         // 1. Identificar o Usuário
-        /** @var \App\Models\User $user */
+        /** @var \App\Models\User|null $user */
         $user = auth()->user();
 
         if (!$user) {
@@ -22,6 +104,7 @@ class VagaController extends Controller
         }
 
         // 2. Pegar IDs das Habilidades
+        // Ajuste a query conforme sua tabela pivot/nomes reais
         $skillIds = $user->skills()->pluck('habilidades_tb.id')->toArray();
 
         if (empty($skillIds)) {
@@ -37,27 +120,28 @@ class VagaController extends Controller
             ->latest('created_at')
             ->take($limit)
             ->get()
-            ->map(function (Vaga $vaga) {
+            ->map(function (Vaga $vaga) use ($user) {
                 $empresa = $vaga->empresa;
                 $companyName = $empresa->nome_empresa ?? 'Empresa confidencial';
                 $nomeHabilidade = Skill::find($vaga->funcVaga)?->nome ?? $vaga->tipoVaga ?? 'Vaga';
-                $user = auth()->user();
-                $userLat = $user && $user->endereco ? $user->endereco->latitude : null;
-                $userLon = $user && $user->endereco ? $user->endereco->longitude : null;
-                $empresaLat = $empresa && $empresa->endereco ? $empresa->endereco->latitude : null;
-                $empresaLon = $empresa && $empresa->endereco ? $empresa->endereco->longitude : null;
+
+                $userLat = $user && isset($user->endereco) ? $user->endereco->latitude : null;
+                $userLon = $user && isset($user->endereco) ? $user->endereco->longitude : null;
+                $empresaLat = $empresa && isset($empresa->endereco) ? $empresa->endereco->latitude : null;
+                $empresaLon = $empresa && isset($empresa->endereco) ? $empresa->endereco->longitude : null;
+
                 $distance = null;
                 if ($userLat && $userLon && $empresaLat && $empresaLon) {
                     $distance = $this->calculateDistance($userLat, $userLon, $empresaLat, $empresaLon);
                 }
 
                 // Monta array de candidatos
-                $candidates = $vaga->candidaturas->map(function($candidatura) {
+                $candidates = $vaga->candidaturas->map(function ($candidatura) {
                     $user = $candidatura->user;
                     return [
                         'id' => $user->id ?? null,
                         'nome' => $user->nome_real ?? $user->username ?? 'Candidato',
-                        'foto' => $user->fotoUser ? asset('storage/' . $user->fotoUser) : null,
+                        'foto' => !empty($user->fotoUser) ? asset('storage/' . ltrim($user->fotoUser, '/')) : null,
                     ];
                 })->filter()->values();
 
@@ -70,12 +154,13 @@ class VagaController extends Controller
                     'desc' => $vaga->descVaga ?? 'Descrição indisponível.',
                     'image' => $this->resolveImagePath($vaga->imgVaga),
                     'fotoEmpresa' => $this->resolveEmpresaImagePath($empresa->fotoEmpresa ?? null),
-                    'salary' => 'R$ ' . number_format($vaga->valor_vaga, 2, ',', '.'),
+                    'salary' => !is_null($vaga->valor_vaga) ? 'R$ ' . number_format($vaga->valor_vaga, 2, ',', '.') : null,
                     'distance' => $distance,
                     'candidates' => $candidates,
                 ];
             })
             ->filter(function ($vaga) {
+                // Se não houver distance, filtra pra não mostrar
                 if (!$vaga['distance']) return false;
                 $distValue = floatval(str_replace(' km', '', $vaga['distance']));
                 return $distValue <= 500;
@@ -85,6 +170,34 @@ class VagaController extends Controller
         return response()->json($vagas);
     }
 
+    /**
+     * Recomendação IA: utiliza OpenAI para analisar candidatos
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function melhorCandidatoIA(int $id)
+    {
+        $vaga = Vaga::with(['candidaturas.user.skills', 'candidaturas.respostas'])->findOrFail($id);
+        $candidatos = $vaga->candidaturas;
+        $prompt = "Avalie cada candidato de 0 a 100, considerando as respostas do formulário das habilidades. Retorne apenas a nota de cada candidato, sem explicação.\n";
+        foreach ($candidatos as $candidatura) {
+            $user = $candidatura->user;
+            $prompt .= "Candidato: @{$user->username}\n";
+            $prompt .= "Skills: " . $user->skills->pluck('nome')->implode(', ') . "\n";
+            $prompt .= "Respostas:\n";
+            foreach ($candidatura->respostas as $resp) {
+                $prompt .= "- {$resp->resposta}\n";
+            }
+            $prompt .= "---\n";
+        }
+        $prompt .= "Formato da resposta: Candidato: @[username] Nota: [0-100]\n";
+
+        $gemini = new GeminiService();
+        $result = $gemini->analyze($prompt);
+        return response()->json($result);
+    }
+
     // --- MÉTODOS AUXILIARES ---
 
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
@@ -92,31 +205,27 @@ class VagaController extends Controller
         $earthRadius = 6371; 
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
-        $a = sin($dLat/2) * sin($dLat/2) +
+        $a = sin($dLat / 2) * sin($dLat / 2) +
              cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-             sin($dLon/2) * sin($dLon/2);
-        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+             sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
         $distance = $earthRadius * $c;
         return number_format($distance, 1) . ' km';
     }
 
     /**
-     * AQUI ESTÁ O AJUSTE DA EMPRESA
      * Retorna NULL se não tiver foto. O Frontend vai ver o NULL e mostrar as letras.
      */
     private function resolveEmpresaImagePath(?string $path): ?string
     {
-        // Se estiver vazio ou null, retorna null (ativa o visual de letras)
-        if (empty($path) || $path === 'null' || $path === null) {
+        if (empty($path) || $path === 'null') {
             return null; 
         }
 
-        // Se for link da internet (http), retorna o link
         if (Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
         }
 
-        // Se for arquivo local, retorna o asset
         return asset('storage/' . ltrim($path, '/'));
     }
 
@@ -129,17 +238,14 @@ class VagaController extends Controller
 
     private function resolveImagePath(?string $path): string
     {
-        // Para vaga, se não tiver foto, retorna uma padrão bonita
         if (empty($path) || $path === 'null') {
             return asset('img/match-example.png');
         }
 
-        // Aceita links da internet para o seu vídeo pitch
         if (Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
         }
 
-        // Se for arquivo salvo no storage, retorna o asset correto
         return asset('storage/vagas_img/' . basename($path));
     }
 }

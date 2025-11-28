@@ -1,0 +1,1 @@
+criar uma IA que vai analisar as respostas do forms dos workers que se candidataram a vaga e após isso fazer aparecer a imagem do candidato com mlehor porcentagem de acordo com a IA (quanto maior melhor pode ir de 0 a 100%) como se fosse vagas no dashboard de worker mas ao inves disso vai aparecer foto do melhor worker no dashboard de enterprises

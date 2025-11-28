@@ -21,7 +21,12 @@ Route::post('/validate-field', [ValidationController::class, 'check']);
 // Rota de Vagas (PROTEGIDA e usando sessão WEB)
 // Se não tiver 'auth:web', o auth()->user() retorna null e quebra tudo.
 // CERTO: Carregamos a sessão 'web' E DEPOIS verificamos o 'auth'
+
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/vagas', [VagaController::class, 'index']);
     Route::get('/vagas/destaque', [VagaController::class, 'destaque']);
+    Route::get('/vaga/{id}/melhor-candidato', [VagaController::class, 'melhorCandidato']);
 });
+
+// Torna a rota da IA pública para testes
+Route::get('/vaga/{id}/melhor-candidato-ia', [\App\Http\Controllers\Api\VagaController::class, 'melhorCandidatoIA']);

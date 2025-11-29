@@ -7,7 +7,6 @@ use App\Models\Vaga;
 use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-// ...existing code...
 
 class VagaController extends Controller
 {
@@ -25,7 +24,6 @@ class VagaController extends Controller
             $user = $candidatura->user;
 
             // 1. Compatibilidade de skills
-            // Aqui eu assumo que $vaga->funcVaga guarda um id de skill ou array/string — adapte conforme seu modelo
             $skillsVaga = is_array($vaga->funcVaga) ? $vaga->funcVaga : [$vaga->funcVaga];
             $skillsVaga = array_filter($skillsVaga); // remove nulls
 
@@ -68,6 +66,12 @@ class VagaController extends Controller
             if ($expScore > 0) $explicacao[] = "Experiência relevante";
             if ($formScore > 0) $explicacao[] = "Boas respostas no formulário";
             if ($perfilScore > 0) $explicacao[] = "Perfil completo";
+
+            // Salva a nota calculada no banco
+            if ($candidatura->nota_ia !== $total) {
+                $candidatura->nota_ia = $total;
+                $candidatura->save();
+            }
 
             return [
                 'id' => $user->id,
@@ -157,7 +161,7 @@ class VagaController extends Controller
                     'salary' => !is_null($vaga->valor_vaga) ? 'R$ ' . number_format($vaga->valor_vaga, 2, ',', '.') : null,
                     'distance' => $distance,
                     'candidates' => $candidates,
-                ];
+                };
             })
             ->filter(function ($vaga) {
                 // Se não houver distance, filtra pra não mostrar
@@ -170,32 +174,6 @@ class VagaController extends Controller
         return response()->json($vagas);
     }
 
-    /**
-     * Recomendação IA: utiliza OpenAI para analisar candidatos
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function melhorCandidatoIA(int $id)
-    {
-        $vaga = Vaga::with(['candidaturas.user.skills', 'candidaturas.respostas'])->findOrFail($id);
-        $candidatos = $vaga->candidaturas;
-        $prompt = "Avalie cada candidato de 0 a 100, considerando as respostas do formulário das habilidades. Retorne apenas a nota de cada candidato, sem explicação.\n";
-        foreach ($candidatos as $candidatura) {
-            $user = $candidatura->user;
-            $prompt .= "Candidato: @{$user->username}\n";
-            $prompt .= "Skills: " . $user->skills->pluck('nome')->implode(', ') . "\n";
-            $prompt .= "Respostas:\n";
-            foreach ($candidatura->respostas as $resp) {
-                $prompt .= "- {$resp->resposta}\n";
-            }
-            $prompt .= "---\n";
-        }
-        $prompt .= "Formato da resposta: Candidato: @[username] Nota: [0-100]\n";
-
-        // ...existing code...
-        return response()->json($result);
-    }
 
     // --- MÉTODOS AUXILIARES ---
 

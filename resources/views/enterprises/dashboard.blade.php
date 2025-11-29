@@ -81,7 +81,28 @@
 
         <!-- Aqui deve ficar o card da última vaga da empresa e o melhor candidato IA -->
         <div  id="flame" class="h-full flex flex-col items-center justify-center">
-            <!-- Aqui pode voltar o card da vaga ou outro conteúdo padrão -->
+            @php
+                $empresaId = Auth::guard('empresa')->id();
+                $vagas = \App\Models\Vaga::where('idEmpresa', $empresaId)->latest('created_at')->get();
+            @endphp
+            @foreach($vagas as $vaga)
+                @php
+                    $melhorCandidatura = $vaga->candidaturas->sortByDesc('nota_ia')->first();
+                    $user = $melhorCandidatura ? $melhorCandidatura->user : null;
+                @endphp
+                <div class="mb-4 p-4 bg-white dark:bg-gray-900 rounded shadow w-full max-w-md">
+                    <div class="font-bold text-sky-600 mb-2">{{ $vaga->funcVaga }}</div>
+                    @if($user)
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold">Melhor candidato:</span>
+                            <span class="text-gray-800 dark:text-gray-200">{{ $user->username ?? 'Sem nome' }}</span>
+                            <img src="{{ !empty($user->fotoUser) ? asset('storage/' . ltrim($user->fotoUser, '/')) : asset('/img/default-user.png') }}" alt="Foto do candidato" class="w-6 h-6 rounded-full object-cover border ml-2" />
+                        </div>
+                    @else
+                        <div class="text-gray-400">Nenhum candidato disponível</div>
+                    @endif
+                </div>
+            @endforeach
         </div>
 
         <div class="hidden p-2 mx-auto" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -168,33 +189,5 @@
     @endif
 @endauth
 
-@php
-    $melhorCandidatoLocal = null;
-    $explicacaoLocal = null;
-    if(isset($vaga)) {
-        $response = Http::get(url('/api/vaga/' . $vaga->id . '/melhor-candidato'));
-        if($response->ok() && isset($response['melhor'])) {
-            $melhorCandidatoLocal = $response['melhor'];
-            $explicacaoLocal = $melhorCandidatoLocal['explicacao'] ?? null;
-        }
-    }
-@endphp
-
-@if($melhorCandidatoLocal)
-    <div class="fixed bottom-6 right-6 z-50">
-        <div class="bg-white dark:bg-gray-900 border border-sky-600 shadow-lg rounded-xl p-5 max-w-sm w-full flex flex-col gap-2 animate-fade-in">
-            <div class="flex items-center gap-2 mb-2">
-                <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="text-sky-600"><path d="M12 2v2m0 16v2m8-10h2M2 12H0m16.24-7.76l1.42 1.42M4.34 19.66l-1.42-1.42M19.66 19.66l-1.42-1.42M4.34 4.34l1.42 1.42"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/></svg>
-                <span class="font-bold text-sky-600">Recomendação IA Local</span>
-            </div>
-            <div class="flex items-center gap-2 mb-2">
-                <img src="{{ $melhorCandidatoLocal['foto'] ?? '../img/default-user.png' }}" alt="Foto do candidato" class="w-8 h-8 rounded-full object-cover border-2 border-white" />
-                <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $melhorCandidatoLocal['nome'] }}</span>
-                <span class="text-xs text-sky-600 ml-auto">{{ $melhorCandidatoLocal['porcentagem'] }}%</span>
-            </div>
-            <div class="text-gray-800 dark:text-gray-200 whitespace-pre-line text-sm">{{ $explicacaoLocal }}</div>
-        </div>
-    </div>
-@endif
 </body>
 </html>

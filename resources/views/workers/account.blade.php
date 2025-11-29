@@ -191,7 +191,7 @@ function abrirPerguntas(idHabilidade) {
     perguntas.forEach(p => {
       html += `<div class=\"mb-3\">
         <label class=\"block text-gray-800 dark:text-gray-200 font-semibold mb-1\">${p.texto}</label>
-        <input type=\"text\" name=\"respostas[${p.id}]\" class=\"input-labor w-full border rounded px-3 py-2\" required>
+        <select name=\"respostas[${p.id}]\" class=\"input-labor w-full border rounded px-3 py-2\" required>\n          <option value=\"\">Selecione</option>\n          <option value=\"Ruim\">Ruim</option>\n          <option value=\"Regular\">Regular</option>\n          <option value=\"Bom\">Bom</option>\n          <option value=\"Ótimo\">Ótimo</option>\n          <option value=\"Excelente\">Excelente</option>\n        </select>
       </div>`;
     });
     document.getElementById('perguntas-container').innerHTML = html;

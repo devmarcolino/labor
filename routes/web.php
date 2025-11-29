@@ -45,6 +45,14 @@ Route::middleware('guest')->group(function () {
 
 // --- AUTH (Logado) ---
 Route::middleware('auth:web')->group(function () {
+            // Formulário para responder perguntas de uma habilidade
+            Route::get('/workers/responder-perguntas', function() {
+                $habilidade_id = request('habilidade_id');
+                return view('workers.responder-perguntas', ['habilidade_id' => $habilidade_id]);
+            })->name('workers.responderPerguntas');
+
+            // Salvar respostas do formulário
+            Route::post('/workers/salvar-respostas', [\App\Http\Controllers\WorkerRespostaController::class, 'salvarRespostas'])->name('workers.salvarRespostas');
         // Página de configurações do worker
         Route::get('/workers/settings', function() {
             return view('workers.settings');

@@ -7,7 +7,7 @@ use App\Models\Vaga;
 use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Services\GeminiService;
+// ...existing code...
 
 class VagaController extends Controller
 {
@@ -193,8 +193,7 @@ class VagaController extends Controller
         }
         $prompt .= "Formato da resposta: Candidato: @[username] Nota: [0-100]\n";
 
-        $gemini = new GeminiService();
-        $result = $gemini->analyze($prompt);
+        // ...existing code...
         return response()->json($result);
     }
 

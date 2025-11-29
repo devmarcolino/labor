@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Candidatura;
 use Illuminate\Support\Facades\Auth;
+// ...existing code...
 
 class CandidaturaController extends Controller
 {
@@ -58,51 +59,22 @@ class CandidaturaController extends Controller
         // Perfil
         $perfil_completo = !empty($user->nome_real) && !empty($user->fotoUser);
 
-        // Monta JSON para IA
-        $input_ia = [
-            'candidatos' => [[
-                'nome' => $user->nome_real ?? $user->username,
-                'skills' => $skills_user,
-                'experiencia' => $experiencia,
-                'respostas' => $respostas_json,
-                'foto' => $user->fotoUser,
-                'perfil_completo' => $perfil_completo,
-            ]],
-            'vaga' => [
-                'skills' => $skills_vaga,
-            ]
+
+        // Calcula nota manualmente
+        $valores = [
+            'Ruim' => 20,
+            'Regular' => 40,
+            'Bom' => 60,
+            'Ótimo' => 80,
+            'Excelente' => 100
         ];
-
-        // Executa script Python
-        $python = base_path('python_ai/analisador_candidatos.py');
-        $input_json = json_encode($input_ia, JSON_UNESCAPED_UNICODE);
-        $cmd = "python \"$python\"";
-        $process = proc_open($cmd, [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ], $pipes);
-        $output = '';
-        if (is_resource($process)) {
-            fwrite($pipes[0], $input_json);
-            fclose($pipes[0]);
-            $output = stream_get_contents($pipes[1]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            proc_close($process);
+        $notas = [];
+        foreach ($respostas_json as $r) {
+            $resp = $r['resposta'];
+            $notas[] = $valores[$resp] ?? 0;
         }
-
-        $nota_ia = null;
-        $explicacao_ia = null;
-        // Debug: loga o output do Python para storage/logs/laravel.log
-        \Log::info('Python IA output: ' . $output);
-        if ($output) {
-            $result = json_decode($output, true);
-            if (is_array($result) && count($result) > 0) {
-                $nota_ia = $result[0]['score'] ?? null;
-                $explicacao_ia = $result[0]['explicacao'] ?? null;
-            }
-        }
+        $nota_ia = count($notas) ? intval(array_sum($notas) / count($notas)) : 0;
+        $explicacao_ia = 'Nota calculada automaticamente pela média das respostas.';
 
         // Salva candidatura
         $candidatura = Candidatura::firstOrCreate([

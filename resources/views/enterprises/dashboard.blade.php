@@ -81,42 +81,7 @@
 
         <!-- Aqui deve ficar o card da última vaga da empresa e o melhor candidato IA -->
         <div  id="flame" class="h-full flex flex-col items-center justify-center">
-            @if(isset($vaga))
-                <div class="relative w-full h-full max-w-md mx-auto border-match overflow-hidden shadow-2xl card-item bg-gray-200">
-                    <img src="{{ $vaga->image ?? '../img/default-vaga.png' }}" alt="{{ $vaga->title ?? 'Vaga' }}" class="absolute inset-0 h-full w-full object-cover" />
-                    <div class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
-                        <h2 class="text-3xl font-bold">{{ $vaga->title }}</h2>
-                        <p class="text-sm text-gray-200">{{ $vaga->desc }}</p>
-                        <div class="mt-4 flex items-center gap-2 w-full py-2 px-3 bg-gray-900/30 backdrop-blur-md border border-white/10 rounded-full ">
-                            <!-- Espaço reservado para outros dados, se necessário -->
-                        </div>
-                    </div>
-                </div>
-                    @if($melhorCandidatoLocal)
-                        <div class="fixed bottom-6 right-6 z-50">
-                            <div class="bg-white dark:bg-gray-900 border border-sky-600 shadow-lg rounded-xl p-5 max-w-sm w-full flex flex-col gap-2 animate-fade-in">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="text-sky-600"><path d="M12 2v2m0 16v2m8-10h2M2 12H0m16.24-7.76l1.42 1.42M4.34 19.66l-1.42-1.42M19.66 19.66l-1.42-1.42M4.34 4.34l1.42 1.42"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/></svg>
-                                    <span class="font-bold text-sky-600">Recomendação IA Local</span>
-                                </div>
-                                <div class="flex items-center gap-2 mb-2">
-                                    <img src="{{ $melhorCandidatoLocal['foto'] ?? '../img/default-user.png' }}" alt="Foto do candidato" class="w-8 h-8 rounded-full object-cover border-2 border-white" />
-                                    <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $melhorCandidatoLocal['nome'] }}</span>
-                                    <span class="text-xs text-sky-600 ml-auto">{{ $melhorCandidatoLocal['porcentagem'] }}%</span>
-                                </div>
-                                <div class="text-gray-800 dark:text-gray-200 whitespace-pre-line text-sm">{{ $explicacaoLocal }}</div>
-                            </div>
-                        </div>
-                    @endif
-            @else
-                <div class="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400">
-                    <img src="../img/empty-box.png" alt="" class="opacity-50 mx-auto" width="252px" height="165px">
-                    <div class="mt-5">
-                        <p class="text-2xl font-bold">É tudo por agora!</p>
-                        <p>Não há mais vagas cadastradas no momento.</p>
-                    </div>
-                </div>
-            @endif
+            <!-- Aqui pode voltar o card da vaga ou outro conteúdo padrão -->
         </div>
 
         <div class="hidden p-2 mx-auto" id="home" role="tabpanel" aria-labelledby="home-tab">

@@ -29,10 +29,10 @@
     </div>
 
     <!-- Controle do modal de criar vaga -->
-    <div x-data="{ openVagaModal: false }" x-init="$watch('openVagaModal', value => { $root.modalOpen = value })">
-        <button @click="openVagaModal = true" class="w-full bg-sky-600 text-white font-semibold py-3 rounded-full mb-5 flex items-center justify-center gap-2 shadow">
-            <span>+ Criar nova vaga</span>
-        </button>
+    <div x-data="{ openVagaModal: false }">
+        <x-btn-primary @click="openVagaModal = true">
+            Criar nova vaga
+        </x-btn-primary>
 
         <!-- Partial do modal de criar vaga -->
         <div>
@@ -43,127 +43,113 @@
     <!-- Controle dos modais de deletar -->
     <div x-data="{ openDelete: false, vagaId: null }" x-init="$watch('openDelete', value => { $root.modalOpen = value })">
         @foreach($vagas as $vaga)
-        <div class="bg-white rounded-2xl shadow-md p-4 mb-6 dark:bg-gray-800">
-            <div class="flex items-center gap-2 mb-2">
-                @if(!empty($vaga->empresa->fotoEmpresa))
-                    <img src="{{ asset('storage/' . $vaga->empresa->fotoEmpresa) }}" alt="Logo empresa" class="w-8 h-8 rounded-full object-cover">
-                @else
-                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs dark:bg-gray-200">?</div>
-                @endif
-                <div>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{ $vaga->empresa->nome_empresa ?? '' }}</span>
-                    <div class="text-xs text-gray-400 dark:text-gray-300">{{ $vaga->empresa->cidade ?? '' }}</div>
-                </div>
+        <div class="bg-white dark:bg-gray-800 rounded-[30px] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-6 transition-all hover:shadow-md">
+    
+    <div class="p-4 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+            @if(!empty($vaga->empresa->fotoEmpresa))
+                <img src="{{ asset('storage/' . $vaga->empresa->fotoEmpresa) }}" class="w-full h-full object-cover">
+            @else
+                <span class="text-sm font-bold text-gray-500">
+                    {{ substr($vaga->empresa->nome_empresa, 0, 2) }}
+                </span>
+            @endif
+        </div>
+        
+        <div class="flex flex-col">
+            <h3 class="font-bold text-gray-900 dark:text-white text-lg leading-tight">
+                {{ $vaga->empresa->nome_empresa }}
+            </h3>
+            <span class="text-xs text-gray-400 font-medium">
+                {{ $vaga->empresa->ramo ?? 'Restaurante' }} </span>
+        </div>
+    </div>
+
+    <div class="w-full h-48 bg-gray-200 relative">
+        @if(!empty($vaga->imgVaga))
+            <img src="{{ asset('storage/' . $vaga->imgVaga) }}" class="w-full h-full object-cover">
+        @else
+            <div class="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
+                <svg class="w-10 h-10 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
             </div>
+        @endif
+        
+        <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-green-700 shadow-sm">
+            R$ {{ number_format($vaga->valor_vaga, 2, ',', '.') }}
+        </div>
+    </div>
 
-            <div class="rounded-xl overflow-hidden mb-3">
-                @if(!empty($vaga->imgVaga))
-                    <div class="w-full h-32 flex items-center justify-center rounded-xl overflow-hidden vaga-img-bg" style="background: #fff;">
-                        <img src="{{ asset('storage/' . $vaga->imgVaga) }}" alt="Foto da vaga" class="h-full object-contain vaga-img" style="max-width:100%; max-height:100%;">
-                    </div>
-                @else
-                    <div class="w-full h-32 bg-gray-50 flex items-center justify-center text-gray-400 text-sm dark:bg-gray-100">Sem imagem da vaga</div>
-                @endif
+    <div class="p-5">
+        <div class="mb-3">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                {{ \App\Models\Skill::find($vaga->funcVaga)?->nome ?? $vaga->funcVaga }}
+                <span class="text-gray-400 font-normal text-base ml-1">
+                    ({{ $vaga->horario ?? 'Horário a combinar' }})
+                </span>
+            </h2>
+            <p class="text-sm text-gray-500 mt-1 line-clamp-2">
+                {{ $vaga->descVaga }}
+            </p>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs text-gray-500 font-medium mb-4">
+            <div class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                {{ $vaga->visualizacoes ?? 0 }} visualizações
             </div>
-
-            <div class="font-bold text-md text-gray-900 mb-1 dark:text-white">
-                <span class="font-bold text-md text-gray-900 dark:text-white mb-1">{{ $vaga->funcVaga ?? '' }} ({{ $vaga->horario ?? 'horario da vaga' }})</span>
-            </div>
-
-            <ul class="text-sm text-gray-500 mb-2 list-disc pl-5">
-                <li class="text-gray-500 dark:text-gray-300">{{ $vaga->descVaga ?? '' }}</li>
-            </ul>
-
-            <div class="flex gap-6 mb-2">
-                <div class="flex items-center gap-1 text-gray-400 dark:text-gray-200">
-                    <img src="/img/eye.svg" alt="Visualizações" class="w-4 h-4">
-                    <span class="text-xs">{{ $vaga->visualizacoes ?? 0 }} visualizações</span>
-                </div>
-                @if(Auth::guard('empresa')->id() !== $vaga->idEmpresa)
-                <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    fetch("{{ route('vagas.visualizar') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ vaga_id: {{ $vaga->id }} })
-                    });
-                });
-                </script>
-                @endif
-                <div class="flex items-center gap-1 text-gray-400 dark:text-gray-200">
-                    <img src="/img/heart-handshake.svg" alt="Candidaturas" class="w-4 h-4">
-                    <span class="text-xs">{{ $vaga->candidaturasCount() }} candidaturas</span>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2 mb-3">
-                @if(isset($vaga->candidatos) && count($vaga->candidatos) > 0 && !empty($vaga->candidatos[0]->foto))
-                    <img src="{{ asset('storage/' . $vaga->candidatos[0]->foto) }}" alt="Candidato" class="w-8 h-8 rounded-full object-cover">
-                @else
-                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 text-xs dark:bg-gray-200">?</div>
-                @endif
-                <div>
-                    <span class="font-semibold text-gray-900 dark:text-white">Candidatos</span>
-                    <div class="text-xs text-gray-400 dark:text-gray-300">Ver informações</div>
-                </div>
-                <span class="ml-auto text-gray-400 dark:text-gray-200 text-xs">{{ isset($vaga->candidatos) ? count($vaga->candidatos) : 0 }}</span>
-            </div>
-
-            <div class="flex gap-2">
-                <button class="flex-1 bg-sky-600 text-white font-semibold py-2 rounded-full flex items-center justify-center gap-2">
-                    <img src="/img/heart-handshake.svg" alt="Concluir" class="w-5 h-5">
-                    Concluir vaga
-                </button>
-
-                <button
-                    class="flex-1 bg-red-500 text-white font-semibold py-2 rounded-full flex items-center justify-center gap-2"
-                    @click="openDelete = true; vagaId = {{ $vaga->id }};">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 6L18 18M6 18L18 6"/>
-                    </svg>
-                    Deletar vaga
-                </button>
-            </div>
-
-            <!-- Modal de confirmação -->
-            <div
-                x-show="openDelete"
-                x-cloak
-                x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-70 backdrop-blur-sm p-2"
-            >
-                <div class="relative w-full max-w-sm rounded-3xl bg-white pt-6 pb-4 px-4 shadow-labor dark:bg-gray-800 flex flex-col max-h-[95vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    <button 
-                        @click="openDelete = false"
-                        class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl leading-none"
-                        aria-label="Fechar modal"
-                    >&times;</button>
-                    <div class="flex flex-col items-center mb-4">
-                        <svg class="w-12 h-12 text-red-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Confirmar exclusão</h2>
-                        <p class="text-gray-500 mb-2 text-center text-sm">Tem certeza que deseja deletar esta vaga? Esta ação não poderá ser desfeita.</p>
-                    </div>
-                    <div class="flex flex-col gap-2 w-full mt-2">
-                        <button @click="openDelete = false" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-full w-full">Cancelar</button>
-                        <form :action="'/enterprises/vagas/delete/' + vagaId" method="POST" class="w-full" x-show="vagaId != null">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full shadow-labor transition-all duration-200">Confirmar exclusão</button>
-                        </form>
-                    </div>
-                </div>
+            <div class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                {{ $vaga->candidaturas->count() }} candidaturas
             </div>
         </div>
+
+        <div class="bg-gray-50 dark:bg-gray-700/30 rounded-2xl p-3 flex items-center justify-between mb-5 cursor-pointer hover:bg-gray-100 transition-colors"
+             @click="openCandidatosModal = true; currentVagaId = {{ $vaga->id }}">
+            
+            <div class="flex items-center gap-3">
+                @if($vaga->candidaturas->count() > 0)
+                    <div class="flex -space-x-3">
+                        @foreach($vaga->candidaturas->take(3) as $candidatura)
+                            <img class="w-10 h-10 rounded-full border-2 border-white object-cover" 
+                                 src="{{ $candidatura->user->fotoUser ? asset('storage/'.$candidatura->user->fotoUser) : asset('img/default-avatar.png') }}" 
+                                 alt="Candidato">
+                        @endforeach
+                        @if($vaga->candidaturas->count() > 3)
+                            <div class="w-10 h-10 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                                +{{ $vaga->candidaturas->count() - 3 }}
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </div>
+                @endif
+
+                <div class="flex flex-col">
+                    <span class="font-bold text-gray-900 dark:text-white text-sm">Candidatos</span>
+                    <span class="text-xs text-gray-400">Ver informações</span>
+                </div>
+            </div>
+
+            <span class="text-gray-400 font-medium text-sm">{{ $vaga->candidaturas->count() }}</span>
+        </div>
+
+        <div class="flex gap-3">
+            <button class="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-full flex items-center justify-center gap-2 shadow-sm transition-transform active:scale-95">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Concluir vaga
+            </button>
+
+            <button class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-full flex items-center justify-center gap-2 shadow-sm transition-transform active:scale-95"
+                    @click="openDelete = true; vagaId = {{ $vaga->id }};">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                Deletar vaga
+            </button>
+        </div>
+
+    </div>
+</div>
         @endforeach
     </div>
 </div>

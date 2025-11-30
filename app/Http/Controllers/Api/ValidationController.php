@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-// IMPORTE AS NOVAS REGRAS
 use App\Rules\ValidaCpf;
 use App\Rules\ValidaCnpj;
 
@@ -28,23 +27,18 @@ class ValidationController extends Controller
 
         switch ($field) {
             case 'email':
-                // Valida formato real de email E se é único
                 $rules = [$field => ["required", "email:rfc,dns", "unique:{$table},email"]];
                 break;
             
             case 'cpf':
-                // Valida algoritmo de CPF E se é único
                 $rules = [$field => ["required", new ValidaCpf, "unique:user_tb,cpf"]];
                 break;
 
             case 'cnpj':
-                // Valida algoritmo de CNPJ E se é único
                 $rules = [$field => ["required", new ValidaCnpj, "unique:empresa_tb,cnpj"]];
                 break;
 
             case 'telefone':
-                // Regex para: (11) 99999-9999 ou (11) 9999-9999
-                // Formato: Parenteses, Espaço, Hífen
                 $rules = [$field => [
                     "required", 
                     "unique:{$table},tel",
@@ -61,7 +55,6 @@ class ValidationController extends Controller
             return response()->json(['valid' => true]);
         }
 
-        // Faz a validação
         $validator = Validator::make([$field => $value], $rules, [
             'email.email' => 'O formato do e-mail é inválido.',
             'telefone.regex' => 'O telefone deve estar no formato (99) 99999-9999.',

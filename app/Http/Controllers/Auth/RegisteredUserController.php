@@ -3,29 +3,21 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-// use App\Models\Empresa; // Não precisa mais aqui
-use App\Models\End; // Não precisa mais aqui
-use Illuminate\Http\Request; // <<< VAMOS USAR A REQUEST PADRÃO
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth; // <<< PARA LOGAR O USUÁRIO
-use Illuminate\Validation\Rules; // <<< Para regras de senha
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules;
 use App\Rules\ValidaCpf;
 
 class RegisteredUserController extends Controller
 {
-    // ... seu método create() continua aqui ...
     public function create()
     {
         return view('workers.register');
     }
 
-    /**
-     * Handle an incoming registration request.
-     * Este é o NOVO método que recebe o POST do formulário.
-     */
     public function store(Request $request)
     {
-        // 1. Validação (SÓ dos campos do formulário)
         $validated = $request->validate([
             'nome_real' => 'required|string|max:100',
             'username'  => 'required|string|max:50|unique:user_tb,username',
@@ -36,27 +28,20 @@ class RegisteredUserController extends Controller
             'password'  => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // 2. Criar o usuário no banco
         $user = User::create([
             'nome_real' => $validated['nome_real'],
             'username'  => $validated['username'],
             'email'     => $validated['email'],
             'cpf'       => $validated['cpf'],
-            // Formatar a data para o banco (de 'd/m/Y' para 'Y-m-d')
             'datanasc'  => \Carbon\Carbon::createFromFormat('d/m/Y', $validated['datanasc'])->format('Y-m-d'),
-            'tel'       => $validated['telefone'], // Mapeando 'telefone' (form) para 'tel' (banco)
+            'tel'       => $validated['telefone'],
             'password'  => Hash::make($validated['password']),
-            'idEnd'     => null, // <<< O ENDEREÇO FICA NULO! (Obrigatório)
-            'status'    => 1, // Definimos como '1' (Pendente de Perfil)
+            'idEnd'     => null,
+            'status'    => 1,
         ]);
 
-        // 3. Logar o usuário recém-criado
         Auth::login($user);
 
-        // 4. Redirecionar para o Dashboard
-        // (Aqui a sua modal obrigatória vai entrar em ação)
         return redirect()->route('workers.dashboard')->with('success', 'Conta criada com sucesso!');
     }
-
-    // ... (Apague os métodos registerEndereco e registerUser antigos)
 }

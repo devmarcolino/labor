@@ -17,6 +17,7 @@ class Vaga extends Model
         'valor_vaga',
         'dataVaga',
         'descVaga',
+        'horario',
         'funcVaga',
         'imgVaga',
     ];

@@ -36,13 +36,20 @@ class EnterpriseVagaController extends Controller
     // Salva a vaga no banco
     public function store(Request $request)
     {
+        $valorLimpo = str_replace(['R$', '.', ' '], '', $request->valor_vaga);
+        $valorLimpo = str_replace(',', '.', $valorLimpo);
+        
+        // Injeta o valor limpo de volta na request para validar
+        $request->merge(['valor_vaga' => $valorLimpo]);
+        
         $request->validate([
             'tipoVaga' => 'required|string|max:100',
             'valor_vaga' => 'required|numeric',
             'dataVaga' => 'required|date',
             'descVaga' => 'required|string|max:255',
+            'horario' => 'required|string|max:50',
             'funcVaga' => 'required|integer|exists:habilidades_tb,id',
-            'imgVaga' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'imgVaga' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $vagaData = $request->only([
@@ -50,6 +57,8 @@ class EnterpriseVagaController extends Controller
             'valor_vaga',
             'dataVaga',
             'descVaga',
+            'horario',
+            'imgVaga',
             'funcVaga'
         ]);
 

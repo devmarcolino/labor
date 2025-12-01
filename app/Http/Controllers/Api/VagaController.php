@@ -150,6 +150,31 @@ class VagaController extends Controller
                     ];
                 })->filter()->values();
 
+                $duracao = '';
+                if ($vaga->horario && str_contains($vaga->horario, ' - ')) {
+                    try {
+                        // Quebra "18:00 - 23:00" em duas partes
+                        $partes = explode(' - ', $vaga->horario);
+                        $inicio = \Carbon\Carbon::createFromFormat('H:i', trim($partes[0]));
+                        $fim = \Carbon\Carbon::createFromFormat('H:i', trim($partes[1]));
+
+                        // Se o fim for menor que o início (ex: 22:00 - 04:00), adiciona um dia
+                        if ($fim->lessThan($inicio)) {
+                            $fim->addDay();
+                        }
+
+                        // Calcula a diferença
+                        $totalMinutos = $inicio->diffInMinutes($fim);
+                        $horas = floor($totalMinutos / 60);
+                        $minutos = $totalMinutos % 60;
+
+                        // Formata: "5h" ou "5h 30m"
+                        $duracao = $horas . 'h' . ($minutos > 0 ? ' ' . $minutos . 'm' : '');
+                    } catch (\Exception $e) {
+                        $duracao = ''; // Se der erro no formato, ignora
+                    }
+                }
+
                 return [
                     'id' => $vaga->id,
                     'title' => $nomeHabilidade,
@@ -164,6 +189,8 @@ class VagaController extends Controller
                         : null,
                     'distance' => $distance,
                     'candidates' => $candidates,
+                    'horario' => $vaga->horario,
+                    'duracao' => $duracao,
                 ];
             })
             ->filter(function ($vaga) {

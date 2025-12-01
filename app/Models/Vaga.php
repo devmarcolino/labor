@@ -20,6 +20,7 @@ class Vaga extends Model
         'horario',
         'funcVaga',
         'imgVaga',
+        'status',
     ];
 
     protected $casts = [
@@ -51,5 +52,11 @@ class Vaga extends Model
     public function candidaturasCount()
     {
         return $this->candidaturas()->count();
+    }
+
+    public function skill()
+    {
+        // 'funcVaga' é a coluna na tabela vagas que guarda o ID (1, 2...)
+        return $this->belongsTo(Skill::class, 'funcVaga');
     }
 }

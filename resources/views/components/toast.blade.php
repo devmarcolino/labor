@@ -45,7 +45,7 @@
      style="display: none;"> {{-- display:none evita piscar antes do Alpine carregar --}}
     
     <div class="p-4">
-        <div class="flex items-start">
+        <div class="flex items-center">
             <div class="flex-shrink-0">
                 <div class="flex h-8 w-8 items-center justify-center rounded-full {{ $style['icon_bg'] }}">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

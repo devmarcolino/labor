@@ -10,7 +10,8 @@ use App\Http\Controllers\Auth\EnterpriseLoginController;
 
 // Controllers de Perfil (Onboarding)
 use App\Http\Controllers\ProfileController; // Perfil User
-use App\Http\Controllers\EnterpriseProfileController; // Perfil Empresa
+use App\Http\Controllers\EnterpriseProfileController;
+use App\Http\Controllers\EnterpriseVagaController; // Perfil Empresa
 
 // Models
 use App\Models\Skill;
@@ -142,7 +143,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth:empresa')->group(function () {
 
     // Minhas vagas (lista)
-    Route::get('/enterprises/vagas', [\App\Http\Controllers\EnterpriseVagaController::class, 'list'])
+    Route::get('/enterprises/vagas', [EnterpriseVagaController::class, 'list'])
         ->name('enterprises.vagas.list');
 
     // ⚠️ IMPORTANTE: rota de visualizar vaga NÃO fica aqui!
@@ -152,15 +153,18 @@ Route::middleware('auth:empresa')->group(function () {
         ->name('enterprises.dashboard');
 
     // Criar vaga
-    Route::get('/enterprises/vagas/create', [\App\Http\Controllers\EnterpriseVagaController::class, 'create'])
+    Route::get('/enterprises/vagas/create', [EnterpriseVagaController::class, 'create'])
         ->name('enterprises.vagas.create');
 
-    Route::post('/enterprises/vagas', [\App\Http\Controllers\EnterpriseVagaController::class, 'store'])
+    Route::post('/enterprises/vagas', [EnterpriseVagaController::class, 'store'])
         ->name('enterprises.vagas.store');
 
     // Excluir vaga
-    Route::delete('/enterprises/vagas/delete/{id}', [\App\Http\Controllers\EnterpriseVagaController::class, 'destroy'])
+    Route::delete('/enterprises/vagas/delete/{id}', [EnterpriseVagaController::class, 'destroy'])
         ->name('enterprises.vagas.delete');
+
+    Route::patch('/enterprises/vagas/concluir/{id}', [EnterpriseVagaController::class, 'concluir'])
+    ->name('enterprises.vagas.concluir');
 
     // Chat & Perfil
     Route::get('/enterprises/chat', fn() => view('enterprises.chat'))->name('enterprises.chat');

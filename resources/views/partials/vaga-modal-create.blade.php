@@ -12,13 +12,22 @@
     <div class="relative w-full max-w-md rounded-[50px] bg-white pt-10 pb-6 px-6 shadow-2xl dark:bg-gray-800 flex flex-col max-h-[90vh] overflow-x-hidden">
         
         <div class="text-center mb-4 relative">
-            <button @click="openVagaModal = false" class="absolute -top-6 -right-2 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            <div class="flex items-center justify-center">
+            <button @click="openVagaModal = false" 
+                    type="button" 
+                    aria-label="Fechar" 
+                    class="absolute right-4 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition z-10">
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
             
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
                 <span x-show="step === 1">Nova Vaga</span>
                 <span x-show="step === 2">Detalhes</span>
                 <span x-show="step === 3">Imagem</span>
             </h2>
+            </div>
             
             <div class="w-full bg-gray-200 rounded-full h-2 mt-4 dark:bg-gray-700 overflow-hidden">
                 <div class="bg-sky-600 h-2 rounded-full transition-all duration-500 ease-out" 
@@ -41,7 +50,7 @@
 
                 <div>
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Habilidade Necessária</label>
-                    <select x-model="fields.funcVaga" name="funcVaga" class="bg-gray-50/85 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-sky-500 block w-full p-2.5 dark:bg-gray-700/85 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                    <select x-model="fields.funcVaga" name="funcVaga" class="bg-gray-50/85 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5 dark:bg-gray-700/85 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
                         <option value="">Selecione uma habilidade</option>
                         @foreach($skills as $skill)
                             <option value="{{ $skill->id }}">{{ $skill->nomeHabilidade }}</option>
@@ -58,17 +67,36 @@
                             Valor
                         </x-input>
                     </div>
-                    <div>
-                        <x-input x-model="fields.horario" name="horario" placeholder="Ex: 18:00 - 23:00" required>
-                            Horário
-                        </x-input>
+                    <div class="gap-3">
+
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Horário (Início e Fim)</label>
+                            
+                            <div class="flex items-center bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus-within:ring-1.5 focus-within:ring-sky-500 focus-within:border-sky-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white overflow-hidden">
+                                
+                                <input type="time" x-model="fields.hora_inicio" name="hora_inicio" class="bg-transparent border-none focus:ring-0 w-full p-2.5 text-center appearance-none" required>
+                                
+                                <span class="text-gray-400 font-bold px-1">às</span>
+                                
+                                <input type="time" x-model="fields.hora_fim" name="hora_fim" class="bg-transparent border-none focus:ring-0 w-full p-2.5 text-center appearance-none" required>
+                                
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <div>
-                    <x-input x-model="fields.dataVaga" type="date" name="dataVaga" x-min="minDate" required>
-                        Data do Trabalho
-                    </x-input>
+                <div class="mt-3">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Data do Trabalho</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/></svg>
+                        </div>
+                        <input id="dataVagaInput" placeholder="Selecione a data" 
+            autocomplete="off"
+            readonly
+            required type="text" name="dataVaga" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Selecione a data" required>
+                    </div>
                 </div>
 
                 <div>
@@ -98,7 +126,7 @@
                 </div>
             </div>
 
-            <div class="mt-6 flex w-full gap-3 pt-2 dark:border-gray-700">
+            <div class="mt-6 flex flex-col w-full gap-3 pt-2 dark:border-gray-700">
                 
                 <div x-show="step > 1" class="flex-1">
                     <x-btn-outline type="button" @click="step--">
@@ -127,48 +155,72 @@ function jobCreateForm() {
     return {
         step: 1,
         photoPreview: null,
-        minDate: new Date().toISOString().split('T')[0], // Pega a data de hoje (YYYY-MM-DD)
         
         fields: { 
-            tipoVaga: '', 
-            funcVaga: '', 
-            valor_vaga: '', 
-            dataVaga: '', 
-            horario: '',
-            descVaga: '' 
+            tipoVaga: '', funcVaga: '', valor_vaga: '', dataVaga: '', 
+            hora_inicio: '', hora_fim: '', descVaga: '' 
         },
 
         init() {
-            // Inicializa a máscara de Dinheiro no input x-ref="moneyInput"
-            // Requer IMask importado no app.js
+            // 1. Inicia Máscara de Dinheiro
             if(this.$refs.moneyInput) {
                 IMask(this.$refs.moneyInput, {
                     mask: 'R$ num',
-                    blocks: {
-                        num: {
-                            mask: Number,
-                            thousandsSeparator: '.',
-                            radix: ','
-                        }
-                    }
+                    blocks: { num: { mask: Number, thousandsSeparator: '.', radix: ',' } }
+                });
+            }
+
+            // 2. Inicia o Datepicker MANUALMENTE (Sem duplicidade)
+            const dataEl = document.getElementById('dataVagaInput');
+            if (dataEl && typeof Datepicker !== 'undefined') {
+                const dp = new Datepicker(dataEl, {
+                    autohide: true,
+                    format: 'dd/mm/yyyy',
+                    language: 'pt-BR', // Garante português
+                    minDate: new Date(), // Bloqueia passado
+                });
+                
+                // O "Pulo do Gato": Quando mudar a data, atualiza o Alpine
+                dataEl.addEventListener('changeDate', (e) => {
+                    this.fields.dataVaga = dataEl.value;
                 });
             }
         },
 
         nextStep() {
-            // Validação
+            // Função auxiliar para disparar erro
+            const showError = (msg) => {
+                window.dispatchEvent(new CustomEvent('notify', {
+                    detail: { type: 'warning', title: 'Atenção', msg: msg }
+                }));
+            };
+
+            // Validação Step 1
             if (this.step === 1) {
                 if (!this.fields.tipoVaga || !this.fields.funcVaga) { 
-                    alert('Preencha o título e a habilidade.'); return; 
+                    showError('Por favor, preencha o título e selecione a habilidade.'); 
+                    return; 
                 }
             }
+
+            // Validação Step 2
             if (this.step === 2) {
-                // Pega o valor do input mascarado direto do DOM (pois o x-model pode não pegar a máscara)
                 const valor = this.$refs.moneyInput.value;
-                if (!valor || !this.fields.dataVaga || !this.fields.descVaga || !this.fields.horario) { 
-                    alert('Preencha todos os detalhes, valor e horário.'); return; 
+                
+                const dataReal = document.getElementById('dataVagaInput').value;
+                this.fields.dataVaga = dataReal;
+
+                if (!valor || !this.fields.descVaga || !this.fields.hora_inicio || !this.fields.hora_fim) { 
+                    showError('Preencha todos os detalhes, valor e horários.'); 
+                    return; 
+                }
+                
+                if(!this.fields.dataVaga) {
+                     showError('Selecione a data do trabalho.');
+                     return;
                 }
             }
+
             this.step++;
         },
 

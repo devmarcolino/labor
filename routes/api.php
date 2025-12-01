@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\VagaController;
+use App\Http\Controllers\EnterpriseVagaController;
 use App\Http\Controllers\Api\ValidationController;
 
 /*

@@ -12,8 +12,14 @@
 </head>
 <x-flash-manager />
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-500 h-screen flex flex-col">
-        <x-btn-back />
     
     <x-loading/>
+
+    <header>
+        <div class="flex items-center justify-between w-full max-w-2xl gap-2 mb-4">
+            <x-btn-back/>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white">Minhas <span class="text-sky-500">habilidades</span></h1>
+        </div>
+    </header>
 </body>
 </html>

@@ -1,4 +1,6 @@
-<div x-show="activeModal === {{ $vaga->id }}" 
+<div x-data="{ show: false }"
+     x-show="show"
+     @open-candidates-modal.window="if ($event.detail.id === {{ $vaga->id }}) show = true" 
      x-cloak
      class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/90 backdrop-blur-sm p-4"
      x-transition:enter="transition ease-out duration-300"
@@ -9,13 +11,9 @@
      x-transition:leave-end="opacity-0">
 
     <div class="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-[40px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
-         @click.away="activeModal = null">
+         @click.away="show = false">
 
-        <button @click="activeModal = null" class="absolute top-4 right-4 z-20 bg-white/20 backdrop-blur-md text-white rounded-full p-2 hover:bg-white/40 transition-colors shadow-lg">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-
-        <div class="overflow-y-auto custom-scrollbar pb-6">
+        <div class="overflow-y-auto custom-scrollbar">
             
             @if($vaga->candidaturas->count() > 0)
                 @php
@@ -35,13 +33,13 @@
                     
                     <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
-                    <div class="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-3 shadow-lg">
-                        <div class="bg-blue-600 p-1.5 rounded-full">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <div class="absolute top-3 right-3 left-3 max-w-2xl flex items-center gap-3 bg-gray-900/60 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 shadow-lg">
+                        <div class="rounded-full">
+                            <img src="../img/ia.svg" alt="" class="w-6 h-6">
                         </div>
                         <div>
-                            <p class="text-xs font-bold text-gray-800 uppercase tracking-wider">Melhor Candidato</p>
-                            <p class="text-[10px] text-gray-500 font-medium">Analisado por Labor IA ©</p>
+                            <p class="text-xs font-bold text-gray-100 uppercase tracking-wider">Melhor Candidato</p>
+                            <p class="text-[10px] text-gray-200 font-medium">Analisado por Labor IA ©</p>
                         </div>
                     </div>
 
@@ -57,11 +55,10 @@
                             </div>
                         </div>
 
-                        <button @click="activeModal = null; window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'success', title: 'Sucesso!', msg: 'Vaga atribuída para {{ explode(' ', $melhorCandidato->nome_real)[0] }}!'}}))" 
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-600/30 transition-transform active:scale-95 flex items-center justify-center gap-2">
-                            <span>Atribuir Vaga</span>
+                        <x-btn-primary @click="show = false; window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'success', title: 'Sucesso!', msg: 'Vaga atribuída para {{ explode(' ', $melhorCandidato->nome_real)[0] }}!'}}))">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </button>
+                            <span>Atribuir Vaga</span>
+                        </x-btn-primary>
                     </div>
                 </div>
 
@@ -79,8 +76,8 @@
                                         <p class="text-xs text-gray-500">{{ $cand->user->endereco->cidade ?? 'Localização não inf.' }}</p>
                                     </div>
 
-                                    <button @click="activeModal = null; window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'success', title: 'Sucesso!', msg: 'Vaga atribuída!'}}))"
-                                            class="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors">
+                                    <button @click="show = false; window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'success', title: 'Sucesso!', msg: 'Vaga atribuída!'}}))"
+                                            class="p-2 rounded-full bg-sky-50 text-sky-600 hover:bg-sky-600 hover:text-white transition-colors">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     </button>
                                 </div>
@@ -96,8 +93,6 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Aguardando Candidatos</h3>
                     <p class="text-gray-500 text-sm max-w-[200px]">Assim que alguém se candidatar, a Labor IA fará a análise do perfil aqui.</p>
-                    
-                    <button @click="activeModal = null" class="mt-8 text-sky-600 font-semibold hover:text-sky-700 text-sm">Voltar para Vagas</button>
                 </div>
             @endif
 

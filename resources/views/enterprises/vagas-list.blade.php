@@ -34,11 +34,11 @@
           currentVagaId: null,
           activeModal: null // <--- NOVO (Para saber de qual vaga abrir os candidatos)
       }" @open-delete-modal.window="openDelete = true; vagaId = $event.detail.id"
-      @open-candidates-modal.window="activeModal = $event.detail.id">
+     @open-candidates-modal.window="activeModal = $event.detail.id; console.log('Abriu vaga:', $event.detail.id)">
 <div class="container mx-auto px-5 py-5 sm:py-9 max-w-md">
     <div class="flex items-center justify-between w-full max-w-2xl gap-2 mb-4">
-        <x-btn-back />
-        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Minhas Vagas</h1>
+        <x-btn-back/>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Minhas <span class="text-sky-500">vagas</span></h1>
     </div>
 
     <!-- Controle do modal de criar vaga -->

@@ -65,9 +65,11 @@ Route::middleware('auth:web')->group(function () {
 
     // Dashboard (+ Habilidades para a Modal de Onboarding)
     Route::get('/workers/dashboard', function () {
-        $habilidades = Skill::all();
-        return view('workers.dashboard', ['habilidades' => $habilidades]);
-    })->name('workers.dashboard');
+    // Eager Loading: Já traz as perguntas e as opções de resposta de uma vez
+    $habilidades = Skill::with('perguntas.opcoes')->get();
+    
+    return view('workers.dashboard', ['habilidades' => $habilidades]);
+})->name('workers.dashboard');
 
     // Chat & Perfil
     Route::get('/workers/chat', fn() => view('workers.chat'))->name('workers.chat');
@@ -76,17 +78,17 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/workers/account', [ProfileController::class, 'edit'])->name('workers.account');
     Route::post('/workers/update-skills', [ProfileController::class, 'updateSkills'])->name('workers.update.skills');
     Route::patch('/workers/account', [ProfileController::class, 'update'])->name('workers.profile.update');
-
+    Route::post('/workers/account/photo', [ProfileController::class, 'updatePhoto'])
+    ->name('workers.profile.photo.update');
     // Logout
     Route::post('/workers/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     // === OUTRAS PÁGINAS ===
     Route::view('/workers/settings', 'workers.settings')->name('workers.settings');
     Route::view('/workers/schedule', 'workers.schedule')->name('workers.schedule');
-    Route::view('/workers/other_jobs', 'workers.other_jobs')->name('workers.jobs'); // nome correto do arquivo é 'other_jobs'
     Route::view('/workers/rating', 'workers.rating')->name('workers.rating');
     Route::view('/workers/skills', 'workers.skills')->name('workers.skills');
-    Route::view('/workers/address', 'workers.adress')->name('workers.address'); // 'adress' com um D só
+    Route::view('/workers/adress', 'workers.adress')->name('workers.adress'); // 'adress' com um D só
 
     /*
     |--------------------------------------------------------------------------

@@ -162,4 +162,18 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Perfil atualizado com sucesso!');
     }
+
+    public function updatePhoto(Request $request)
+    {
+        $request->validate(['fotoUser' => 'required|image|max:5120']); // Aumentei pra 5MB por garantia
+        
+        $user = auth()->user();
+        if ($user->fotoUser) Storage::disk('public')->delete($user->fotoUser);
+        
+        $path = $request->file('fotoUser')->store('fotos_perfil', 'public');
+        $user->fotoUser = $path;
+        $user->save();
+
+        return back()->with('success', 'Foto atualizada com sucesso!');
+    }
 }

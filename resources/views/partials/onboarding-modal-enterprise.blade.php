@@ -1,5 +1,5 @@
 <div x-data="onboardingEnterpriseForm()" x-init="init()" 
-     class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-90 backdrop-blur-sm p-4">
+     class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/90 backdrop-blur-sm p-4">
 
     <div class="relative w-full max-w-md rounded-[50px] bg-white pt-10 pb-6 px-6 shadow-2xl dark:bg-gray-800 flex flex-col max-h-[90vh] overflow-x-hidden">
         
@@ -103,13 +103,17 @@ function onboardingEnterpriseForm() {
 
         init() {},
 
+        showError(msg) {
+            window.dispatchEvent(new CustomEvent('notify', {
+                detail: { type: 'warning', title: 'Faltam dados', msg: msg }
+            }));
+        },
+
         previewPhoto(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.photoPreview = e.target.result;
-                };
+                reader.onload = (e) => { this.photoPreview = e.target.result; };
                 reader.readAsDataURL(file);
             }
         },
@@ -118,15 +122,13 @@ function onboardingEnterpriseForm() {
             const inputFoto = document.getElementById('fotoEmpresa');
             const desc = document.getElementById('desc_empresa').value;
             
-            // Validação da Foto (Input ou Preview existente)
             if ((!inputFoto.files || inputFoto.files.length === 0) && !this.photoPreview) {
-                alert('Por favor, adicione o logótipo da empresa.');
+                this.showError('Adicione o logotipo da empresa.');
                 return;
             }
             
-            // Validação da Descrição
             if (!desc.trim()) {
-                alert('Adicione uma breve descrição sobre a empresa.');
+                this.showError('A descrição da empresa é obrigatória.');
                 return;
             }
             
@@ -143,8 +145,10 @@ function onboardingEnterpriseForm() {
                     if (!data.erro) {
                         this.rua = data.logradouro; this.bairro = data.bairro;
                         this.cidade = data.localidade; this.uf = data.uf;
+                    } else {
+                        this.showError('CEP inválido.');
                     }
-                } catch (e) {} finally { this.loading = false; }
+                } catch (e) { this.showError('Erro de conexão.'); } finally { this.loading = false; }
             }
         }
     }

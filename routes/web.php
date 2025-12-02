@@ -187,11 +187,24 @@ Route::middleware('auth:empresa')->group(function () {
         ->name('enterprises.vagas.store');
 
     // Excluir vaga
+    Route::get('/enterprises/account-info', [EnterpriseProfileController::class, 'editInfo'])
+        ->name('enterprises.account.info');
+
+    // Ação de Atualizar Dados (Nome, Email, Tel)
+    Route::patch('/enterprises/account-info', [EnterpriseProfileController::class, 'updateInfo'])
+        ->name('enterprises.account.info.update');
+
+    // Ação de Atualizar Senha
+    Route::put('/enterprises/password', [EnterpriseProfileController::class, 'updatePassword'])
+        ->name('enterprises.password.update');
+
     Route::delete('/enterprises/vagas/delete/{id}', [EnterpriseVagaController::class, 'destroy'])
         ->name('enterprises.vagas.delete');
 
     Route::patch('/enterprises/vagas/concluir/{id}', [EnterpriseVagaController::class, 'concluir'])
     ->name('enterprises.vagas.concluir');
+
+    Route::get('/enterprises/settings', [EnterpriseProfileController::class, 'settings'])->name('enterprises.settings');
 
     // Chat & Perfil
     Route::get('/enterprises/chat', fn() => view('enterprises.chat'))->name('enterprises.chat');
@@ -202,11 +215,16 @@ Route::middleware('auth:empresa')->group(function () {
     // Logout
     Route::post('/enterprises/logout', [EnterpriseLoginController::class, 'destroy'])->name('enterprises.logout');
 
+
+    Route::get('/address', [EnterpriseProfileController::class, 'editAddress'])
+        ->name('enterprises.edit.address');
+
+    // Ação de Salvar (A modal manda pra cá)
+    Route::patch('/address', [EnterpriseProfileController::class, 'updateAddress'])
+        ->name('enterprises.update.address');
     // === OUTRAS PÁGINAS ===
-    Route::view('/enterprises/settings', 'enterprises.settings')->name('enterprises.settings');
     Route::view('/enterprises/schedule', 'enterprises.schedule')->name('enterprises.schedule');
     Route::view('/enterprises/jobs', 'enterprises.jobs')->name('enterprises.jobs');
     Route::view('/enterprises/rating', 'enterprises.rating')->name('enterprises.rating');
-    Route::view('/enterprises/address', 'enterprises.adress')->name('enterprises.address');
     Route::view('/enterprises/analytics', 'enterprises.analytics')->name('enterprises.analytics');
 });

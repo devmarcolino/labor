@@ -22,6 +22,90 @@ class EnterpriseProfileController extends Controller
         ]);
     }
 
+    public function editInfo()
+{
+    return view('enterprises.account-info', ['user' => auth()->user()]);
+}
+    public function updatePassword(Request $request)
+{
+    $validated = $request->validate([
+        'current_password' => 'required|current_password',
+        'password' => ['required', 'confirmed', Password::defaults()],
+    ]);
+
+    auth()->user()->update([
+        'password' => Hash::make($validated['password']),
+    ]);
+
+    return back()->with('success', 'Senha alterada com sucesso!');
+}
+    // CARREGA A TELA
+    public function updateInfo(Request $request)
+    {
+        $user = auth()->user(); // Aqui é a instância de Empresa
+
+        $validated = $request->validate([
+            // Valida na tabela 'empresa_tb', ignorando o ID atual
+            'email' => 'required|email|max:255|unique:empresa_tb,email,'.$user->id,
+            'nome_empresa' => 'required|string|max:255',
+            'tel' => 'required|string|max:20',
+            'ramo' => 'nullable|string|max:100',
+            'desc_empresa' => 'nullable|string|max:500',
+        ]);
+
+        $user->update($validated);
+
+        return back()->with('success', 'Informações da empresa atualizadas!');
+    }
+
+    public function editAddress()
+    {
+        // Carrega o usuário logado (Empresa) e o endereço dele
+        $user = auth()->user()->load('endereco');
+
+        // Retorna a view específica da empresa
+        return view('enterprises.address', compact('user'));
+    }
+
+    // SALVA O ENDEREÇO
+    public function updateAddress(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'cep' => 'required|string',
+            'rua' => 'required|string',
+            'numero' => 'required|string',
+            'bairro' => 'required|string',
+            'cidade' => 'required|string',
+            'uf' => 'required|string|max:2',
+        ]);
+
+        try {
+            // 1. Cria ou Atualiza na tabela enderecos_tb
+            $endereco = End::updateOrCreate(
+                $user->idEnd ? ['id' => $user->idEnd] : ['id' => null],
+                $validated
+            );
+            
+            // 2. Vincula ao usuário se ainda não estiver
+            if ($user->idEnd !== $endereco->id) {
+                 $user->update(['idEndereco' => $endereco->id]);
+            }
+            
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erro ao salvar.'], 500);
+        }
+    }
+
+    public function settings()
+    {
+        // Passamos o user para verificar configurações salvas no banco futuramente
+        return view('enterprises.settings', ['user' => auth()->user()]);
+    }
+
     /**
      * Atualiza o perfil da Empresa.
      */

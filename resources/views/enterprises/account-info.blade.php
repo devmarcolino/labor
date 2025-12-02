@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Editar Informações</title>
+    <title>Labor for enterprises</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
@@ -27,59 +27,57 @@
         <!-- CARD PRINCIPAL (DADOS PESSOAIS) -->
         <div class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-[40px] shadow-labor p-6 mb-6">
             
-            <form action="{{ route('workers.account.info.update') }}" method="POST" class="flex flex-col gap-5">
+            <form action="{{ route('enterprises.account.info.update') }}" method="POST" class="flex flex-col gap-5">
                 @csrf
                 @method('PATCH')
 
-                <!-- 1. USUÁRIO (Editável) -->
+                <!-- 1. NOME DA EMPRESA -->
                 <div>
-                    <x-input name="username" 
-        value="{{ old('username', $user->username) }}" 
-        placeholder="@usuario"
-        x-on:input="if (!$el.value.startsWith('@')) $el.value = '@' + $el.value.replace(/@/g, '')">
-                        Usuário
+                    <x-input name="nome_empresa" value="{{ old('nome_empresa', $user->nome_empresa) }}" placeholder="Nome Fantasia">
+                        Nome da Empresa
                     </x-input>
                 </div>
 
-                <!-- 2. NOME (Bloqueado) -->
+                <!-- 2. CNPJ (Bloqueado) -->
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Nome Completo (Não editável)</label>
-                    <input type="text" value="{{ $user->nome_real }}" readonly 
+                    <label class="block mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">CNPJ (Não editável)</label>
+                    <input type="text" value="{{ $user->cnpj }}" readonly 
                            class="bg-gray-100 border border-gray-200 text-gray-500 text-sm rounded-lg focus:ring-0 focus:border-gray-200 block w-full p-2.5 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
                 </div>
 
-                <!-- 3. EMAIL (Editável) -->
+                <!-- 3. EMAIL -->
                 <div>
-                    <x-input name="email" type="email" value="{{ old('email', $user->email) }}" placeholder="seu@email.com">
-                        E-mail
+                    <x-input name="email" type="email" value="{{ old('email', $user->email) }}" placeholder="empresa@email.com">
+                        E-mail Corporativo
                     </x-input>
                 </div>
 
-                <!-- 4. TELEFONE (Editável) -->
+                <!-- 4. TELEFONE -->
                 <div>
-                    <x-input id="telInput" name="tel" type="tel" value="{{ old('tel', $user->tel) }}" placeholder="(00) 00000-0000" x-mask="(99) 99999-9999">
-                        Telefone
+                    <x-input id="telInput" name="tel" type="tel" value="{{ old('tel', $user->tel) }}" placeholder="(00) 00000-0000">
+                        Telefone / WhatsApp
                     </x-input>
                 </div>
 
-                <!-- 5. CPF (Bloqueado) -->
+                <!-- 5. RAMO DE ATUAÇÃO (Novo) -->
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">CPF (Não editável)</label>
-                    <input type="text" value="{{ $user->cpf }}" readonly 
-                           class="bg-gray-100 border border-gray-200 text-gray-500 text-sm rounded-lg focus:ring-0 focus:border-gray-200 block w-full p-2.5 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
+                    <x-input name="ramo" value="{{ old('ramo', $user->ramo) }}" placeholder="Ex: Eventos, Buffet, Segurança...">
+                        Ramo de Atuação
+                    </x-input>
                 </div>
 
-                <!-- 6. DATA NASCIMENTO (Bloqueado) -->
+                <!-- 6. DESCRIÇÃO DA EMPRESA (Novo - Textarea simples) -->
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Data de Nascimento (Não editável)</label>
-                    <input type="text" value="{{ \Carbon\Carbon::parse($user->datanasc)->format('d/m/Y') }}" readonly 
-                           class="bg-gray-100 border border-gray-200 text-gray-500 text-sm rounded-lg focus:ring-0 focus:border-gray-200 block w-full p-2.5 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descrição da Empresa</label>
+                    <textarea name="desc_empresa" rows="3" 
+                        class="block w-full p-3 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-sky-500 focus:border-sky-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+                        placeholder="Fale um pouco sobre a empresa...">{{ old('desc_empresa', $user->desc_empresa) }}</textarea>
                 </div>
 
                 <!-- Botão Salvar -->
                 <div class="pt-2">
                     <x-btn-primary type="submit" class="w-full justify-center">
-                        Confirmar mudanças
+                        Salvar Informações
                     </x-btn-primary>
                 </div>
             </form>
@@ -91,7 +89,7 @@
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 px-2">Segurança</h3>
             
             <div class="bg-white dark:bg-gray-800 rounded-[40px] shadow-labor p-6">
-                <form action="{{ route('workers.password.update') }}" method="POST" class="flex flex-col gap-5">
+                <form action="{{ route('enterprises.password.update') }}" method="POST" class="flex flex-col gap-5">
                     @csrf
                     @method('PUT')
 

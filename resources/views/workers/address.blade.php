@@ -68,9 +68,9 @@
      x-transition:leave-end="opacity-0"
      class="relative z-50">
         @include('partials.address-edit-modal', [
-            // Agora passamos o objeto Endereco (ou array vazio se for nulo)
-            'addressData' => $user->endereco ? $user->endereco->toArray() : [] 
-        ])
+            'addressData' => $user->endereco ? $user->endereco->toArray() : [],
+            'actionUrl' => route('workers.update.address') // <--- APONTA PARA A ROTA DA EMPRESA
+         ])
     </div>
 
 </body>

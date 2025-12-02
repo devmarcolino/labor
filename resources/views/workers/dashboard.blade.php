@@ -277,6 +277,57 @@
                 @endif
                 </div>
 
+                @php
+    use App\Models\Mensagem;
+    use App\Models\Empresa;
+    $workerId = Auth::id();
+    // Busca empresas que enviaram mensagem para o worker
+    $empresasComMensagem = Mensagem::where('destinatario_id', $workerId)
+        ->where('destinatario_tipo', 'user')
+        ->where('remetente_tipo', 'empresa')
+        ->select('remetente_id')
+        ->distinct()
+        ->get();
+    $cardsEmpresas = collect();
+    foreach ($empresasComMensagem as $row) {
+        $empresa = Empresa::find($row->remetente_id);
+        $ultimaMensagem = Mensagem::where(function($q) use ($workerId, $empresa) {
+            $q->where('remetente_id', $empresa->id)
+              ->where('remetente_tipo', 'empresa')
+              ->where('destinatario_id', $workerId)
+              ->where('destinatario_tipo', 'user');
+        })->orWhere(function($q) use ($workerId, $empresa) {
+            $q->where('remetente_id', $workerId)
+              ->where('remetente_tipo', 'user')
+              ->where('destinatario_id', $empresa->id)
+              ->where('destinatario_tipo', 'empresa');
+        })
+        ->orderByDesc('horario')
+        ->first();
+        if ($empresa) {
+            $cardsEmpresas->push([
+                'empresa' => $empresa,
+                'ultimaMensagem' => $ultimaMensagem
+            ]);
+        }
+    }
+@endphp
+
+@if($cardsEmpresas->count() > 0)
+    <div class="w-full flex flex-col gap-2 py-3 rounded-full">
+        @foreach($cardsEmpresas as $card)
+            @include('partials.chat-empresa-card', [
+                'empresa' => $card['empresa'],
+                'ultimaMensagem' => $card['ultimaMensagem']
+            ])
+        @endforeach
+    </div>
+@else
+    <div class="w-full flex justify-center items-center bg-gray-100/80 rounded-full py-3">
+        <p class="text-gray-400 font-light">Nenhuma empresa iniciou conversa</p>
+    </div>
+@endif
+
             </div>
         </div>
     </main>

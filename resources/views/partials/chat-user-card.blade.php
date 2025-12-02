@@ -2,7 +2,7 @@
     <img src="{{ $user->fotoUser ? asset('storage/' . $user->fotoUser) : asset('img/default-avatar.png') }}" class="w-12 h-12 rounded-full object-cover">
     <div class="flex-1 min-w-0">
         <div class="flex items-center justify-between">
-            <span class="font-bold text-gray-900">{{ $user->nome_real }}</span>
+            <span class="font-bold text-gray-900">{{ $user->username }}</span>
             <span class="text-xs text-gray-400">{{ $hora ?? '' }}</span>
         </div>
         <div class="text-gray-400 text-sm truncate">{{ $mensagem ?? 'Mensagem...' }}</div>

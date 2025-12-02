@@ -8,18 +8,17 @@ use App\Models\Empresa;
 use App\Models\Mensagem;
 use Illuminate\Support\Facades\Auth;
 
-class EnterpriseChatController extends Controller
+class WorkerChatController extends Controller
 {
     /**
-     * Exibe o chat entre a empresa logada e um usuário específico.
+     * Exibe o chat entre o worker logado e uma empresa específica.
      */
-    public function chatWithUser(Request $request, User $user)
+    public function chatWithEmpresa(Request $request, Empresa $empresa)
     {
-        // Empresa logada
-        $empresa = Auth::guard('empresa')->user();
-
-        if (!$empresa) {
-            abort(403, 'Acesso negado. Você não está logado como empresa.');
+        // Worker logado
+        $worker = Auth::user();
+        if (!$worker) {
+            abort(403, 'Acesso negado. Você não está logado como trabalhador.');
         }
 
         // Se o formulário foi enviado, salva a mensagem
@@ -28,20 +27,17 @@ class EnterpriseChatController extends Controller
                 'mensagem' => 'nullable|string|max:1000',
                 'arquivo' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi,wmv|max:20480',
             ]);
-
             $arquivoPath = null;
             if ($request->hasFile('arquivo')) {
                 $arquivo = $request->file('arquivo');
                 $arquivoPath = $arquivo->store('chat-midias', 'public');
             }
-
-            // Só salva se houver mensagem ou arquivo
             if ($request->filled('mensagem') || $arquivoPath) {
                 $novaMensagem = Mensagem::create([
-                    'remetente_id' => $empresa->id,
-                    'remetente_tipo' => 'empresa',
-                    'destinatario_id' => $user->id,
-                    'destinatario_tipo' => 'user',
+                    'remetente_id' => $worker->id,
+                    'remetente_tipo' => 'user',
+                    'destinatario_id' => $empresa->id,
+                    'destinatario_tipo' => 'empresa',
                     'mensagem' => $request->input('mensagem'),
                     'arquivo' => $arquivoPath,
                     'horario' => now(),
@@ -51,24 +47,24 @@ class EnterpriseChatController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => true]);
             }
-            return redirect()->route('enterprises.chat.user', $user->id);
+            return redirect()->route('workers.chat.empresa', $empresa->id);
         }
 
-        // Busca todas as mensagens ENTRE a empresa e o usuário curtido
-        $mensagens = Mensagem::where(function($q) use ($empresa, $user) {
-            $q->where('remetente_id', $empresa->id)
-              ->where('remetente_tipo', 'empresa')
-              ->where('destinatario_id', $user->id)
-              ->where('destinatario_tipo', 'user');
-        })->orWhere(function($q) use ($empresa, $user) {
-            $q->where('remetente_id', $user->id)
+        // Busca todas as mensagens ENTRE o worker e a empresa
+        $mensagens = Mensagem::where(function($q) use ($worker, $empresa) {
+            $q->where('remetente_id', $worker->id)
               ->where('remetente_tipo', 'user')
               ->where('destinatario_id', $empresa->id)
               ->where('destinatario_tipo', 'empresa');
+        })->orWhere(function($q) use ($worker, $empresa) {
+            $q->where('remetente_id', $empresa->id)
+              ->where('remetente_tipo', 'empresa')
+              ->where('destinatario_id', $worker->id)
+              ->where('destinatario_tipo', 'user');
         })
         ->orderBy('horario', 'asc')
         ->get();
 
-        return view('enterprises.chat-user', compact('user', 'empresa', 'mensagens'));
+        return view('workers.chat-empresa', compact('empresa', 'worker', 'mensagens'));
     }
 }

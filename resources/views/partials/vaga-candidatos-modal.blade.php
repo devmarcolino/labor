@@ -100,8 +100,31 @@
                                         <p class="text-xs text-gray-500">{{ $cand->user->endereco->cidade ?? 'Localização não inf.' }}</p>
                                     </div>
 
-                                    <button @click="show = false; window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'success', title: 'Sucesso!', msg: 'Vaga atribuída!'}}))"
-                                            class="p-2 rounded-full bg-sky-50 text-sky-600 hover:bg-sky-600 hover:text-white transition-colors">
+                                    <button @click.prevent="
+                                        fetch('/vagas/curtir-candidato', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                                            },
+                                            body: JSON.stringify({
+                                                user_id: {{ $cand->user->id }},
+                                                vaga_id: {{ $vaga->id }}
+                                            })
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if(data.success) {
+                                                show = false;
+                                                window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'success', title: 'Sucesso!', msg: 'Você curtiu {{ explode(' ', $cand->user->nome_real)[0] }}!'}}));
+                                            } else {
+                                                window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'error', title: 'Erro', msg: data.message || 'Erro ao curtir candidato'}}));
+                                            }
+                                        })
+                                        .catch(() => {
+                                            window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'error', title: 'Erro', msg: 'Erro ao curtir candidato'}}));
+                                        })
+                                    " class="p-2 rounded-full bg-sky-50 text-sky-600 hover:bg-sky-600 hover:text-white transition-colors">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     </button>
                                 </div>

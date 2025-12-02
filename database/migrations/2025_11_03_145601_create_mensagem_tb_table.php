@@ -18,7 +18,9 @@ return new class extends Migration {
             // Tipo do destinatário: 'user' ou 'empresa'
             $table->enum('destinatario_tipo', ['user', 'empresa']);
             // Conteúdo da mensagem
-            $table->text('mensagem');
+            $table->text('mensagem')->nullable();
+            // Caminho do arquivo (imagem ou vídeo)
+            $table->string('arquivo')->nullable();
             // Data/hora da mensagem (default: agora)
             $table->dateTime('horario')->useCurrent();
             $table->timestamps();

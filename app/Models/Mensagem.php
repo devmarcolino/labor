@@ -17,6 +17,7 @@ class Mensagem extends Model
         'remetente_tipo',     // 'empresa' ou 'usuario'
         'destinatario_tipo',  // 'empresa' ou 'usuario'
         'mensagem',
+        'arquivo',
         'horario',
     ];
 

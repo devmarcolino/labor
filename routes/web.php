@@ -46,6 +46,26 @@ Route::middleware('guest')->group(function () {
 
 // --- AUTH (Logado) ---
 Route::middleware('auth:web')->group(function () {
+                    // Endpoint para retornar mensagens entre worker e empresa em JSON
+                    Route::get('/workers/chat/{empresa}/mensagens', function($empresaId) {
+                        $workerId = auth()->id();
+                        $mensagens = \App\Models\Mensagem::where(function($q) use ($workerId, $empresaId) {
+                            $q->where('remetente_id', $workerId)
+                              ->where('remetente_tipo', 'user')
+                              ->where('destinatario_id', $empresaId)
+                              ->where('destinatario_tipo', 'empresa');
+                        })->orWhere(function($q) use ($workerId, $empresaId) {
+                            $q->where('remetente_id', $empresaId)
+                              ->where('remetente_tipo', 'empresa')
+                              ->where('destinatario_id', $workerId)
+                              ->where('destinatario_tipo', 'user');
+                        })
+                        ->orderBy('horario', 'asc')
+                        ->get();
+                        return response()->json($mensagens);
+                    })->name('workers.chat.mensagens');
+                // Chat 1:1 worker-empresa
+                Route::match(['get', 'post'], '/workers/chat/{empresa}', [\App\Http\Controllers\WorkerChatController::class, 'chatWithEmpresa'])->name('workers.chat.empresa');
             // Formulário para responder perguntas de uma habilidade
             Route::get('/workers/responder-perguntas', function() {
                 $habilidade_id = request('habilidade_id');

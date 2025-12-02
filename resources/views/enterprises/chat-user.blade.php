@@ -18,33 +18,57 @@
         </a>
         <img src="{{ $user->fotoUser ? asset('storage/' . $user->fotoUser) : asset('img/default-avatar.png') }}" class="w-10 h-10 rounded-full object-cover">
         <div class="flex flex-col">
-            <span class="font-bold text-gray-900">{{ $user->nome_real }}</span>
+            <span class="font-bold text-gray-900">{{ $user->username }}</span>
             <span class="text-xs text-gray-400">Hoje</span>
         </div>
     </header>
     <main id="chatMessages" class="flex-1 flex flex-col gap-2 px-4 py-6 overflow-y-auto bg-gray-50" style="margin-top:72px; margin-bottom:72px;">
         @foreach($mensagens as $msg)
-            @if($msg->remetente_id === $empresa->id && $msg->remetente_tipo === 'empresa')
-                <div class="flex justify-end mb-2">
-                    <div class="bg-sky-100 text-gray-800 rounded-2xl px-4 py-2 max-w-xs w-fit break-words shadow text-right">
-                        <div style="word-break:break-word;white-space:pre-line;">{{ $msg->mensagem }}</div>
-                        <div class="text-xs text-gray-400 mt-1">{{ \Carbon\Carbon::parse($msg->horario)->format('H:i') }}</div>
-                    </div>
-                </div>
-            @else
-                <div class="flex justify-start mb-2">
+            @php $isEmpresa = $msg->remetente_id === $empresa->id && $msg->remetente_tipo === 'empresa'; @endphp
+            <div class="flex {{ $isEmpresa ? 'justify-end' : 'justify-start' }} mb-2">
+                @if(!$isEmpresa)
                     <img src="{{ $user->fotoUser ? asset('storage/' . $user->fotoUser) : asset('img/default-avatar.png') }}" class="w-7 h-7 rounded-full object-cover mr-2">
-                    <div class="bg-white text-gray-800 rounded-2xl px-4 py-2 max-w-xs w-fit break-words shadow">
+                @endif
+                <div class="{{ $isEmpresa ? 'bg-sky-100 text-gray-800 text-right' : 'bg-white text-gray-800' }} rounded-2xl px-4 py-2 max-w-xs w-fit break-words shadow">
+                    @if($msg->arquivo)
+                        @php
+                            $ext = pathinfo($msg->arquivo, PATHINFO_EXTENSION);
+                        @endphp
+                        @if(in_array(strtolower($ext), ['jpg','jpeg','png','gif','webp']))
+                            <img src="{{ asset('storage/' . $msg->arquivo) }}" class="rounded-lg mb-2 max-w-[120px] h-auto object-cover">
+                        @elseif(in_array(strtolower($ext), ['mp4','mov','avi','wmv']))
+                            <video src="{{ asset('storage/' . $msg->arquivo) }}" controls class="rounded-lg mb-2 max-w-[160px] h-auto"></video>
+                        @endif
+                    @endif
+                    @if($msg->mensagem)
                         <div style="word-break:break-word;white-space:pre-line;">{{ $msg->mensagem }}</div>
-                        <div class="text-xs text-gray-400 mt-1">{{ \Carbon\Carbon::parse($msg->horario)->format('H:i') }}</div>
-                    </div>
+                    @endif
+                    <div class="text-xs text-gray-400 mt-1">{{ \Carbon\Carbon::parse($msg->horario)->format('H:i') }}</div>
                 </div>
-            @endif
+            </div>
         @endforeach
+        <script>
+                // Scroll imediato para a última mensagem ao abrir
+                window.addEventListener('DOMContentLoaded', function() {
+                    var main = document.getElementById('chatMessages');
+                    if(main) main.scrollTop = main.scrollHeight;
+                });
+            // Scroll automático para a última mensagem ao carregar
+            window.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    var main = document.getElementById('chatMessages');
+                    if(main) main.scrollTop = main.scrollHeight;
+                }, 100);
+            });
+        </script>
     </main>
     <form id="chatForm" class="flex items-center gap-2 px-4 py-3 bg-white border-t fixed bottom-0 left-0 w-full z-10" style="max-width: 100vw;">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="text" name="mensagem" id="mensagemInput" placeholder="Digite a mensagem..." class="flex-1 rounded-full border border-gray-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-200">
+        <button type="button" id="mediaBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-200">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        </button>
+        <input type="file" name="arquivo" id="arquivoInput" accept="image/*,video/*" class="hidden">
+        <input type="text" name="mensagem" id="mensagemInput" placeholder="Digite a mensagem..." class="flex-1 min-w-0 max-w-[60vw] rounded-full border border-gray-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-200">
         <button type="submit" class="bg-sky-500 hover:bg-sky-600 text-white rounded-full p-2 transition">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13"/><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
         </button>
@@ -80,28 +104,61 @@
             document.querySelector('main').scrollTop = document.querySelector('main').scrollHeight;
         });
 
+    // Atualiza a cada 10s para garantir sincronismo
+    setInterval(() => { window.location.reload(); }, 10000);
     // Envio AJAX do formulário
+    // Botão de mídia aciona input file
+    // Removido setInterval para evitar delay, atualização só via Pusher
+
+    const fileInput = document.getElementById('arquivoInput');
+    document.getElementById('mediaBtn').addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // Ao escolher arquivo, envia o formulário automaticamente
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) {
+            document.getElementById('chatForm').dispatchEvent(new Event('submit', {cancelable: true}));
+        }
+    });
+
     document.getElementById('chatForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const input = document.getElementById('mensagemInput');
+        const fileInput = document.getElementById('arquivoInput');
         const mensagem = input.value.trim();
-        if (!mensagem) return;
+        const arquivo = fileInput.files[0];
         const token = document.querySelector('input[name="_token"]').value;
+        if (!mensagem && !arquivo) return;
 
-        // Exibe a mensagem enviada instantaneamente
-        let html = `<div class=\"flex justify-end mb-2\"><div class=\"bg-sky-100 text-gray-800 rounded-2xl px-4 py-2 max-w-xs shadow text-right\"><div>${mensagem}</div><div class=\"text-xs text-gray-400 mt-1\">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div></div></div>`;
+        // Exibe a mensagem/imagem/vídeo instantaneamente
+        let html = '';
+        if (arquivo) {
+            const url = URL.createObjectURL(arquivo);
+            if (arquivo.type.startsWith('image/')) {
+                html = `<div class="flex justify-end mb-2"><div class="bg-sky-100 text-gray-800 rounded-2xl px-4 py-2 max-w-xs shadow text-right"><img src="${url}" class="rounded-lg mb-2 max-w-full h-auto"><div>${mensagem}</div><div class="text-xs text-gray-400 mt-1">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div></div></div>`;
+            } else if (arquivo.type.startsWith('video/')) {
+                html = `<div class="flex justify-end mb-2"><div class="bg-sky-100 text-gray-800 rounded-2xl px-4 py-2 max-w-xs shadow text-right"><video src="${url}" controls class="rounded-lg mb-2 max-w-full h-auto"></video><div>${mensagem}</div><div class="text-xs text-gray-400 mt-1">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div></div></div>`;
+            }
+        } else {
+            html = `<div class="flex justify-end mb-2"><div class="bg-sky-100 text-gray-800 rounded-2xl px-4 py-2 max-w-xs shadow text-right"><div>${mensagem}</div><div class="text-xs text-gray-400 mt-1">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div></div></div>`;
+        }
         document.querySelector('main').insertAdjacentHTML('beforeend', html);
         document.querySelector('main').scrollTop = document.querySelector('main').scrollHeight;
         input.value = '';
+        fileInput.value = '';
+
+        const formData = new FormData();
+        formData.append('_token', token);
+        formData.append('mensagem', mensagem);
+        if (arquivo) formData.append('arquivo', arquivo);
 
         fetch(`{{ route('enterprises.chat.user', $user->id) }}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': token,
                 'Accept': 'application/json',
             },
-            body: JSON.stringify({ mensagem })
+            body: formData
         });
     });
 </script>

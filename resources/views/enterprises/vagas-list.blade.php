@@ -60,7 +60,7 @@
     <!-- Controle dos modais de deletar -->
     <div class="mt-2" x-data="{ openDelete: false, vagaId: null }" x-init="$watch('openDelete', value => { $root.modalOpen = value })">
         @foreach($vagas as $vaga)
-        <div class="bg-white dark:bg-gray-800 rounded-[40px] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-8 transition-all hover:shadow-md relative group">
+        <div class="bg-white dark:bg-gray-800 rounded-[40px] shadow-labor border border-gray-100 dark:border-gray-700 overflow-hidden mb-8 transition-all hover:shadow-md relative group">
     
     <div class="px-5 pt-5 pb-3 flex justify-between items-start">
         <div class="flex items-center gap-3">

@@ -1,4 +1,5 @@
-<div x-data="onboardingWorkerForm(@js($habilidades))" x-init="init()" 
+<div x-data="{{ $alpineInit ?? "onboardingWorkerForm(" . json_encode($habilidades ?? []) . ")" }}"
+     x-init="init()" 
      class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/90 backdrop-blur-sm p-4">
 
     <div class="relative w-full max-w-md rounded-[50px] bg-white pt-10 pb-6 px-6 shadow-2xl dark:bg-gray-800 flex flex-col max-h-[90vh] overflow-x-hidden">
@@ -82,7 +83,7 @@
             <div x-show="step === totalSteps" x-transition:enter="transition ease-out duration-300" class="flex flex-col gap-3 py-2">
                 <div>
                     <div @blur.capture="buscaCep()">
-                        <x-input name="cep" x-model="cep" placeholder="CEP" required>CEP</x-input>
+                        <x-input id="cepWorker" name="cep" x-model="cep" placeholder="CEP" required>CEP</x-input>
                     </div>
                     <p x-show="loading" class="text-xs text-sky-500 font-medium mt-1">Buscando...</p>
                 </div>
@@ -115,16 +116,20 @@
 </div>
 
 <script>
-function onboardingWorkerForm(dataBackend) {
+function onboardingWorkerForm(skillsData, initialSelection = []) {
     return {
         step: 1,
-        allSkills: dataBackend,
-        selectedSkills: [],
+        allSkills: skillsData,
+        selectedSkills: initialSelection.map(String),
         questionQueue: [],
         answers: {},
         photoPreview: null, cep: '', rua: '', bairro: '', cidade: '', uf: '', loading: false,
 
-        init() {},
+        init() {
+            // APLICA A MÁSCARA AQUI
+            const el = document.getElementById('cepWorker');
+            if(el) IMask(el, { mask: '00000-000' });
+        },
 
         get totalSteps() { return 2 + this.questionQueue.length; },
         get isQuestionStep() { return this.step > 1 && this.step < this.totalSteps; },

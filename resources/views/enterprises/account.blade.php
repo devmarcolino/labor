@@ -16,23 +16,75 @@
 
   <header class="p-2 flex justify-between w-full">
     <x-btn-account/>
-
-    <x-btn-theme/>
+    <a href="{{ route('workers.account.info') }}" class="p-3 rounded-full text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+      <svg class="text-gray-800 dark:text-gray-100" class="" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d='M4 21h16M5.666 13.187A2.28 2.28 0 0 0 5 14.797V18h3.223c.604 0 1.183-.24 1.61-.668l9.5-9.505a2.28 2.28 0 0 0 0-3.22l-.938-.94a2.277 2.277 0 0 0-3.222.001z'/></svg>
+    </a>
+    
   </header> 
 
     <div class="flex flex-col self-center items-center w-full gap-5 text-center px-5 py-5 sm:py-9">
       
 
-      <div class="bg-white dark:bg-gray-800 flex flex-col items-center justify-center text-center rounded-[40px] shadow-md w-full max-w-2xl py-5 px-5 mt-[5rem]">
-        <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[120px] h-[120px] rounded-full shadow-md relative mt-[-6rem]" style="background-image: url('{{ Auth::user()->fotoEmpresa ? asset('storage/' . Auth::user()->fotoEmpresa) : '' }}');">
-         
-         {{-- Se NÃO tiver foto, mostra um ícone padrão --}}
-         @if(!Auth::user()->fotoEmpresa)
-            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-         @endif
-    </div>
+      <div class="bg-white dark:bg-gray-800 flex flex-col items-center justify-center text-center rounded-[40px] shadow-labor w-full max-w-2xl py-5 px-5 mt-[5rem]">
+        <div x-data="photoUploader()" class="relative flex justify-center mt-[-6rem] mb-6">
+
+          <div @click="openPhotoModal()" 
+              class="w-[120px] h-[120px] rounded-full shadow-md cursor-pointer overflow-hidden group transition-transform active:scale-95 bg-gray-200e">
+              
+              <template x-if="currentPhotoUrl">
+                  <img :src="currentPhotoUrl" class="w-full h-full object-cover">
+              </template>
+              
+              <template x-if="!currentPhotoUrl">
+                  <div class="w-full h-full flex items-center justify-center text-gray-400">
+                      <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                  </div>
+              </template>
+          </div>
+
+          <template x-teleport="body">
+              <div x-show="isEditingPhoto" 
+                  x-cloak
+                  class="fixed inset-0 z-[99] flex flex-col items-center justify-center p-6"
+                  x-transition.opacity.duration.300ms>
+
+                  <div @click="closePhotoModal()" class="absolute inset-0 bg-gray-900/90 backdrop-blur-sm cursor-pointer"></div>
+
+                  <div class="relative z-10 flex flex-col items-center w-full max-w-xs space-y-8 animate-scaleIn">
+                      
+                      <div class="w-64 h-64 rounded-full overflow-hidden shadow-2xl bg-gray-800">
+                          <img :src="photoPreview || currentPhotoUrl || '/img/default_avatar.png'" class="w-full h-full object-cover">
+                      </div>
+
+                      <div class="w-full space-y-3">
+                          <template x-if="!photoPreview">
+                              <x-btn-primary type="button" @click="triggerSelect()">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d='M4 21h16M5.666 13.187A2.28 2.28 0 0 0 5 14.797V18h3.223c.604 0 1.183-.24 1.61-.668l9.5-9.505a2.28 2.28 0 0 0 0-3.22l-.938-.94a2.277 2.277 0 0 0-3.222.001z'/></svg>
+                                  Trocar foto de perfil
+                              </x-btn-primary>
+                          </template>
+
+                          <template x-if="photoPreview">
+                              <x-btn-primary type="button" @click="submitForm()">
+                                  <span x-show="!isLoading">Confirmar mudança</span>
+                                  <span x-show="isLoading">Salvando...</span>
+                              </x-btn-primary>
+                          </template>
+                      </div>
+                  </div>
+              </div>
+          </template>
+
+          <form id="avatarForm" 
+                action="{{ route('enterprises.profile.photo.update') }}" 
+                method="POST" 
+                enctype="multipart/form-data" 
+                class="hidden">
+              @csrf
+              <input type="file" name="fotoUser" id="realFileInput" accept="image/*" @change="handleFileSelect">
+          </form>
+
+      </div>
 
         <div class="my-2">
           <p class="font-[300] text-gray-900 dark:text-white">{{ Auth::user()->ramo }}</p>
@@ -58,7 +110,7 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 items-center justify-center text-center rounded-[40px] shadow-md w-full max-w-2xl py-3 px-5">
+      <div class="bg-white dark:bg-gray-800 items-center justify-center text-center rounded-[40px] shadow-labor w-full max-w-2xl py-3 px-5">
             
         <x-btn-outline-account>
           <svg class="text-gray-800 dark:text-gray-100" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -99,5 +151,65 @@
         </form>
       </div>
   </div>
+<script>
+    function photoUploader() {
+        return {
+            isEditingPhoto: false,
+            isLoading: false,
+            currentPhotoUrl: "{{ Auth::user()->fotoEmpresa ? asset('storage/' . Auth::user()->fotoEmpresa) : '' }}",
+            photoPreview: null,
+
+            openPhotoModal() {
+                this.isEditingPhoto = true;
+                this.photoPreview = null;
+                // Limpa o input real para permitir selecionar a mesma foto se quiser
+                document.getElementById('realFileInput').value = '';
+            },
+
+            closePhotoModal() {
+                this.isEditingPhoto = false;
+                setTimeout(() => { this.photoPreview = null; }, 300);
+            },
+
+            // 1. Clica no botão da modal -> Clica no input escondido do form
+            triggerSelect() {
+                document.getElementById('realFileInput').click();
+            },
+
+            // 2. Quando escolhe o arquivo, gera o preview
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                // Validação básica
+                if (!file.type.match('image.*')) {
+                    alert('Apenas imagens são permitidas.');
+                    return;
+                }
+                
+                // Gera preview visual
+                const reader = new FileReader();
+                reader.onload = (e) => { this.photoPreview = e.target.result; };
+                reader.readAsDataURL(file);
+            },
+
+            // 3. Clica em confirmar -> Envia o form nativo
+            submitForm() {
+                this.isLoading = true;
+                document.getElementById('avatarForm').submit();
+            }
+        }
+    }
+</script>
+
+<style>
+    @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .animate-scaleIn {
+        animation: scaleIn 0.2s ease-out forwards;
+    }
+</style>
 </body>
 </html>

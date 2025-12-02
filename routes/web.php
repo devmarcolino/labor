@@ -76,19 +76,33 @@ Route::middleware('auth:web')->group(function () {
 
     // Conta/Perfil (Onboarding usa isso)
     Route::get('/workers/account', [ProfileController::class, 'edit'])->name('workers.account');
-    Route::post('/workers/update-skills', [ProfileController::class, 'updateSkills'])->name('workers.update.skills');
     Route::patch('/workers/account', [ProfileController::class, 'update'])->name('workers.profile.update');
     Route::post('/workers/account/photo', [ProfileController::class, 'updatePhoto'])
     ->name('workers.profile.photo.update');
     // Logout
+
     Route::post('/workers/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
+
+    Route::get('/workers/address', [ProfileController::class, 'editAddress'])->name('workers.edit.address');
+    Route::patch('/workers/update-address', [ProfileController::class, 'updateAddress'])->name('workers.update.address');
     // === OUTRAS PÁGINAS ===
     Route::view('/workers/settings', 'workers.settings')->name('workers.settings');
     Route::view('/workers/schedule', 'workers.schedule')->name('workers.schedule');
     Route::view('/workers/rating', 'workers.rating')->name('workers.rating');
-    Route::view('/workers/skills', 'workers.skills')->name('workers.skills');
-    Route::view('/workers/adress', 'workers.adress')->name('workers.adress'); // 'adress' com um D só
+
+    Route::get('/workers/skills', [ProfileController::class, 'editSkills'])
+        ->name('workers.skills');
+
+    // 2. Rota para SALVAR/ATUALIZAR as habilidades do Modal (PATCH)
+    // O JavaScript manda para cá. Note que é PATCH porque seu JS usa _method: PATCH
+    Route::patch('/workers/update-skills', [ProfileController::class, 'updateSkills'])
+        ->name('workers.update.skills');
+
+    // 3. Rota para DELETAR uma habilidade específica (DELETE)
+    // O botão "X" manda para cá
+    Route::delete('/workers/skills/{id}/remove', [ProfileController::class, 'removeSkill'])
+        ->name('workers.skills.remove');
 
     /*
     |--------------------------------------------------------------------------
@@ -107,6 +121,16 @@ Route::middleware('auth:web')->group(function () {
     // Página de Vagas Curtidas
     Route::get('/workers/vagas-curtidas', [VagaCurtidaController::class, 'index'])->name('workers.vagasCurtidas');
 
+    Route::get('/workers/account/info', [ProfileController::class, 'editInfo'])
+        ->name('workers.account.info');
+
+    // 2. Ação de Salvar Informações
+    Route::patch('/workers/account/info', [ProfileController::class, 'updateInfo'])
+        ->name('workers.account.info.update');
+
+    // 3. Ação de Trocar Senha
+    Route::put('/workers/password', [ProfileController::class, 'updatePassword'])
+        ->name('workers.password.update');
     // Rota para retornar vagas curtidas em JSON
     Route::get('/workers/vagas-curtidas-json', function() {
         $userId = auth()->id();
@@ -137,6 +161,8 @@ Route::middleware('guest')->group(function () {
     Route::get('/enterprises/login', [EnterpriseLoginController::class, 'create'])->name('enterprises.login');
     Route::post('/enterprises/login', [EnterpriseLoginController::class, 'store']);
 
+    Route::post('/enterprises/account/photo', [EnterpriseProfileController::class, 'updatePhoto'])
+    ->name('enterprises.profile.photo.update');
     Route::get('/enterprises/register', [RegisteredEnterpriseController::class, 'create'])->name('enterprises.register');
     Route::post('/enterprises/register', [RegisteredEnterpriseController::class, 'store']);
 });
@@ -148,8 +174,7 @@ Route::middleware('auth:empresa')->group(function () {
     Route::get('/enterprises/vagas', [EnterpriseVagaController::class, 'list'])
         ->name('enterprises.vagas.list');
 
-    // ⚠️ IMPORTANTE: rota de visualizar vaga NÃO fica aqui!
-
+    // ⚠️ IMPORTANTE: rota de visualizar vaga NÃO fica aqu
     // Dashboard
     Route::get('/enterprises/dashboard', fn() => view('enterprises.dashboard'))
         ->name('enterprises.dashboard');

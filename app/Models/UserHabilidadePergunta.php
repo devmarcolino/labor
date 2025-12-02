@@ -10,14 +10,14 @@ class UserHabilidadePergunta extends Model
     
     protected $table = 'user_habilidade_perguntas_tb';
     
+    // LIBERAR TUDO PARA EVITAR ERRO DE "MASS ASSIGNMENT"
     protected $fillable = [
         'idUser', 
-        'idHabilidade', 
+        'idHabilidade', // <--- Essencial
         'idPergunta', 
-        'idOpcao' // <--- Mudou de 'resposta' para 'idOpcao'
+        'idOpcao'       // <--- Essencial
     ];
 
-    // Relação para pegar os pontos depois (Útil para o Match)
     public function opcao()
     {
         return $this->belongsTo(Opcao::class, 'idOpcao');

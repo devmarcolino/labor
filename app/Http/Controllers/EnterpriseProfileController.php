@@ -88,4 +88,18 @@ class EnterpriseProfileController extends Controller
 
         return back()->with('success', 'Perfil atualizado com sucesso!');
     }
+
+    public function updatePhoto(Request $request)
+    {
+        $request->validate(['fotoEmpresa' => 'required|image|max:5120']); // Aumentei pra 5MB por garantia
+        
+        $empresa = auth()->user();
+        if ($empresa->fotoEmpresa) Storage::disk('public')->delete($empresa->fotoEmpresa);
+        
+        $path = $request->file('fotoEmpresa')->store('fotos_empresa', 'public');
+        $empresa->fotoEmpresa = $path;
+        $empresa->save();
+
+        return back()->with('success', 'Foto atualizada com sucesso!');
+    }
 }

@@ -48,7 +48,7 @@
             <div x-show="step === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0" class="space-y-3 py-2">
                 <div>
                     <div @blur.capture="buscaCep()">
-                        <x-input name="cep" x-model="cep" placeholder="CEP (00000-000)" required>CEP</x-input>
+                        <x-input id="cepEnterprise" name="cep" x-model="cep" placeholder="CEP (00000-000)" required>CEP</x-input>
                     </div>
                     <p x-show="loading" class="text-xs text-sky-500 font-medium mt-1">A procurar endereço...</p>
                 </div>
@@ -101,7 +101,13 @@ function onboardingEnterpriseForm() {
         photoPreview: null,
         cep: '', rua: '', bairro: '', cidade: '', uf: '', loading: false,
 
-        init() {},
+        init() {
+            // APLICA A MÁSCARA AQUI
+            const el = document.getElementById('cepEnterprise');
+            if(el) IMask(el, { mask: '00000-000' });
+        },
+
+
 
         showError(msg) {
             window.dispatchEvent(new CustomEvent('notify', {

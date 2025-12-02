@@ -55,9 +55,33 @@
                             </div>
                         </div>
 
-                        <x-btn-primary @click="show = false; window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'success', title: 'Sucesso!', msg: 'Vaga atribuída para {{ explode(' ', $melhorCandidato->nome_real)[0] }}!'}}))">
+                        <x-btn-primary @click.prevent="
+                            fetch('/vagas/curtir-candidato', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                                },
+                                body: JSON.stringify({
+                                    user_id: {{ $melhorCandidato->id }},
+                                    vaga_id: {{ $vaga->id }}
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if(data.success) {
+                                    show = false;
+                                    window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'success', title: 'Sucesso!', msg: 'Você curtiu {{ explode(' ', $melhorCandidato->nome_real)[0] }}!'}}));
+                                } else {
+                                    window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'error', title: 'Erro', msg: data.message || 'Erro ao curtir candidato'}}));
+                                }
+                            })
+                            .catch(() => {
+                                window.dispatchEvent(new CustomEvent('notify', {detail: {type: 'error', title: 'Erro', msg: 'Erro ao curtir candidato'}}));
+                            })
+                        ">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>Atribuir Vaga</span>
+                            <span>Curtir candidato</span>
                         </x-btn-primary>
                     </div>
                 </div>

@@ -174,6 +174,9 @@ Route::middleware('auth:empresa')->group(function () {
     Route::get('/enterprises/vagas', [EnterpriseVagaController::class, 'list'])
         ->name('enterprises.vagas.list');
 
+    // Rota para curtir candidato em uma vaga
+    Route::post('/vagas/curtir-candidato', [\App\Http\Controllers\CandidatoCurtidoController::class, 'store'])->name('vagas.curtirCandidato');
+
     // ⚠️ IMPORTANTE: rota de visualizar vaga NÃO fica aqu
     // Dashboard
     Route::get('/enterprises/dashboard', fn() => view('enterprises.dashboard'))

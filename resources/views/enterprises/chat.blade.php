@@ -64,16 +64,22 @@
         </ul>
 
             <a href="{{ url('enterprises/account') }}" class="text-gray-600 hover:text-gray-900 shadow-labor">
-                <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[40px] h-[40px] rounded-full shadow-md" style="background-image: url('{{ asset('img/Ferreirinha.jpg') }}');">
+                @php
+                    $empresa = auth('empresa')->user();
+                    $foto = $empresa && $empresa->fotoEmpresa ? asset('storage/' . $empresa->fotoEmpresa) : asset('img/default-avatar.png');
+                @endphp
+                <div class="bg-gray-200 bg-center bg-cover bg-no-repeat w-[40px] h-[40px] rounded-full shadow-md" style="background-image: url('{{ $foto }}');">
                 </div>
             </a>
     </header>
 
-    <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 px-5 items-center">
-      <div class="flex gap-3 items-center py-3 px-5 w-full max-w-2xl border border-gray-200 bg-white shadow-md rounded-full">
-        <img src="../img/zoom.svg" alt="">
-        <input type="text" id="search" name="search" class="w-full border-transparent focus:border-none">
-      </div>
-    </div>
+        <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 px-5 items-center">
+            <div class="flex gap-3 items-center py-3 px-5 w-full max-w-2xl border border-gray-200 bg-white shadow-md rounded-full">
+                <img src="../img/zoom.svg" alt="">
+                <input type="text" id="search" name="search" class="w-full border-transparent focus:border-none">
+            </div>
+        </div>
+
+        @include('enterprises.partials.curtidos-list')
     </body>
 </html>

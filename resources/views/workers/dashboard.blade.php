@@ -173,7 +173,7 @@
 
                 <button class="bg-transparent w-full text-left">
                     <a href="{{ url('workers/schedule') }}">
-                        <div class="bg-white dark:bg-gray-800 shadow-labor border-btn flex justify-between items-center py-6 px-8">
+                        <div class="bg-white dark:bg-gray-800 shadow-labor hover:shadow-xl ease-in border-btn flex justify-between items-center py-6 px-8">
                             <div class="flex gap-5 items-center">
                                 <svg class="text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M21 7.5V6C21 5.46957 20.7893 4.96086 20.4142 4.58579C20.0391 4.21071 19.5304 4 19 4H5C4.46957 4 3.96086 4.21071 3.58579 4.58579C3.21071 4.96086 3 5.46957 3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -200,7 +200,7 @@
                     </a>
                 </button>
 
-               <div class="w-full flex flex-col gap-4 mt-6 bg-white dark:bg-gray-800 shadow-labor rounded-[45px] pt-6 pb-4 px-4">
+               <div class="w-full flex flex-col gap-4 mt-6 bg-white dark:bg-gray-800 shadow-labor hover:shadow-xl ease-in rounded-[45px] pt-6 pb-4 px-4">
                 <div class="flex w-full justify-between items-center px-4">
                     <div class="flex gap-5 items-center">
                         <svg class="text-gray-900 dark:text-gray-200" width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
@@ -210,7 +210,7 @@
                         </div>
                     </div>
                     <div>
-                        <svg class="text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg class="text-gray-900 dark:text-gray-200 rotate-90" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </div>
                 </div>
 
@@ -228,14 +228,44 @@
                     <div class="w-full flex flex-col gap-2 py-3 rounded-full">
                         @foreach($candidaturas as $candidatura)
                             @if($candidatura->vaga)
-                                <div class="flex items-center gap-2 px-4 py-2 rounded-[33px] bg-[#F0F0F0]/[0.29] h-[62px]">
-                                    <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2" fill="none"/>
-                                    </svg>
-                                    <div class="flex flex-col flex-1">
-                                        <span class="text-sm text-gray-900 font-medium">Você se candidatou para {{ $candidatura->vaga->tipoVaga ?? '' }} ({{ Carbon::parse($candidatura->created_at)->diffForHumans() }})</span>
-                                        <span class="text-xs text-gray-500">{{ $candidatura->vaga->empresa->nome_empresa ?? '' }}</span>
+                                <div class="relative flex items-center gap-3 px-4 py-3 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-labor overflow-hidden h-[70px] group transition-all">
+                                    
+                                    @php 
+                                        // Tenta pegar a imagem da vaga. Se não tiver, usa uma padrão.
+                                        // Ajuste 'imagem' para o nome real da coluna na sua tabela de vagas (ex: 'banner', 'foto', 'flyer')
+                                        $imgVaga = $candidatura->vaga->imgVaga ?? null; 
+                                        
+                                        $bgImage = $imgVaga 
+                                            ? asset('storage/' . $imgVaga) 
+                                            : asset('img/default-job-bg.jpg'); 
+                                    @endphp
+
+                                    <div class="absolute inset-0 z-0 pointer-events-none">
+                                        <img src="{{ $bgImage }}" 
+                                            class="w-full h-full object-cover filter blur-[4px] scale-110 opacity-50 dark:opacity-30" 
+                                            alt="">
+                                        
+                                        <div class="absolute inset-0 bg-gradient-to-l from-transparent via-white/80 to-white dark:via-gray-800/80 dark:to-gray-800"></div>
                                     </div>
+
+                                    <div class="relative z-10 p-2 bg-white/60 dark:bg-gray-700/60 backdrop-blur-md rounded-full text-pink-500 shadow-sm">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                    </div>
+
+                                    <div class="relative z-10 flex flex-col flex-1 min-w-0">
+                                        <span class="text-sm text-gray-900 dark:text-gray-100 font-bold truncate">
+                                            Você se candidatou para {{ $candidatura->vaga->tipoVaga ?? 'Vaga' }}
+                                        </span>
+                                        
+                                        <div class="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 font-medium">
+                                            <span class="truncate max-w-[150px]">{{ $candidatura->vaga->empresa->nome_empresa ?? '' }}</span>
+                                            <span>•</span>
+                                            <span>{{ $candidatura->created_at->diffForHumans() }}</span>
+                                        </div>
+                                    </div>
+
                                 </div>
                             @endif
                         @endforeach

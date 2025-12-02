@@ -83,11 +83,11 @@ Route::middleware('auth:web')->group(function () {
 
     Route::post('/workers/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
+    Route::get('/workers/settings', [ProfileController::class, 'settings'])->name('workers.settings');
 
     Route::get('/workers/address', [ProfileController::class, 'editAddress'])->name('workers.edit.address');
     Route::patch('/workers/update-address', [ProfileController::class, 'updateAddress'])->name('workers.update.address');
     // === OUTRAS PÁGINAS ===
-    Route::view('/workers/settings', 'workers.settings')->name('workers.settings');
     Route::view('/workers/schedule', 'workers.schedule')->name('workers.schedule');
     Route::view('/workers/rating', 'workers.rating')->name('workers.rating');
 

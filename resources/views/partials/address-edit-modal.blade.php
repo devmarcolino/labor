@@ -2,14 +2,22 @@
      class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/90 backdrop-blur-sm p-4">
 
     <div class="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        
-        <button @click="openModal = false" class="absolute top-5 right-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 z-10">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
 
-        <div class="px-6 pt-8 pb-2 text-center">
+        <div class="px-6 pt-8 pb-2 text-left">
+            <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800 dark:text-white">Atualizar Endereço</h2>
-            <p class="text-xs text-gray-400 mt-2">Digite seu CEP para buscar automaticamente</p>
+
+            <button @click="openModal = false" 
+                    type="button" 
+                    aria-label="Fechar" 
+                    class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition z-10">
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            </div>
+            <p class="text-xs text-gray-400">Digite seu CEP para buscar automaticamente</p>
         </div>
 
         <form @submit.prevent="submitForm" class="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">

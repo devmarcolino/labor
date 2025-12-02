@@ -596,54 +596,63 @@ Alpine.start();
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM Carregado. Executando scripts adicionais.");
 
-    function applyThemeFromStorage() {
-        const savedTheme = localStorage.getItem("theme") || "light"; // Padrão é 'light'
-        const html = document.documentElement;
+   // --- 1. LÓGICA DE TEMA (O SEU CÓDIGO) ---
+function applyThemeFromStorage() {
+    const savedTheme = localStorage.getItem("theme") || "light";
+    const html = document.documentElement;
 
-        if (savedTheme === "dark") {
-            html.classList.add("dark");
-        } else {
-            html.classList.remove("dark");
-        }
+    if (savedTheme === "dark") {
+        html.classList.add("dark");
+    } else {
+        html.classList.remove("dark");
     }
+}
 
-    applyThemeFromStorage();
+// Aplica imediatamente ao carregar
+applyThemeFromStorage();
 
-    window.addEventListener("pageshow", (event) => {
-        if (event.persisted) {
-            console.log("Página restaurada do cache. Re-aplicando tema...");
-            applyThemeFromStorage();
-        }
-    });
+// --- 2. NOVA LÓGICA DE FONTE (ACESSIBILIDADE) ---
+function applyFontFromStorage() {
+    // Níveis: 0 = Pequeno, 1 = Normal (Padrão), 2 = Grande, 3 = Extra Grande
+    const savedLevel = localStorage.getItem("font-level") || "1"; 
+    const html = document.documentElement;
 
-    const themeToggleBtn = document.getElementById("theme-toggle");
-    if (themeToggleBtn) {
-        const iconSun = document.getElementById("icon-sun");
-        const iconMoon = document.getElementById("icon-moon");
+    // Remove classes anteriores para evitar conflito
+    html.classList.remove("text-sm", "text-base", "text-lg", "text-xl");
 
-        // Função para atualizar apenas os ícones sol/lua
-        const updateThemeIcons = () => {
-            const isDark = document.documentElement.classList.contains("dark");
-            if (iconSun && iconMoon) {
-                iconSun.style.display = isDark ? "block" : "none";
-                iconMoon.style.display = isDark ? "none" : "block";
-            }
-        };
-
-        // Listener para o clique
-        themeToggleBtn.addEventListener("click", () => {
-            const currentTheme = localStorage.getItem("theme") || "light";
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-            localStorage.setItem("theme", newTheme);
-
-            // Aplica o tema na página e depois atualiza os ícones
-            applyThemeFromStorage();
-            updateThemeIcons();
-        });
-
-        // Atualiza os ícones no carregamento da página
-        updateThemeIcons();
+    // Define o tamanho base no HTML. O Tailwind usa 'rem', então tudo escala junto.
+    switch (savedLevel) {
+        case "0": // Pequeno
+            html.style.fontSize = "14px"; 
+            break;
+        case "1": // Normal (Padrão dos navegadores é 16px)
+            html.style.fontSize = "16px";
+            break;
+        case "2": // Grande
+            html.style.fontSize = "18px";
+            break;
+        case "3": // Extra Grande
+            html.style.fontSize = "20px";
+            break;
+        default:
+            html.style.fontSize = "16px";
     }
+}
+
+// Aplica fonte imediatamente
+applyFontFromStorage();
+
+// --- EVENTOS GLOBAIS ---
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+        applyThemeFromStorage();
+        applyFontFromStorage(); // Reaplica fonte ao voltar do cache
+    }
+});
+
+// Disponibiliza as funções globalmente para o Alpine usar
+window.applyThemeGlobal = applyThemeFromStorage;
+window.applyFontGlobal = applyFontFromStorage;
 
     console.log("Procurando por #page-loader...");
     const pageLoader = document.getElementById("page-loader");

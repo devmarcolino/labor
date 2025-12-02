@@ -317,6 +317,12 @@ class ProfileController extends Controller
             return response()->json(['success' => false, 'message' => 'Erro ao salvar endereço.'], 500);
         }
     }
+
+    public function settings()
+    {
+        // Passamos o user para verificar configurações salvas no banco futuramente
+        return view('workers.settings', ['user' => auth()->user()]);
+    }
     public function updateInfo(Request $request)
 {
     $user = auth()->user();

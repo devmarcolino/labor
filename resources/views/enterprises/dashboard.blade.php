@@ -155,7 +155,7 @@
 
                 <button class="bg-transparent w-full text-left">
                     <a href="{{ url('enterprises/schedule') }}">
-                        <div class="bg-white dark:bg-gray-800 shadow-labor border-btn flex justify-between items-center py-6 px-8">
+                        <div class="bg-white dark:bg-gray-800 shadow-labor hover:shadow-xl ease-in border-btn flex justify-between items-center py-6 px-8">
                             <div class="flex gap-5 items-center">
                                 <svg class="text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M21 7.5V6C21 5.46957 20.7893 4.96086 20.4142 4.58579C20.0391 4.21071 19.5304 4 19 4H5C4.46957 4 3.96086 4.21071 3.58579 4.58579C3.21071 4.96086 3 5.46957 3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -180,7 +180,7 @@
 
                 <button class="bg-transparent w-full text-left flex flex-col gap-4">
                     <a href="{{ route('enterprises.vagas.list') }}">
-                        <div class="bg-white dark:bg-gray-800 flex flex-col gap-3 shadow-labor rounded-[45px] justify-center items-center px-4 py-4">
+                        <div class="bg-white dark:bg-gray-800 flex flex-col gap-3 shadow-labor hover:shadow-xl ease-in rounded-[45px] justify-center items-center px-4 py-4">
                             <div class="flex items-center w-full justify-between px-4 py-4">
                                 <div class="flex gap-5 items-center">
                                     <svg class="text-gray-900 dark:text-gray-200" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
@@ -211,43 +211,68 @@
                             ->count();
                         @endphp
 
-                        <div class="bg-white dark:bg-gray-800 justify-center rounded-[25px] w-full flex flex-col gap-2 shadow-lg text-center p-4 border border-gray-100 dark:border-gray-700">
-                            @if($ultimaVaga)
-                                <div class="flex items-center gap-2 mb-1 w-full justify-center text-center">
-                                    <img src="/img/gauge.svg" class="w-4 h-4">
-                                    <span class="text-xs text-gray-500 dark:text-gray-300">
-                                        Última vaga postada: ({{ $ultimaVaga->created_at->diffForHumans() }})
-                                    </span>
-                                </div>
+                        <div class="relative bg-white dark:bg-gray-800 justify-center rounded-[30px] w-full flex flex-col gap-2 shadow-lg text-center p-4 border border-gray-100 dark:border-gray-700 overflow-hidden group transition-all">
+    
+    @if($ultimaVaga)
+        @php 
+            // Pega a imagem da vaga ou uma padrão
+            $imgVaga = $ultimaVaga->imgVaga ?? null; 
+            $bgImage = $imgVaga 
+                ? asset('storage/' . $imgVaga) 
+                : asset('img/default-job-bg.jpg'); 
+        @endphp
 
-                                <div class="font-bold text-md text-gray-900 dark:text-white mb-1">
-                                   {{ $ultimaVaga->skill->nomeHabilidade ?? $ultimaVaga->funcVaga }} ({{ $ultimaVaga->dataVaga->format('d/m/Y') }})
-                                </div>
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <img src="{{ $bgImage }}" 
+                 class="w-full h-full object-cover filter blur-[4px] scale-110 opacity-30 dark:opacity-20 transition-transform duration-700 group-hover:scale-125" 
+                 alt="">
+            
+            <div class="absolute inset-0 bg-gradient-to-r from-white via-white/70 to-white/40 dark:from-gray-800 dark:via-gray-800/70 dark:to-gray-800/40"></div>
+        </div>
 
-                                <div class="w-full flex justify-center mb-2">
-                            <div class="w-1/3 h-[2px] bg-gray-100 dark:bg-gray-700 rounded-full"></div>
-                        </div>
+        <div class="relative z-10 flex flex-col items-center">
+            
+            <div class="flex items-center gap-2 mb-1 w-full justify-center text-center">
+                <div class="p-1.5 bg-sky-50 dark:bg-sky-900/30 rounded-full">
+                    <img src="/img/gauge.svg" class="w-4 h-4 text-sky-600 dark:text-sky-400">
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300 font-medium">
+                    Última vaga postada: ({{ $ultimaVaga->created_at->diffForHumans() }})
+                </span>
+            </div>
 
-                        <div class="gap-1 mt-2 w-full justify-center text-center flex flex-col items-center">
-                            <div class="flex gap-1.5 items-center text-gray-400">
-                                <img src="/img/eye.svg" class="w-4 h-4">
-                                <span class="text-xs font-bold text-sky-700">{{ $totalVisualizacoes }}</span>
-                                <span class="text-xs text-gray-400">visualizações</span>
-                                        
-                            </div>
+            <div class="font-bold text-lg text-gray-900 dark:text-white mb-2 drop-shadow-sm">
+               {{ $ultimaVaga->skill->nomeHabilidade ?? $ultimaVaga->funcVaga }} 
+               <span class="text-sm font-normal text-gray-500 dark:text-gray-400">({{ $ultimaVaga->dataVaga->format('d/m/Y') }})</span>
+            </div>
 
-                            <div class="flex items-center gap-1.5 text-gray-400">
-                                <img src="/img/heart-handshake.svg" class="w-4 h-4">
-                                <span class="text-xs font-bold text-sky-700">{{ $ultimaVaga->candidaturas()->count() }}</span>
-                                <span class="text-xs text-gray-400">candidaturas         
-                                </span>
-                            </div>
-                        </div>
+            <div class="w-full flex justify-center mb-3">
+                <div class="w-1/3 h-[2px] bg-gray-200/60 dark:bg-gray-700/60 rounded-full"></div>
+            </div>
 
-                            @else
-                                <div class="text-gray-500 dark:text-gray-300">Nenhuma vaga cadastrada.</div>
-                            @endif
-                            </div>
+            <div class="gap-2 w-full justify-center text-center flex flex-col items-center">
+                
+                <div class="flex gap-2 items-center text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                    <img src="/img/eye.svg" class="w-4 h-4 opacity-70">
+                    <span class="text-sm font-bold text-sky-700 dark:text-sky-400">{{ $totalVisualizacoes }}</span>
+                    <span class="text-xs">visualizações</span>
+                </div>
+
+                <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-gray-800/50 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                    <img src="/img/heart-handshake.svg" class="w-4 h-4 opacity-70">
+                    <span class="text-sm font-bold text-sky-700 dark:text-sky-400">{{ $ultimaVaga->candidaturas()->count() }}</span>
+                    <span class="text-xs">candidaturas</span>
+                </div>
+            </div>
+        </div>
+
+    @else
+        <div class="relative z-10 flex flex-col items-center justify-center py-6 text-gray-500 dark:text-gray-400">
+            <svg class="w-12 h-12 mb-3 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+            <p>Nenhuma vaga cadastrada.</p>
+        </div>
+    @endif
+</div>
                         </div>
                     </a>
                     

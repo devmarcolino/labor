@@ -12,21 +12,22 @@
     <div class="relative w-full max-w-md rounded-[50px] bg-white pt-10 pb-6 px-6 shadow-2xl dark:bg-gray-800 flex flex-col max-h-[90vh] overflow-x-hidden">
         
         <div class="text-center mb-4 relative">
-            <div class="flex items-center justify-center">
-            <button @click="openVagaModal = false" 
-                    type="button" 
-                    aria-label="Fechar" 
-                    class="absolute right-4 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition z-10">
-                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+            <div class="flex items-center justify-between">
             
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
                 <span x-show="step === 1">Nova Vaga</span>
                 <span x-show="step === 2">Detalhes</span>
                 <span x-show="step === 3">Imagem</span>
             </h2>
+
+            <button @click="openVagaModal = false" 
+                    type="button" 
+                    aria-label="Fechar" 
+                    class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition z-10">
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
             </div>
             
             <div class="w-full bg-gray-200 rounded-full h-2 mt-4 dark:bg-gray-700 overflow-hidden">

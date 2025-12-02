@@ -15,10 +15,13 @@
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-500 h-screen flex flex-col"
       x-data="{ openModal: false }">
     
-    <header class="flex justify-center w-full mx-auto pt-4">
-        <div class="flex items-center justify-between w-full max-w-2xl px-5">
-            <x-btn-back/>
-            <h1 class="text-xl font-bold text-gray-900 dark:text-white">Meu <span class="text-sky-600">Endereço</span></h1>
+    <header class="flex justify-center w-full mx-auto pt-4 mb-2">
+        <div class="flex items-center justify-between w-full max-w-2xl px-5 relative">
+            <a href="{{ route('workers.account') }}" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            
+            <h1 class="text-xl font-bold text-center dark:text-white">Meu endereço</h1>
         </div>
     </header>
 
@@ -55,7 +58,15 @@
         </div>
     </div>
 
-    <<div x-show="openModal" x-cloak class="relative z-50">
+    <<div x-show="openModal" 
+    x-cloak  
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="relative z-50">
         @include('partials.address-edit-modal', [
             // Agora passamos o objeto Endereco (ou array vazio se for nulo)
             'addressData' => $user->endereco ? $user->endereco->toArray() : [] 

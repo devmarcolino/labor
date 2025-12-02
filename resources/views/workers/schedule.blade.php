@@ -15,10 +15,13 @@
     
     <x-loading/>
 
-    <header>
-        <div class="flex items-center justify-between w-full max-w-2xl gap-2 mb-4">
-            <x-btn-back/>
-            <h1 class="text-xl font-bold text-gray-900 dark:text-white">Escala <span class="text-sky-500">automática</span></h1>
+    <header class="flex justify-center w-full mx-auto pt-4 mb-2">
+        <div class="flex items-center justify-between w-full max-w-2xl px-5 relative">
+            <a href="{{ route('workers.dashboard') }}" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            
+            <h1 class="text-xl font-bold text-center dark:text-white">Esala automática</h1>
         </div>
     </header>
 </body>

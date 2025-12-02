@@ -11,11 +11,11 @@
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-500 h-screen flex flex-col">
+<body class="bg-white dark:bg-gray-900 transition-colors duration-500 h-screen flex flex-col overflow-hidden">
     
     <x-loading/>
 
-    <header class="flex items-center justify-between py-3 px-5">
+    <header class="flex items-center justify-between py-3 px-5 fixed top-0 left-0 w-full z-10 bg-white shadow-sm" style="max-width:100vw;">
 
         <button class="icon-btn">
             <a href="{{ url(path: 'enterprises/chat') }}" class="text-gray-500 dark:text-gray-400">
@@ -73,13 +73,15 @@
             </a>
     </header>
 
-        <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 px-5 items-center">
+        <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 px-5 items-center fixed top-16 left-0 z-10 bg-white" style="max-width:100vw;">
             <div class="flex gap-3 items-center py-3 px-5 w-full max-w-2xl border border-gray-200 bg-white shadow-md rounded-full">
                 <img src="../img/zoom.svg" alt="">
                 <input type="text" id="search" name="search" class="w-full border-transparent focus:border-none">
             </div>
         </div>
 
-        @include('enterprises.partials.curtidos-list')
+        <div class="flex-1 overflow-y-auto pt-[120px] pb-4 px-2 w-full max-w-xl mx-auto" style="max-width:100vw;">
+            @include('enterprises.partials.curtidos-list')
+        </div>
     </body>
 </html>

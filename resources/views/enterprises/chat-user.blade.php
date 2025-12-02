@@ -12,7 +12,7 @@
 </head>
 <body>
 <div class="flex flex-col h-screen bg-gray-50">
-    <header class="flex items-center gap-3 px-4 py-4 bg-white shadow-sm">
+    <header class="flex items-center gap-3 px-4 py-4 bg-white shadow-sm fixed top-0 left-0 w-full z-10" style="max-width: 100vw;">
         <a href="{{ route('enterprises.chat') }}" class="text-gray-500">
             <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
         </a>
@@ -22,27 +22,27 @@
             <span class="text-xs text-gray-400">Hoje</span>
         </div>
     </header>
-    <main class="flex-1 flex flex-col gap-2 px-4 py-6 overflow-y-auto bg-gray-50">
+    <main id="chatMessages" class="flex-1 flex flex-col gap-2 px-4 py-6 overflow-y-auto bg-gray-50" style="margin-top:72px; margin-bottom:72px;">
         @foreach($mensagens as $msg)
             @if($msg->remetente_id === $empresa->id && $msg->remetente_tipo === 'empresa')
                 <div class="flex justify-end mb-2">
-                    <div class="bg-sky-100 text-gray-800 rounded-2xl px-4 py-2 max-w-xs shadow text-right">
-                        <div>{{ $msg->mensagem }}</div>
+                    <div class="bg-sky-100 text-gray-800 rounded-2xl px-4 py-2 max-w-xs w-fit break-words shadow text-right">
+                        <div style="word-break:break-word;white-space:pre-line;">{{ $msg->mensagem }}</div>
                         <div class="text-xs text-gray-400 mt-1">{{ \Carbon\Carbon::parse($msg->horario)->format('H:i') }}</div>
                     </div>
                 </div>
             @else
                 <div class="flex justify-start mb-2">
                     <img src="{{ $user->fotoUser ? asset('storage/' . $user->fotoUser) : asset('img/default-avatar.png') }}" class="w-7 h-7 rounded-full object-cover mr-2">
-                    <div class="bg-white text-gray-800 rounded-2xl px-4 py-2 max-w-xs shadow">
-                        <div>{{ $msg->mensagem }}</div>
+                    <div class="bg-white text-gray-800 rounded-2xl px-4 py-2 max-w-xs w-fit break-words shadow">
+                        <div style="word-break:break-word;white-space:pre-line;">{{ $msg->mensagem }}</div>
                         <div class="text-xs text-gray-400 mt-1">{{ \Carbon\Carbon::parse($msg->horario)->format('H:i') }}</div>
                     </div>
                 </div>
             @endif
         @endforeach
     </main>
-    <form id="chatForm" class="flex items-center gap-2 px-4 py-3 bg-white border-t">
+    <form id="chatForm" class="flex items-center gap-2 px-4 py-3 bg-white border-t fixed bottom-0 left-0 w-full z-10" style="max-width: 100vw;">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <input type="text" name="mensagem" id="mensagemInput" placeholder="Digite a mensagem..." class="flex-1 rounded-full border border-gray-200 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-200">
         <button type="submit" class="bg-sky-500 hover:bg-sky-600 text-white rounded-full p-2 transition">

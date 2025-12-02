@@ -174,6 +174,9 @@ Route::middleware('auth:empresa')->group(function () {
     Route::get('/enterprises/vagas', [EnterpriseVagaController::class, 'list'])
         ->name('enterprises.vagas.list');
 
+    // Chat 1:1 empresa-usuário (aceita GET e POST)
+    Route::match(['get', 'post'], '/enterprises/chat/{user}', [\App\Http\Controllers\EnterpriseChatController::class, 'chatWithUser'])->name('enterprises.chat.user');
+
     // Rota para curtir candidato em uma vaga
     Route::post('/vagas/curtir-candidato', [\App\Http\Controllers\CandidatoCurtidoController::class, 'store'])->name('vagas.curtirCandidato');
 

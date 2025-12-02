@@ -9,14 +9,18 @@ return new class extends Migration {
     {
         Schema::create('mensagem_tb', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('idChat')->nullable();
-            $table->foreign('idChat')->references('id')->on('chat_tb')->onDelete('cascade');
-            $table->unsignedBigInteger('idRemetente');
-            $table->unsignedBigInteger('idDestinatario');
-            $table->enum('tipoRemetente', ['user', 'empresa']);
-            $table->enum('tipoDestinatario', ['user', 'empresa']);
+            // ID do remetente (empresa ou user)
+            $table->unsignedBigInteger('remetente_id')->index();
+            // ID do destinatário (empresa ou user)
+            $table->unsignedBigInteger('destinatario_id')->index();
+            // Tipo do remetente: 'user' ou 'empresa'
+            $table->enum('remetente_tipo', ['user', 'empresa']);
+            // Tipo do destinatário: 'user' ou 'empresa'
+            $table->enum('destinatario_tipo', ['user', 'empresa']);
+            // Conteúdo da mensagem
             $table->text('mensagem');
-            $table->dateTime('horario')->default(now());
+            // Data/hora da mensagem (default: agora)
+            $table->dateTime('horario')->useCurrent();
             $table->timestamps();
         });
     }

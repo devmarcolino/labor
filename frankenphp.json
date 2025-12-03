@@ -1,0 +1,9 @@
+{
+  "document_root": "public",
+  "workers": [
+    {
+      "script": "public/index.php",
+      "worker": true
+    }
+  ]
+}

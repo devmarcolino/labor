@@ -1,4 +1,4 @@
-# Build do Laravel (Composer + NPM)
+# Build do Laravel
 FROM ghcr.io/composer/composer:2 AS build
 
 WORKDIR /app
@@ -12,8 +12,8 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Runtime com FrankenPHP
-FROM dunglas/frankenphp
+# Runtime usando FrankenPHP pelo GHCR (não usa Docker Hub!)
+FROM ghcr.io/dunglas/frankenphp:1.1.0
 
 WORKDIR /app
 

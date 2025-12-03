@@ -1,8 +1,3 @@
-// =================================================================
-// ARQUIVO: resources/js/app.js (VERSÃO FINAL COMPLETA E CORRIGIDA)
-// =================================================================
-
-// --- 1. IMPORTS ---
 import "./bootstrap";
 import Alpine from "alpinejs";
 import interact from "interactjs";
@@ -10,8 +5,6 @@ import IMask from "imask";
 import "flowbite";
 import { Datepicker } from "flowbite-datepicker";
 import ptBR from "./flowbite-locale-pt.js";
-
-
 
 function cardStack() {
     return {
@@ -211,44 +204,51 @@ function cardStack() {
                     const y =
                         (parseFloat(element.getAttribute("data-y")) || 0) +
                         event.dy;
-
                     const rotation = x * 0.1;
 
+                    // Sem transição durante o drag
+                    element.style.transition = "none";
                     element.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
                     element.setAttribute("data-x", x);
                     element.setAttribute("data-y", y);
                 },
                 onend(event) {
-    const card = event.target;
+                    const card = event.target;
+                    const vagaId = card.getAttribute("data-vaga-id");
+                    const x = parseFloat(card.getAttribute("data-x")) || 0;
+                    const direction = x > 0 ? "right" : "left";
 
-    // Pega os atributos SEM remover card ainda
-    const userId = card.getAttribute('data-user-id');
-    const vagaId = card.getAttribute('data-vaga-id');
-    const direction = event.dx > 0 ? 'right' : 'left';
-
-    // Decide se vai curtir ou descartar
-    if (Math.abs(event.dx) > 150) {
-
-        if (direction === 'right') {
-            aprovarCandidato(vagaId, userId); /// sua função
-        } else {
-            recusarCandidato(vagaId, userId); /// se tiver
-        }
-
-        // Adiciona classe de saída animada
-        card.classList.add(direction === 'right' ? 'swipe-right' : 'swipe-left');
-
-        // ⚠️ Só remove DEPOIS que a animação terminar
-        setTimeout(() => {
-            card.remove();
-        }, 300); // tempo da animação
-    } 
-    else {
-        // Volta pro centro
-        card.style.transform = '';
-    }
-}
-
+                    if (Math.abs(x) > 150) {
+                        // Sempre recusar vaga, independente do lado
+                        fetch("/vagas/interagir", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    .getAttribute("content"),
+                            },
+                            body: JSON.stringify({
+                                vaga_id: vagaId,
+                                tipo: "recusada",
+                            }),
+                        }).catch(console.error);
+                        card.classList.add(
+                            direction === "right" ? "swipe-right" : "swipe-left"
+                        );
+                        setTimeout(() => {
+                            component.removeTopCard();
+                        }, 300);
+                    } else {
+                        card.style.transition = "transform 0.3s ease";
+                        card.style.transform = "";
+                        card.setAttribute("data-x", 0);
+                        card.setAttribute("data-y", 0);
+                        setTimeout(() => {
+                            card.style.transition = "";
+                        }, 300);
+                    }
+                },
             });
         },
     };
@@ -262,19 +262,19 @@ function enterpriseFeed() {
         async init() {
             await this.fetchFeed();
             // Inicia o watcher igual ao cardStack para garantir que o topo sempre ative
-            this.$watch('cards', () => this.activateTopCard());
+            this.$watch("cards", () => this.activateTopCard());
         },
 
         async fetchFeed() {
             this.isLoading = true;
             try {
                 // Rota específica do enterprise
-                const res = await fetch('/enterprise/api/feed');
+                const res = await fetch("/enterprise/api/feed");
                 if (res.ok) {
                     this.cards = await res.json();
                 }
             } catch (e) {
-                console.error('Erro feed', e);
+                console.error("Erro feed", e);
             } finally {
                 this.isLoading = false;
             }
@@ -291,7 +291,9 @@ function enterpriseFeed() {
         // Igual ao cardStack: animação de entrada scale 0.95 -> 1
         activateTopCard() {
             this.$nextTick(() => {
-                const cards = this.$el.querySelectorAll(".card-item:not(.interact-enabled)");
+                const cards = this.$el.querySelectorAll(
+                    ".card-item:not(.interact-enabled)"
+                );
                 if (cards.length === 0) return;
 
                 const top = cards[0];
@@ -313,7 +315,8 @@ function enterpriseFeed() {
         },
 
         initInteract(element) {
-            if (!element || element.classList.contains("interact-enabled")) return;
+            if (!element || element.classList.contains("interact-enabled"))
+                return;
             element.classList.add("interact-enabled");
 
             const component = this;
@@ -345,9 +348,13 @@ function enterpriseFeed() {
                     heart.classList.add("floating-heart"); // Certifique-se de ter esse CSS global
                     heart.style.left = `${Math.random() * 100}vw`;
                     heart.style.fontSize = `${Math.random() * 30 + 40}px`;
-                    heart.style.animationDuration = `${Math.random() * 1 + 1.5}s`;
+                    heart.style.animationDuration = `${
+                        Math.random() * 1 + 1.5
+                    }s`;
                     document.body.appendChild(heart);
-                    heart.addEventListener("animationend", () => heart.remove());
+                    heart.addEventListener("animationend", () =>
+                        heart.remove()
+                    );
                 }
 
                 // Dados
@@ -355,8 +362,8 @@ function enterpriseFeed() {
                 const userId = element.getAttribute("data-user-id");
 
                 // 4. Ação (Adaptado para Enterprise)
-                if (typeof window.aprovarCandidato === 'function') {
-                     window.aprovarCandidato(vagaId, userId);
+                if (typeof window.aprovarCandidato === "function") {
+                    window.aprovarCandidato(vagaId, userId);
                 }
 
                 // 5. Função de finalizar remoção (Subir e sumir)
@@ -391,8 +398,12 @@ function enterpriseFeed() {
                     element.style.transition = "none";
                 },
                 onmove: (event) => {
-                    const x = (parseFloat(element.getAttribute("data-x")) || 0) + event.dx;
-                    const y = (parseFloat(element.getAttribute("data-y")) || 0) + event.dy;
+                    const x =
+                        (parseFloat(element.getAttribute("data-x")) || 0) +
+                        event.dx;
+                    const y =
+                        (parseFloat(element.getAttribute("data-y")) || 0) +
+                        event.dy;
 
                     const rotation = x * 0.1; // Rotação igual cardStack
 
@@ -402,89 +413,133 @@ function enterpriseFeed() {
                 },
                 onend(event) {
                     const card = event.target;
-                    const userId = card.getAttribute('data-user-id');
-                    const vagaId = card.getAttribute('data-vaga-id');
-                    
+                    const userId = card.getAttribute("data-user-id");
+                    const vagaId = card.getAttribute("data-vaga-id");
+
                     // Pega o X acumulado (igual cardStack logic)
-                    const x = parseFloat(card.getAttribute('data-x')) || 0;
-                    const direction = x > 0 ? 'right' : 'left';
+                    const x = parseFloat(card.getAttribute("data-x")) || 0;
+                    const direction = x > 0 ? "right" : "left";
 
                     // Threshold de 150px
                     if (Math.abs(x) > 150) {
-                        
-                        if (direction === 'right') {
+                        if (direction === "right") {
                             // Aprovar
-                            if (typeof window.aprovarCandidato === 'function') {
+                            if (typeof window.aprovarCandidato === "function") {
                                 window.aprovarCandidato(vagaId, userId);
                             }
                         } else {
                             // Rejeitar (Rota Enterprise)
-                            fetch('/enterprise/candidatos/rejeitar', {
-                                method: 'POST',
+                            fetch("/enterprise/candidatos/rejeitar", {
+                                method: "POST",
                                 headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                    "Content-Type": "application/json",
+                                    "X-CSRF-TOKEN": document.querySelector(
+                                        'meta[name="csrf-token"]'
+                                    ).content,
                                 },
-                                body: JSON.stringify({ vaga_id: vagaId, user_id: userId })
+                                body: JSON.stringify({
+                                    vaga_id: vagaId,
+                                    user_id: userId,
+                                }),
                             }).catch(console.error);
                         }
 
                         // Adiciona a classe CSS exata que o cardStack usa
-                        card.classList.add(direction === 'right' ? 'swipe-right' : 'swipe-left');
+                        card.classList.add(
+                            direction === "right" ? "swipe-right" : "swipe-left"
+                        );
 
                         // Remove depois da animação
                         setTimeout(() => {
-                            // Aqui usamos removeTopCard() ao invés de card.remove() 
+                            // Aqui usamos removeTopCard() ao invés de card.remove()
                             // para garantir que o array do Alpine atualize e o próximo card suba
                             component.removeTopCard();
                         }, 300);
-                    } 
-                    else {
+                    } else {
                         // Volta pro centro
-                        card.style.transition = 'transform 0.3s ease'; // Adicionei transição suave no reset
-                        card.style.transform = '';
-                        card.setAttribute('data-x', 0);
-                        card.setAttribute('data-y', 0);
-                        setTimeout(() => { card.style.transition = ''; }, 300);
+                        card.style.transition = "transform 0.3s ease"; // Adicionei transição suave no reset
+                        card.style.transform = "";
+                        card.setAttribute("data-x", 0);
+                        card.setAttribute("data-y", 0);
+                        setTimeout(() => {
+                            card.style.transition = "";
+                        }, 300);
                     }
-                }
+                },
             });
-        }
+        },
     };
 }
 
-window.aprovarCandidato = async function(userId, vagaId) {
+window.aprovarCandidato = async function (vagaId, userId) {
     try {
-        const res = await fetch('/enterprise/candidato/curtir', {
-            method: 'POST',
+        console.log("Aprovando candidato:", vagaId, userId);
+
+        const csrfTag = document.querySelector('meta[name="csrf-token"]');
+        const csrf = csrfTag ? csrfTag.getAttribute("content") : null;
+        if (!csrf) {
+            window.dispatchEvent(
+                new CustomEvent("notify", {
+                    detail: {
+                        type: "error",
+                        title: "Erro",
+                        msg: "CSRF token não encontrado.",
+                    },
+                })
+            );
+            return;
+        }
+
+        const res = await fetch("/enterprise/candidatos/curtir", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrf,
             },
             body: JSON.stringify({
                 user_id: userId,
-                vaga_id: vagaId
-            })
+                vaga_id: vagaId,
+            }),
         });
 
         const json = await res.json();
 
-        if (json.success) {
-            window.dispatchEvent(new CustomEvent('notify', {
-                detail: {
-                    type: 'success',
-                    title: 'Aprovado!',
-                    msg: json.message
-                }
-            }));
+        if (json && json.success) {
+            window.dispatchEvent(
+                new CustomEvent("notify", {
+                    detail: {
+                        type: "success",
+                        title: "Aprovado!",
+                        msg: json.message || "Candidato aprovado.",
+                    },
+                })
+            );
+        } else {
+            window.dispatchEvent(
+                new CustomEvent("notify", {
+                    detail: {
+                        type: "error",
+                        title: "Erro",
+                        msg:
+                            (json && json.message) ||
+                            "Falha ao aprovar candidato.",
+                    },
+                })
+            );
         }
-
     } catch (e) {
-        window.dispatchEvent(new CustomEvent('notify', {
-            detail: { type: 'error', title: 'Erro', msg: 'Falha ao aprovar candidato.' }
-        }));
+        console.error("Erro ao aprovar candidato:", e);
+        window.dispatchEvent(
+            new CustomEvent("notify", {
+                detail: {
+                    type: "error",
+                    title: "Erro",
+                    msg: "Falha ao aprovar candidato.",
+                },
+            })
+        );
     }
-}
+};
 
 function registrationForm() {
     return {
@@ -794,7 +849,7 @@ function dashboardView() {
 
 // Registro Global do Alpine
 window.Alpine = Alpine;
-Alpine.data('enterpriseFeed', enterpriseFeed);
+Alpine.data("enterpriseFeed", enterpriseFeed);
 Alpine.data("cardStack", cardStack);
 Alpine.data("registrationForm", registrationForm);
 Alpine.data("enterpriseForm", enterpriseForm);
@@ -808,63 +863,63 @@ Alpine.start();
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM Carregado. Executando scripts adicionais.");
 
-   // --- 1. LÓGICA DE TEMA (O SEU CÓDIGO) ---
-function applyThemeFromStorage() {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    const html = document.documentElement;
+    // --- 1. LÓGICA DE TEMA (O SEU CÓDIGO) ---
+    function applyThemeFromStorage() {
+        const savedTheme = localStorage.getItem("theme") || "light";
+        const html = document.documentElement;
 
-    if (savedTheme === "dark") {
-        html.classList.add("dark");
-    } else {
-        html.classList.remove("dark");
+        if (savedTheme === "dark") {
+            html.classList.add("dark");
+        } else {
+            html.classList.remove("dark");
+        }
     }
-}
 
-// Aplica imediatamente ao carregar
-applyThemeFromStorage();
+    // Aplica imediatamente ao carregar
+    applyThemeFromStorage();
 
-// --- 2. NOVA LÓGICA DE FONTE (ACESSIBILIDADE) ---
-function applyFontFromStorage() {
-    // Níveis: 0 = Pequeno, 1 = Normal (Padrão), 2 = Grande, 3 = Extra Grande
-    const savedLevel = localStorage.getItem("font-level") || "1"; 
-    const html = document.documentElement;
+    // --- 2. NOVA LÓGICA DE FONTE (ACESSIBILIDADE) ---
+    function applyFontFromStorage() {
+        // Níveis: 0 = Pequeno, 1 = Normal (Padrão), 2 = Grande, 3 = Extra Grande
+        const savedLevel = localStorage.getItem("font-level") || "1";
+        const html = document.documentElement;
 
-    // Remove classes anteriores para evitar conflito
-    html.classList.remove("text-sm", "text-base", "text-lg", "text-xl");
+        // Remove classes anteriores para evitar conflito
+        html.classList.remove("text-sm", "text-base", "text-lg", "text-xl");
 
-    // Define o tamanho base no HTML. O Tailwind usa 'rem', então tudo escala junto.
-    switch (savedLevel) {
-        case "0": // Pequeno
-            html.style.fontSize = "14px"; 
-            break;
-        case "1": // Normal (Padrão dos navegadores é 16px)
-            html.style.fontSize = "16px";
-            break;
-        case "2": // Grande
-            html.style.fontSize = "18px";
-            break;
-        case "3": // Extra Grande
-            html.style.fontSize = "20px";
-            break;
-        default:
-            html.style.fontSize = "16px";
+        // Define o tamanho base no HTML. O Tailwind usa 'rem', então tudo escala junto.
+        switch (savedLevel) {
+            case "0": // Pequeno
+                html.style.fontSize = "14px";
+                break;
+            case "1": // Normal (Padrão dos navegadores é 16px)
+                html.style.fontSize = "16px";
+                break;
+            case "2": // Grande
+                html.style.fontSize = "18px";
+                break;
+            case "3": // Extra Grande
+                html.style.fontSize = "20px";
+                break;
+            default:
+                html.style.fontSize = "16px";
+        }
     }
-}
 
-// Aplica fonte imediatamente
-applyFontFromStorage();
+    // Aplica fonte imediatamente
+    applyFontFromStorage();
 
-// --- EVENTOS GLOBAIS ---
-window.addEventListener("pageshow", (event) => {
-    if (event.persisted) {
-        applyThemeFromStorage();
-        applyFontFromStorage(); // Reaplica fonte ao voltar do cache
-    }
-});
+    // --- EVENTOS GLOBAIS ---
+    window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+            applyThemeFromStorage();
+            applyFontFromStorage(); // Reaplica fonte ao voltar do cache
+        }
+    });
 
-// Disponibiliza as funções globalmente para o Alpine usar
-window.applyThemeGlobal = applyThemeFromStorage;
-window.applyFontGlobal = applyFontFromStorage;
+    // Disponibiliza as funções globalmente para o Alpine usar
+    window.applyThemeGlobal = applyThemeFromStorage;
+    window.applyFontGlobal = applyFontFromStorage;
 
     console.log("Procurando por #page-loader...");
     const pageLoader = document.getElementById("page-loader");

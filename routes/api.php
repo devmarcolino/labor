@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\VagaController;
 use App\Http\Controllers\EnterpriseVagaController;
 use App\Http\Controllers\Api\ValidationController;
+use App\Http\Controllers\Api\CandidatoFeedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +28,8 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/vagas', [VagaController::class, 'index']);
     Route::get('/vagas/destaque', [VagaController::class, 'destaque']);
     Route::get('/vaga/{id}/melhor-candidato', [VagaController::class, 'melhorCandidato']);
+    // Rota que alimenta o FEED (Tinder)
+
 });
 
-// Torna a rota da IA pública para testes
-Route::get('/vaga/{id}/melhor-candidato-ia', [\App\Http\Controllers\Api\VagaController::class, 'melhorCandidatoIA']);
+Route::get('/vaga/{id}/melhor-candidato-ia', [VagaController::class, 'melhorCandidatoIA']);

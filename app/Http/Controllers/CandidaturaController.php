@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Candidatura;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Chat;
 // ...existing code...
 
 class CandidaturaController extends Controller
@@ -82,7 +83,7 @@ class CandidaturaController extends Controller
             'idVaga' => $vaga_id,
         ], [
             'dataCandidatura' => now(),
-            'status' => 'ativa',
+            'status' => '1',
             'nota_ia' => $nota_ia,
         ]);
 

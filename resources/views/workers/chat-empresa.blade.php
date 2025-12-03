@@ -43,7 +43,7 @@
             </div>
         @endforeach
     </main>
-    <form id="chatForm" class="flex items-center gap-2 px-4 py-3 bg-white border-t fixed bottom-0 left-0 w-full z-10" style="max-width: 100vw;">
+    <form id="chatForm" class="flex justify-center items-center gap-2 px-4 py-3 bg-white border-t fixed bottom-0 left-0 w-full max-w-2xl z-10">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <button type="button" id="mediaBtn" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-200">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>

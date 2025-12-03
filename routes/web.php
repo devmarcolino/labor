@@ -16,6 +16,8 @@ use App\Http\Controllers\EnterpriseVagaController; // Perfil Empresa
 // Models
 use App\Models\Skill;
 use App\Http\Controllers\VagaCurtidaController;
+use App\Http\Controllers\CandidatoFeedController;
+use App\Http\Controllers\CandidatoCurtidoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -190,15 +192,24 @@ Route::middleware('guest')->group(function () {
 // --- AUTH (Logado como Empresa) ---
 Route::middleware('auth:empresa')->group(function () {
 
-    // Minhas vagas (lista)
     Route::get('/enterprises/vagas', [EnterpriseVagaController::class, 'list'])
         ->name('enterprises.vagas.list');
+
+
+
+Route::prefix('enterprise/api')->group(function () {
+    Route::get('/feed', [CandidatoFeedController::class, 'feed'])->name('enterprise.feed');
+    Route::get('/vaga/{id}/candidatos', [CandidatoFeedController::class, 'candidatosModal'])->name('enterprise.modal');
+});
+
 
     // Chat 1:1 empresa-usuário (aceita GET e POST)
     Route::match(['get', 'post'], '/enterprises/chat/{user}', [\App\Http\Controllers\EnterpriseChatController::class, 'chatWithUser'])->name('enterprises.chat.user');
 
     // Rota para curtir candidato em uma vaga
-    Route::post('/vagas/curtir-candidato', [\App\Http\Controllers\CandidatoCurtidoController::class, 'store'])->name('vagas.curtirCandidato');
+    Route::post('/enterprise/candidatos/curtir', [CandidatoCurtidoController::class, 'store']);
+    Route::post('/enterprise/candidatos/rejeitar', [CandidatoCurtidoController::class, 'rejeitar']);
+
 
     // ⚠️ IMPORTANTE: rota de visualizar vaga NÃO fica aqu
     // Dashboard

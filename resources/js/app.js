@@ -11,6 +11,8 @@ import "flowbite";
 import { Datepicker } from "flowbite-datepicker";
 import ptBR from "./flowbite-locale-pt.js";
 
+
+
 function cardStack() {
     return {
         cards: [],
@@ -216,65 +218,274 @@ function cardStack() {
                     element.setAttribute("data-x", x);
                     element.setAttribute("data-y", y);
                 },
-                onend: () => {
-                    element.style.transition = "transform 0.4s ease-in-out";
-                    const totalX =
-                        parseFloat(element.getAttribute("data-x")) || 0;
-                    const totalY =
-                        parseFloat(element.getAttribute("data-y")) || 0;
+                onend(event) {
+    const card = event.target;
 
-                    const distance = Math.sqrt(totalX ** 2 + totalY ** 2);
+    // Pega os atributos SEM remover card ainda
+    const userId = card.getAttribute('data-user-id');
+    const vagaId = card.getAttribute('data-vaga-id');
+    const direction = event.dx > 0 ? 'right' : 'left';
 
-                    if (distance > 10) {
-                        // Salvar interação de rejeitada no cache
-                        const vagaId = element.getAttribute("data-vaga-id");
-                        if (vagaId) {
-                            fetch("/vagas/interagir", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-CSRF-TOKEN": document
-                                        .querySelector(
-                                            'meta[name="csrf-token"]'
-                                        )
-                                        .getAttribute("content"),
-                                },
-                                body: JSON.stringify({
-                                    vaga_id: vagaId,
-                                    tipo: "rejeitada",
-                                }),
-                            });
-                        }
+    // Decide se vai curtir ou descartar
+    if (Math.abs(event.dx) > 150) {
 
-                        // sai para baixo suave
-                        element.animate(
-                            [
-                                { transform: element.style.transform },
-                                { transform: "translate(0px, 600px)" },
-                            ],
-                            {
-                                duration: 400,
-                                easing: "ease-in-out",
-                                fill: "forwards",
-                            }
-                        );
+        if (direction === 'right') {
+            aprovarCandidato(vagaId, userId); /// sua função
+        } else {
+            recusarCandidato(vagaId, userId); /// se tiver
+        }
 
-                        setTimeout(() => component.removeTopCard(), 400);
-                    } else {
-                        element.style.transform =
-                            "translate(0px, 0px) rotate(0deg)";
-                        element.setAttribute("data-x", 0);
-                        element.setAttribute("data-y", 0);
-                    }
-                },
+        // Adiciona classe de saída animada
+        card.classList.add(direction === 'right' ? 'swipe-right' : 'swipe-left');
+
+        // ⚠️ Só remove DEPOIS que a animação terminar
+        setTimeout(() => {
+            card.remove();
+        }, 300); // tempo da animação
+    } 
+    else {
+        // Volta pro centro
+        card.style.transform = '';
+    }
+}
+
             });
         },
     };
 }
 
-/**
- * Componente Alpine para o formulário de registro multi-etapas.
- */
+function enterpriseFeed() {
+    return {
+        cards: [],
+        isLoading: true,
+
+        async init() {
+            await this.fetchFeed();
+            // Inicia o watcher igual ao cardStack para garantir que o topo sempre ative
+            this.$watch('cards', () => this.activateTopCard());
+        },
+
+        async fetchFeed() {
+            this.isLoading = true;
+            try {
+                // Rota específica do enterprise
+                const res = await fetch('/enterprise/api/feed');
+                if (res.ok) {
+                    this.cards = await res.json();
+                }
+            } catch (e) {
+                console.error('Erro feed', e);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        // Igual ao cardStack: remove o primeiro e reativa o próximo
+        removeTopCard() {
+            this.cards = this.cards.slice(1);
+            this.$nextTick(() => {
+                this.activateTopCard();
+            });
+        },
+
+        // Igual ao cardStack: animação de entrada scale 0.95 -> 1
+        activateTopCard() {
+            this.$nextTick(() => {
+                const cards = this.$el.querySelectorAll(".card-item:not(.interact-enabled)");
+                if (cards.length === 0) return;
+
+                const top = cards[0];
+
+                top.animate(
+                    [
+                        { transform: "scale(0.95)", opacity: 0 },
+                        { transform: "scale(1)", opacity: 1 },
+                    ],
+                    {
+                        duration: 300,
+                        easing: "ease-out",
+                        fill: "forwards",
+                    }
+                );
+
+                this.initInteract(top);
+            });
+        },
+
+        initInteract(element) {
+            if (!element || element.classList.contains("interact-enabled")) return;
+            element.classList.add("interact-enabled");
+
+            const component = this;
+
+            /******************************************************
+             * LIKE (DUPLO CLIQUE)
+             * (Copiado exatamente do cardStack: Borda, Corações, Pulso)
+             ******************************************************/
+            element.addEventListener("dblclick", () => {
+                // 1. Borda vermelha
+                element.style.border = "4px solid #e63946";
+
+                // 2. Animação de pulso
+                const pulse = [
+                    { transform: "scale(1)" },
+                    { transform: "scale(1.1)" },
+                    { transform: "scale(0.98)" },
+                    { transform: "scale(1)" },
+                ];
+                const pulseAnimation = element.animate(pulse, {
+                    duration: 400,
+                    iterations: 1,
+                });
+
+                // 3. Chuva de Corações (Copiado do cardStack)
+                for (let i = 0; i < 15; i++) {
+                    const heart = document.createElement("div");
+                    heart.innerHTML = "❤️";
+                    heart.classList.add("floating-heart"); // Certifique-se de ter esse CSS global
+                    heart.style.left = `${Math.random() * 100}vw`;
+                    heart.style.fontSize = `${Math.random() * 30 + 40}px`;
+                    heart.style.animationDuration = `${Math.random() * 1 + 1.5}s`;
+                    document.body.appendChild(heart);
+                    heart.addEventListener("animationend", () => heart.remove());
+                }
+
+                // Dados
+                const vagaId = element.getAttribute("data-vaga-id");
+                const userId = element.getAttribute("data-user-id");
+
+                // 4. Ação (Adaptado para Enterprise)
+                if (typeof window.aprovarCandidato === 'function') {
+                     window.aprovarCandidato(vagaId, userId);
+                }
+
+                // 5. Função de finalizar remoção (Subir e sumir)
+                const finalizeRemoval = () => {
+                    const rise = element.animate(
+                        [
+                            { transform: "translate(0px, 0px)" },
+                            { transform: "translate(0px, -550px)" },
+                        ],
+                        {
+                            duration: 550,
+                            easing: "ease-in-out",
+                            fill: "forwards",
+                        }
+                    );
+
+                    rise.onfinish = () => {
+                        component.removeTopCard();
+                    };
+                };
+
+                // Aguarda o pulso terminar para subir
+                pulseAnimation.onfinish = finalizeRemoval;
+            });
+
+            /******************************************************
+             * DRAG (ARRASTAR)
+             * (Mesma física e classes swipe-right/left do cardStack)
+             ******************************************************/
+            interact(element).draggable({
+                onstart: () => {
+                    element.style.transition = "none";
+                },
+                onmove: (event) => {
+                    const x = (parseFloat(element.getAttribute("data-x")) || 0) + event.dx;
+                    const y = (parseFloat(element.getAttribute("data-y")) || 0) + event.dy;
+
+                    const rotation = x * 0.1; // Rotação igual cardStack
+
+                    element.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
+                    element.setAttribute("data-x", x);
+                    element.setAttribute("data-y", y);
+                },
+                onend(event) {
+                    const card = event.target;
+                    const userId = card.getAttribute('data-user-id');
+                    const vagaId = card.getAttribute('data-vaga-id');
+                    
+                    // Pega o X acumulado (igual cardStack logic)
+                    const x = parseFloat(card.getAttribute('data-x')) || 0;
+                    const direction = x > 0 ? 'right' : 'left';
+
+                    // Threshold de 150px
+                    if (Math.abs(x) > 150) {
+                        
+                        if (direction === 'right') {
+                            // Aprovar
+                            if (typeof window.aprovarCandidato === 'function') {
+                                window.aprovarCandidato(vagaId, userId);
+                            }
+                        } else {
+                            // Rejeitar (Rota Enterprise)
+                            fetch('/enterprise/candidatos/rejeitar', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({ vaga_id: vagaId, user_id: userId })
+                            }).catch(console.error);
+                        }
+
+                        // Adiciona a classe CSS exata que o cardStack usa
+                        card.classList.add(direction === 'right' ? 'swipe-right' : 'swipe-left');
+
+                        // Remove depois da animação
+                        setTimeout(() => {
+                            // Aqui usamos removeTopCard() ao invés de card.remove() 
+                            // para garantir que o array do Alpine atualize e o próximo card suba
+                            component.removeTopCard();
+                        }, 300);
+                    } 
+                    else {
+                        // Volta pro centro
+                        card.style.transition = 'transform 0.3s ease'; // Adicionei transição suave no reset
+                        card.style.transform = '';
+                        card.setAttribute('data-x', 0);
+                        card.setAttribute('data-y', 0);
+                        setTimeout(() => { card.style.transition = ''; }, 300);
+                    }
+                }
+            });
+        }
+    };
+}
+
+window.aprovarCandidato = async function(userId, vagaId) {
+    try {
+        const res = await fetch('/enterprise/candidato/curtir', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                vaga_id: vagaId
+            })
+        });
+
+        const json = await res.json();
+
+        if (json.success) {
+            window.dispatchEvent(new CustomEvent('notify', {
+                detail: {
+                    type: 'success',
+                    title: 'Aprovado!',
+                    msg: json.message
+                }
+            }));
+        }
+
+    } catch (e) {
+        window.dispatchEvent(new CustomEvent('notify', {
+            detail: { type: 'error', title: 'Erro', msg: 'Falha ao aprovar candidato.' }
+        }));
+    }
+}
+
 function registrationForm() {
     return {
         step: 1,
@@ -583,6 +794,7 @@ function dashboardView() {
 
 // Registro Global do Alpine
 window.Alpine = Alpine;
+Alpine.data('enterpriseFeed', enterpriseFeed);
 Alpine.data("cardStack", cardStack);
 Alpine.data("registrationForm", registrationForm);
 Alpine.data("enterpriseForm", enterpriseForm);

@@ -100,7 +100,7 @@
     </header>
 
     <!-- CONTEÚDO AJUSTADO COM MARGEM PARA O HEADER FIXO -->
-    <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 px-5 items-center mt-20">
+    <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 mb-5 px-5 items-center mt-20">
         <div
             class="flex gap-3 items-center py-3 px-5 w-full max-w-2xl border border-gray-200 bg-white shadow-md rounded-full">
             <img src="../img/zoom.svg" alt="">

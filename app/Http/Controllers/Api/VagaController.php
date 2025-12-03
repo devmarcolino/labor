@@ -5,69 +5,75 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Vaga;
 use App\Models\Skill;
+use App\Models\C;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class VagaController extends Controller
 {
-    /**
-     * Recomendação IA: retorna melhor candidato e lista ordenada
-     */
-    public function melhorCandidato(int $id)
+        public function melhorCandidato(int $id)
     {
-        $vaga = Vaga::with(['candidaturas.user.skills', 'candidaturas.respostas'])->findOrFail($id);
+        // 1. Carregamento Otimizado (Eager Loading)
+        // Precisamos descer: Vaga -> Candidaturas -> User -> Respostas -> Opcao (para pegar os pontos)
+        $vaga = Vaga::with([
+            'candidaturas.user.skills', 
+            'candidaturas.user.respostas.opcao' // <--- O PULO DO GATO: Carrega a opção escolhida e os pontos
+        ])->findOrFail($id);
 
         $candidatos = $vaga->candidaturas->map(function ($candidatura) use ($vaga) {
             $user = $candidatura->user;
 
-            // 1. Compatibilidade de skills
+            // --- A. MATCH DE SKILLS (TAGS) - PESO 30% ---
+            // Verifica se ele tem a etiqueta "Garçom", etc.
             $skillsVaga = is_array($vaga->funcVaga) ? $vaga->funcVaga : [$vaga->funcVaga];
-            $skillsVaga = array_filter($skillsVaga);
-
+            $skillsVaga = array_filter($skillsVaga); // Remove vazios
+            
             $skillsUser = $user->skills->pluck('id')->toArray();
-            $skillsMatch = count(array_intersect($skillsVaga, $skillsUser));
-            $skillsScore = (count($skillsVaga) > 0)
-                ? ($skillsMatch / count($skillsVaga)) * 40
-                : 0;
+            $matchCount = count(array_intersect($skillsVaga, $skillsUser));
+            
+            // Se a vaga pede skills e ele tem, calcula proporção. Se a vaga não pede, dá nota cheia.
+            $skillsScore = (count($skillsVaga) > 0) 
+                ? ($matchCount / count($skillsVaga)) * 30 
+                : 30;
 
-            // 2. Experiência
-            $expScore = 0;
-            if (method_exists($user, 'experiencia') && is_countable($user->experiencia)) {
-                $expScore = min(count($user->experiencia) * 10, 20);
-            } elseif (property_exists($user, 'experiencia') && is_countable($user->experiencia)) {
-                $expScore = min(count($user->experiencia) * 10, 20);
+
+            // --- B. SCORE DO FORMULÁRIO (IA / PONTOS) - PESO 50% ---
+            // Aqui usamos a sua model Opcao com 'pontos'
+            $somaPontos = 0;
+            
+            // Verifica se o user tem respostas carregadas
+            if ($user->respostas && $user->respostas->isNotEmpty()) {
+                foreach ($user->respostas as $resposta) {
+                    // Se a resposta tem uma opção vinculada, soma os pontos dela
+                    if ($resposta->opcao) {
+                        $somaPontos += $resposta->opcao->pontos;
+                    }
+                }
             }
 
-            // 3. Qualidade das respostas
-            $respostas = $candidatura->respostas ?? collect();
-            $mediaNota = 0;
+            // Normalização: Vamos supor que um candidato excelente faça uns 50 a 100 pontos.
+            // Limitamos a 50 pontos para não estourar a porcentagem (ou ajustamos conforme sua regra de negócio)
+            $formScore = min($somaPontos, 50);
 
-            if ($respostas->isNotEmpty() && $respostas->first()->offsetExists('nota')) {
-                $mediaNota = $respostas->avg('nota') ?? 0;
-            } else {
-                $textoTotal = $respostas->pluck('texto')->implode(' ');
-                $mediaNota = min(intval(strlen($textoTotal) / 20), 20);
-            }
 
-            $formScore = min($mediaNota, 20);
-
-            // 4. Perfil
+            // --- C. PERFIL (FOTO E DADOS) - PESO 20% ---
             $perfilScore = 0;
-            $perfilScore += !empty($user->fotoUser) ? 10 : 0;
-            $perfilScore += (isset($user->status) && $user->status == 1) ? 10 : 0;
+            $perfilScore += !empty($user->fotoUser) ? 10 : 0; // Tem foto? +10
+            $perfilScore += ($user->endereco) ? 10 : 0;       // Tem endereço? +10
 
-            // Total
-            $total = $skillsScore + $expScore + $formScore + $perfilScore;
-            $total = min(round($total, 1), 100);
 
-            // Explicação
+            // --- TOTAL ---
+            $total = $skillsScore + $formScore + $perfilScore;
+            $total = min(round($total, 0), 100); // Arredonda e limita a 100%
+
+            // --- EXPLICAÇÃO PARA A EMPRESA (FEEDBACK VISUAL) ---
             $explicacao = [];
-            if ($skillsScore > 0) $explicacao[] = "Skills compatíveis ({$skillsMatch})";
-            if ($expScore > 0) $explicacao[] = "Experiência relevante";
-            if ($formScore > 0) $explicacao[] = "Boas respostas no formulário";
-            if ($perfilScore > 0) $explicacao[] = "Perfil completo";
+            if ($matchCount > 0) $explicacao[] = "Possui as habilidades exigidas";
+            if ($somaPontos > 20) $explicacao[] = "Alta pontuação no teste técnico";
+            elseif ($somaPontos > 0) $explicacao[] = "Respondeu ao questionário";
+            if (!empty($user->fotoUser)) $explicacao[] = "Perfil com foto";
 
-            // Salvando a nota da IA
+            // Salva a nota na tabela pivô para ordenação futura sem recalcular
             if ($candidatura->nota_ia !== $total) {
                 $candidatura->nota_ia = $total;
                 $candidatura->save();
@@ -75,15 +81,20 @@ class VagaController extends Controller
 
             return [
                 'id' => $user->id,
-                'nome' => $user->nome_real ?? $user->username ?? 'Candidato',
-                'foto' => !empty($user->fotoUser)
-                    ? asset('storage/' . ltrim($user->fotoUser, '/'))
-                    : null,
+                'nome' => explode(' ', $user->nome_real)[0], // Primeiro nome
+                'sobrenome' => explode(' ', $user->nome_real)[1] ?? '',
+                'foto' => !empty($user->fotoUser) ? asset('storage/' . $user->fotoUser) : asset('img/default-avatar.png'),
                 'porcentagem' => $total,
-                'explicacao' => implode(', ', $explicacao),
+                'explicacao' => implode(' • ', $explicacao),
+                
+                // Dados extras para o card
+                'idade' => $user->datanasc ? \Carbon\Carbon::parse($user->datanasc)->age . ' anos' : '--',
+                'cidade' => $user->endereco->cidade ?? 'Localização não inf.',
+                'pontos_teste' => $somaPontos // Útil para debug
             ];
         });
 
+        // Ordena do maior para o menor
         $ordenados = $candidatos->sortByDesc('porcentagem')->values();
         $melhor = $ordenados->first();
 
@@ -92,6 +103,65 @@ class VagaController extends Controller
             'candidatos' => $ordenados,
         ]);
     }
+
+    private function calcularMelhoresCandidatos(Vaga $vaga)
+{
+    $vaga->load([
+        'candidaturas.user.skills',
+        'candidaturas.user.respostas.opcao',
+        'candidaturas.user.endereco'
+    ]);
+
+    $candidatos = $vaga->candidaturas->map(function ($candidatura) use ($vaga) {
+        $user = $candidatura->user;
+
+        $skillsVaga = is_array($vaga->funcVaga) ? $vaga->funcVaga : [$vaga->funcVaga];
+        $skillsVaga = array_filter($skillsVaga);
+
+        $skillsUser = $user->skills->pluck('id')->toArray();
+        $matchCount = count(array_intersect($skillsVaga, $skillsUser));
+
+        $skillsScore = (count($skillsVaga) > 0)
+            ? ($matchCount / count($skillsVaga)) * 30
+            : 30;
+
+        $somaPontos = 0;
+        if ($user->respostas) {
+            foreach ($user->respostas as $resp) {
+                if ($resp->opcao) {
+                    $somaPontos += $resp->opcao->pontos;
+                }
+            }
+        }
+
+        $formScore = min($somaPontos, 50);
+
+        $perfilScore  = !empty($user->fotoUser) ? 10 : 0;
+        $perfilScore += $user->endereco ? 10 : 0;
+
+        $total = min(round($skillsScore + $formScore + $perfilScore), 100);
+
+        if ($candidatura->nota_ia != $total) {
+            $candidatura->nota_ia = $total;
+            $candidatura->save();
+        }
+
+        return (object)[
+            'id' => $user->id,
+            'user' => $user,
+            'porcentagem' => $total,
+            'idade' => $user->datanasc ? \Carbon\Carbon::parse($user->datanasc)->age.' anos' : '--',
+            'cidade' => $user->endereco->cidade ?? 'Localização não inf.',
+            'pontos_teste' => $somaPontos,
+        ];
+    });
+
+    $ordenados = $candidatos->sortByDesc('porcentagem')->values();
+    return [
+        'melhor' => $ordenados->first(),
+        'candidatosOrdenados' => $ordenados
+    ];
+}
 
     /**
      * Lista vagas recomendadas para o usuário

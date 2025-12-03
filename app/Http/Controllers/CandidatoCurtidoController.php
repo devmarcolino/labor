@@ -8,32 +8,34 @@ use App\Models\CandidatoCurtido;
 
 class CandidatoCurtidoController extends Controller
 {
-    public function store(Request $request)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:user_tb,id',
-            'vaga_id' => 'required|exists:vagas_tb,id',
-        ]);
+        public function store(Request $request)
+        {
+            $validated = $request->validate([
+                'vaga_id' => 'required|integer',
+                'user_id' => 'required|integer',
+            ]);
 
-        $empresaId = Auth::guard('empresa')->id();
-        $userId = $request->user_id;
-        $vagaId = $request->vaga_id;
+            CandidatoCurtido::create([
+                'empresa_id' => auth()->user()->empresa_id,
+                'user_id' => $validated['user_id'],
+                'vaga_id' => $validated['vaga_id'],
+            ]);
 
-        // Evita duplicidade
-        $exists = CandidatoCurtido::where('empresa_id', $empresaId)
-            ->where('user_id', $userId)
-            ->where('vaga_id', $vagaId)
-            ->exists();
-        if ($exists) {
-            return response()->json(['success' => false, 'message' => 'Candidato já curtido para esta vaga.']);
+            return response()->json(['success' => true]);
         }
 
-        $curtido = CandidatoCurtido::create([
-            'empresa_id' => $empresaId,
-            'user_id' => $userId,
-            'vaga_id' => $vagaId,
-        ]);
+        public function rejeitar(Request $request)
+{
+    $validated = $request->validate([
+        'vaga_id' => 'required|integer',
+        'user_id' => 'required|integer'
+    ]);
 
-        return response()->json(['success' => true, 'id' => $curtido->id]);
-    }
+    \DB::table('candidaturas_tb')
+        ->where('vaga_id', $validated['vaga_id'])
+        ->where('user_id', $validated['user_id'])
+        ->update(['status' => 0]);
+
+    return response()->json(['success' => true]);
+}
 }

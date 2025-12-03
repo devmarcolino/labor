@@ -39,6 +39,14 @@ class User extends Authenticatable
         return $this->belongsTo(End::class, 'idEnd');
     }
 
+    // No app/Models/User.php
+
+// Relação necessária para calcular a nota das perguntas
+public function respostas()
+{
+    // Um User tem muitas Respostas
+    return $this->hasMany(\App\Models\UserHabilidadePergunta::class, 'idUser');
+}
     public function skills()
 {
     return $this->belongsToMany(

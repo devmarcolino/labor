@@ -73,7 +73,7 @@
             </a>
     </header>
 
-        <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 px-5 items-center fixed top-16 left-0 z-10 bg-white" style="max-width:100vw;">
+        <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 px-5 mb-5 items-center fixed top-16 left-0 z-10 bg-white" style="max-width:100vw;">
             <div class="flex gap-3 items-center py-3 px-5 w-full max-w-2xl border border-gray-200 bg-white shadow-md rounded-full">
                 <img src="../img/zoom.svg" alt="">
                 <input type="text" id="search" name="search" class="w-full border-transparent focus:border-none">

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -10,7 +11,7 @@
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
 </head>
-
+@include('partials.vaga-candidatos-modal')
 <x-flash-manager />
 
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-500 h-screen flex flex-col">
@@ -86,67 +87,79 @@
     <main id="icon-tabs-content" class="relative p-3 flex-1 h-full">
 
         <div id="flame" class="h-full flex flex-col items-center justify-center">
-            @php
-                $empresaId = Auth::guard('empresa')->id();
-                $vagas = \App\Models\Vaga::where('idEmpresa', $empresaId)->latest('created_at')->get();
-            @endphp
+                <div x-data="enterpriseFeed()" x-init="init()" class="w-full h-full relative bg-gray-50 dark:bg-gray-900">
 
-            @foreach($vagas as $vaga)
-                @php
-                    $melhorCandidatura = $vaga->candidaturas->sortByDesc('nota_ia')->first();
-                    $user = $melhorCandidatura ? $melhorCandidatura->user : null;
-                @endphp
+        <div x-show="isLoading" class="flex flex-col items-center justify-center h-full absolute inset-0 z-0">
+            <svg class="animate-spin h-10 w-10 text-sky-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p class="text-gray-500 font-medium">Analisando candidatos...</p>
+        </div>
 
-                {{-- CARD NOVO DO MELHOR CANDIDATO --}}
-                @if($user)
-                <div class="w-full max-w-md rounded-3xl overflow-hidden shadow-lg relative bg-black mb-7">
+        <div x-show="!isLoading && cards.length === 0" class="flex flex-col items-center justify-center h-full text-center p-6 absolute inset-0 z-0">
+            <div class="w-24 h-24 bg-gray-200 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Tudo limpo!</h3>
+            <p class="text-gray-500 mt-2">Você zerou as pendências das suas vagas.</p>
+        </div>
 
-                    {{-- FOTO DE FUNDO --}}
-                    <div class="w-full h-80 relative">
-                        <img 
-                            src="{{ $user->fotoUser ? asset('storage/' . $user->fotoUser) : asset('img/default-user.png') }}"
-                            class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black"></div>
-                    </div>
+        <template x-for="(card, index) in cards" :key="card.id">
+            <div class="absolute inset-0 flex justify-center items-center p-4 pointer-events-none"
+                :style="`z-index: ${cards.length - index};`">
+                
+                <div class="relative w-full h-full max-w-md bg-black rounded-[40px] overflow-hidden shadow-2xl card-item pointer-events-auto select-none"
+                    :data-vaga-id="card.id"
+                    :data-user-id="card.candidato.id">
+                    
+                    <img :src="card.candidato.foto" class="absolute inset-0 w-full h-full object-cover opacity-90">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
 
-                    {{-- TAG MELHOR CANDIDATO --}}
-                    <div class="absolute top-3 left-3 right-3 flex items-center justify-between bg-white/90 dark:bg-gray-900/80 backdrop-blur px-3 py-2 rounded-xl shadow">
-                        <div class="flex items-center gap-2">
-                            <img 
-                                src="{{ $user->fotoUser ? asset('storage/' . $user->fotoUser) : asset('img/default-user.png') }}"
-                                class="w-8 h-8 rounded-full object-cover ring-1 ring-gray-200">
-                            <div class="flex flex-col leading-tight">
-                                <span class="text-[11px] font-bold text-gray-900 dark:text-white">Melhor candidato</span>
-                                <span class="text-[10px] text-gray-500">Analisado por Labor IA 🤖</span>
+                    <div class="absolute top-4 left-0 right-0 flex justify-center z-20">
+
+                    <button class="absolute justify-between right-4 left-4 max-w-2xl flex items-center gap-3 bg-gray-900/20 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 shadow-lg" @click="window.dispatchEvent(
+        new CustomEvent('open-candidates-modal', { detail: { id: card.id } })
+    )">
+                        <div class="flex gap-3">
+                            <div class="rounded-full">
+                                <img src="../img/ia.svg" alt="" class="w-6 h-6">
+                            </div>
+
+                            <div>
+                                <p class="text-xs font-bold text-gray-100 uppercase tracking-wider">Melhor Candidato</p>
+                                <p class="text-[10px] text-gray-200 font-medium">Analisado por Labor IA ©</p>
                             </div>
                         </div>
-                        <img src="/img/lb-blue.svg" class="w-7 h-7">
-                    </div>
 
-                    {{-- RODAPÉ --}}
-                    <div class="absolute bottom-0 w-full px-4 pb-4">
-                        <h2 class="text-lg font-bold text-white">
-                            {{ $user->username }}
-                        </h2>
-
-                        <p class="text-sm text-gray-200">
-                            {{ $vaga->funcVaga }}
-                        </p>
-
-                        <div class="mt-2 flex items-center gap-1 bg-black/60 px-3 py-2 rounded-xl w-fit">
-                            <img src="/img/star.svg" class="w-4 h-4" alt="">
-                            <span class="text-white text-sm font-semibold">
-                                {{ number_format($melhorCandidatura->nota_ia ?? 4.0, 1) }}
-                            </span>
+                        <div class="text-white/50">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </div>
+                    </button>
                     </div>
 
-                </div>
-                @else
-                <div class="text-gray-400">Nenhum candidato disponível</div>
-                @endif
+                    <div class="absolute bottom-0 w-full p-8 pb-10 text-white z-10">
+                        
+                        <div class="mb-2 flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-full bg-sky-600/80 backdrop-blur text-xs font-bold border border-sky-400/30" x-text="card.titulo_vaga"></span>
+                            <span class="px-3 py-1 rounded-full bg-green-500/80 backdrop-blur text-xs font-bold border border-green-400/30" x-text="card.match_percent + '% Match'"></span>
+                        </div>
 
-            @endforeach
+                        <h2 class="text-4xl font-bold leading-none mb-1">
+                            <span x-text="card.candidato.nome"></span>
+                            <span class="text-2xl font-normal opacity-70" x-text="card.candidato.idade"></span>
+                        </h2>
+                        
+                        <p class="text-gray-300 text-sm flex items-center gap-1 mb-6">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span x-text="card.candidato.cidade"></span>
+                            <span x-show="card.total_candidatos > 1" class="ml-2 text-sky-400 text-xs font-bold" x-text="'+' + (card.total_candidatos - 1) + ' outros'"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @include('partials.vaga-candidatos-modal')
+
+        </template>
+
+    </div>
 
         </div>
 

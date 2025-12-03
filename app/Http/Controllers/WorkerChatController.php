@@ -42,7 +42,15 @@ class WorkerChatController extends Controller
                     'arquivo' => $arquivoPath,
                     'horario' => now(),
                 ]);
+                // Dispara para ambos os canais
                 event(new \App\Events\NovaMensagemEnviada($novaMensagem));
+                // Canal inverso (empresa->user)
+                $mensagemInvertida = clone $novaMensagem;
+                $mensagemInvertida->remetente_id = $empresa->id;
+                $mensagemInvertida->remetente_tipo = 'empresa';
+                $mensagemInvertida->destinatario_id = $worker->id;
+                $mensagemInvertida->destinatario_tipo = 'user';
+                event(new \App\Events\NovaMensagemEnviada($mensagemInvertida));
             }
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => true]);

@@ -110,11 +110,35 @@
         }
         echo.private(canal)
             .listen('NovaMensagemEnviada', (e) => {
-                // Recarrega a página discretamente ao receber nova mensagem
-                window.location.reload();
+                // Renderiza a nova mensagem recebida sem recarregar a página
+                const isWorker = e.remetente_id === workerId && e.remetente_tipo === 'user';
+                let avatar = isWorker ? '' : `<img src='{{ $empresa->fotoEmpresa ? asset('storage/' . $empresa->fotoEmpresa) : asset('img/default-avatar.png') }}' class='w-7 h-7 rounded-full object-cover mr-2'>`;
+                let arquivoHtml = '';
+                if (e.arquivo) {
+                    const ext = e.arquivo.split('.').pop().toLowerCase();
+                    if(['jpg','jpeg','png','gif','webp'].includes(ext)) {
+                        arquivoHtml = `<img src='${e.arquivo.startsWith('chat-midias') ? '/storage/' + e.arquivo : e.arquivo}' class='rounded-lg mb-2 max-w-[120px] h-auto object-cover'>`;
+                    } else if(['mp4','mov','avi','wmv'].includes(ext)) {
+                        arquivoHtml = `<video src='${e.arquivo.startsWith('chat-midias') ? '/storage/' + e.arquivo : e.arquivo}' controls class='rounded-lg mb-2 max-w-[160px] h-auto'></video>`;
+                    }
+                }
+                let mensagemHtml = e.mensagem ? `<div style='word-break:break-word;white-space:pre-line;'>${e.mensagem}</div>` : '';
+                let hora = new Date(e.horario).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const html = `
+                    <div class='flex ${isWorker ? 'justify-end' : 'justify-start'} mb-2'>
+                        ${avatar}
+                        <div class='${isWorker ? 'bg-sky-100 text-gray-800 text-right' : 'bg-white text-gray-800'} rounded-2xl px-4 py-2 max-w-xs w-fit break-words shadow'>
+                            ${arquivoHtml}
+                            ${mensagemHtml}
+                            <div class='text-xs text-gray-400 mt-1'>${hora}</div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('chatMessages').insertAdjacentHTML('beforeend', html);
+                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
             });
         // Atualiza a cada 10s para garantir sincronismo
-        setInterval(fetchMensagens, 10000);
+        // Recarrega a página apenas ao receber nova mensagem via Pusher
         // Carrega ao abrir
         fetchMensagens();
         // Remover duplicidade de variáveis e listeners
@@ -158,10 +182,6 @@
             fetch(`{{ route('workers.chat.empresa', $empresa->id) }}`, {
                 method: 'POST',
                 body: formData
-            })
-            .then(res => res.json())
-            .then(() => {
-                fetchMensagens();
             });
             input.value = '';
             fileInput.value = '';

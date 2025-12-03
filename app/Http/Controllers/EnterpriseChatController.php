@@ -46,7 +46,15 @@ class EnterpriseChatController extends Controller
                     'arquivo' => $arquivoPath,
                     'horario' => now(),
                 ]);
+                // Dispara para ambos os canais
                 event(new \App\Events\NovaMensagemEnviada($novaMensagem));
+                // Canal inverso (user->empresa)
+                $mensagemInvertida = clone $novaMensagem;
+                $mensagemInvertida->remetente_id = $user->id;
+                $mensagemInvertida->remetente_tipo = 'user';
+                $mensagemInvertida->destinatario_id = $empresa->id;
+                $mensagemInvertida->destinatario_tipo = 'empresa';
+                event(new \App\Events\NovaMensagemEnviada($mensagemInvertida));
             }
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => true]);

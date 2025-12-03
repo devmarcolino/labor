@@ -105,7 +105,7 @@
         });
 
     // Atualiza a cada 10s para garantir sincronismo
-    setInterval(() => { window.location.reload(); }, 10000);
+    // Recarrega a página apenas ao receber nova mensagem via Pusher
     // Envio AJAX do formulário
     // Botão de mídia aciona input file
     // Removido setInterval para evitar delay, atualização só via Pusher

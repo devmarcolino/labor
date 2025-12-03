@@ -1,32 +1,24 @@
-FROM dunglas/frankenphp:1.1-php8.1
-
-# Instala extensões necessárias
-RUN install-php-extensions pdo pdo_mysql mysqli intl opcache
-
-# Instala Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Build do Laravel (Composer + NPM)
+FROM ghcr.io/composer/composer:2 AS build
 
 WORKDIR /app
 
-# Copia o projeto
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+COPY package.json package-lock.json* ./
+RUN npm install
+
 COPY . .
+RUN npm run build
 
-# Instala dependências do Laravel
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+# Runtime com FrankenPHP
+FROM dunglas/frankenphp
 
-# Gera key caso não exista
-RUN php artisan key:generate --force
+WORKDIR /app
 
-# Permissões
-RUN chmod -R 777 storage bootstrap/cache
+COPY --from=build /app ./
 
-# Build do Vite
-RUN npm install && npm run build
-
-# Expõe porta do FrankenPHP
 EXPOSE 8000
 
-# Config do frankenphp
-COPY frankenphp.json /app/frankenphp.json
-
-CMD ["frankenphp", "run", "--config", "/app/frankenphp.json"]
+CMD ["php", "public/index.php"]

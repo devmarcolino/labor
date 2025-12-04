@@ -109,8 +109,11 @@ Route::middleware('auth:web')->group(function () {
 
     Route::get('/workers/address', [ProfileController::class, 'editAddress'])->name('workers.edit.address');
     Route::patch('/workers/update-address', [ProfileController::class, 'updateAddress'])->name('workers.update.address');
+    // Empresa info for worker modal (JSON)
+    Route::get('/workers/empresa-info/{empresa}', [\App\Http\Controllers\WorkerScheduleController::class, 'empresaInfo'])->name('workers.empresa.info');
     // === OUTRAS PÁGINAS ===
-    Route::view('/workers/schedule', 'workers.schedule')->name('workers.schedule');
+    Route::get('/workers/schedule', [App\Http\Controllers\WorkerScheduleController::class, 'index'])->name('workers.schedule');
+    Route::post('/workers/desistir-vaga', [App\Http\Controllers\WorkerScheduleController::class, 'desistirVaga'])->name('workers.desistir-vaga');
     Route::view('/workers/rating', 'workers.rating')->name('workers.rating');
 
     Route::get('/workers/skills', [ProfileController::class, 'editSkills'])
@@ -262,7 +265,9 @@ Route::prefix('enterprise/api')->group(function () {
     Route::patch('/address', [EnterpriseProfileController::class, 'updateAddress'])
         ->name('enterprises.update.address');
     // === OUTRAS PÁGINAS ===
-    Route::view('/enterprises/schedule', 'enterprises.schedule')->name('enterprises.schedule');
+    Route::get('/enterprises/schedule', [App\Http\Controllers\EnterpriseScheduleController::class, 'index'])->name('enterprises.schedule');
+    Route::post('/enterprises/remover-escala', [App\Http\Controllers\EnterpriseScheduleController::class, 'removerEscala'])->name('enterprises.remover-escala');
+    Route::post('/enterprises/remover-usuario-escala', [App\Http\Controllers\EnterpriseScheduleController::class, 'removerUsuarioEscala'])->name('enterprises.remover-usuario-escala');
     Route::view('/enterprises/jobs', 'enterprises.jobs')->name('enterprises.jobs');
     Route::view('/enterprises/rating', 'enterprises.rating')->name('enterprises.rating');
     Route::view('/enterprises/analytics', 'enterprises.analytics')->name('enterprises.analytics');

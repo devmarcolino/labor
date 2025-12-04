@@ -52,22 +52,27 @@ class ChatController extends Controller
 
     public function scaleUser(Request $request)
     {
+        $validated = $request->validate([
+            'user_id' => 'required|integer|exists:user_tb,id',
+            'vaga_id' => 'required|integer|exists:vagas_tb,id',
+        ]);
+
         $empresaId = auth('empresa')->id();
-        $userId = $request->input('user_id');
-        $vagaId = $request->input('vaga_id');
+        $userId = $validated['user_id'];
+        $vagaId = $validated['vaga_id'];
 
         if (!$empresaId) {
             return response()->json(['success' => false, 'message' => 'Empresa não autenticada.'], 401);
-        }
-
-        if (!$vagaId) {
-            return response()->json(['success' => false, 'message' => 'Vaga não especificada.'], 400);
         }
 
         // Buscar a vaga para obter o valor
         $vaga = \App\Models\Vaga::find($vagaId);
         if (!$vaga) {
             return response()->json(['success' => false, 'message' => 'Vaga não encontrada.'], 404);
+        }
+
+        if ($vaga->idEmpresa != $empresaId) {
+            return response()->json(['success' => false, 'message' => 'Acesso negado.'], 403);
         }
 
         // Verifica se já existe escala para evitar duplicatas
@@ -80,8 +85,8 @@ class ChatController extends Controller
             'idUser' => $userId,
             'idEmpresa' => $empresaId,
             'idVaga' => $vagaId,
-            'dataDiaria' => now()->toDateString(),
-            'horaDiaria' => now()->toTimeString(),
+            'dataDiaria' => $vaga->dataVaga ?? now()->toDateString(),
+            'horario' => $vaga->horario,
             'gastoTotal' => $vaga->valor_vaga,
             'dataCriacao' => now(),
         ]);

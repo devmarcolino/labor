@@ -1053,4 +1053,72 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 300);
         }, 3000);
     });
+
+    // MÓDULO: SCALE USER FUNCTION
+    window.scaleUser = function (userId, vagaId) {
+        // Mostra o modal de confirmação
+        const modal = document.getElementById("confirmModal");
+        if (modal) {
+            modal.classList.remove("hidden");
+
+            // Configura os botões
+            document.getElementById("confirmYes").onclick = () => {
+                modal.classList.add("hidden");
+                performScale(userId, vagaId);
+            };
+            document.getElementById("confirmNo").onclick = () => {
+                modal.classList.add("hidden");
+            };
+        }
+    };
+
+    function performScale(userId, vagaId) {
+        fetch("/enterprises/chat/scale", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({ user_id: userId, vaga_id: vagaId }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    window.dispatchEvent(
+                        new CustomEvent("notify", {
+                            detail: {
+                                type: "success",
+                                title: "Sucesso",
+                                msg: "Usuário escalado com sucesso!",
+                            },
+                        })
+                    );
+                } else {
+                    window.dispatchEvent(
+                        new CustomEvent("notify", {
+                            detail: {
+                                type: "error",
+                                title: "Erro",
+                                msg:
+                                    data.message || "Falha ao escalar usuário.",
+                            },
+                        })
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Erro:", error);
+                window.dispatchEvent(
+                    new CustomEvent("notify", {
+                        detail: {
+                            type: "error",
+                            title: "Erro",
+                            msg: "Erro ao escalar usuário.",
+                        },
+                    })
+                );
+            });
+    }
 });

@@ -24,7 +24,7 @@
                 <span class="text-xs text-gray-400">Hoje</span>
             </div>
         </div>
-        <img src="{{ asset('img/button.svg') }}" class="w-15 h-15 cursor-pointer" onclick="scaleUser({{ $user->id }})" alt="Escalar">
+        <img src="{{ asset('img/button.svg') }}" class="w-15 h-15 cursor-pointer" onclick="scaleUser({{ $user->id }}, {{ $vaga->id }})" alt="Escalar">
     </header>
     <main id="chatMessages" class="flex-1 flex flex-col gap-2 px-4 py-6 overflow-y-auto bg-gray-50" style="margin-top:72px; margin-bottom:72px;">
         @foreach($mensagens as $msg)
@@ -164,71 +164,7 @@
             },
             body: formData
         });
-    });
-</script>
-<script>
-    window.scaleUser = function(userId) {
-        // Mostra o modal de confirmação
-        const modal = document.getElementById('confirmModal');
-        modal.classList.remove('hidden');
-
-        // Configura os botões
-        document.getElementById('confirmYes').onclick = () => {
-            modal.classList.add('hidden');
-            performScale(userId);
-        };
-        document.getElementById('confirmNo').onclick = () => {
-            modal.classList.add('hidden');
-        };
-    };
-
-    function performScale(userId) {
-        fetch('/enterprises/chat/scale', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ user_id: userId, vaga_id: {{ $vaga->id }} })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.dispatchEvent(
-                    new CustomEvent("notify", {
-                        detail: {
-                            type: "success",
-                            title: "Sucesso",
-                            msg: "Usuário escalado com sucesso!",
-                        },
-                    })
-                );
-            } else {
-                window.dispatchEvent(
-                    new CustomEvent("notify", {
-                        detail: {
-                            type: "error",
-                            title: "Erro",
-                            msg: data.message || "Falha ao escalar usuário.",
-                        },
-                    })
-                );
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            window.dispatchEvent(
-                new CustomEvent("notify", {
-                    detail: {
-                        type: "error",
-                        title: "Erro",
-                        msg: "Erro ao escalar usuário.",
-                    },
-                })
-            );
-        });
-    };
-</script>
+    </script>
 
 <!-- Modal de Confirmação -->
 <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">

@@ -4,7 +4,7 @@
     $candidatosCurtidos = $empresa ? CandidatoCurtido::with('user')->where('empresa_id', $empresa->id)->latest()->get() : collect();
 @endphp
 
-<div class="flex flex-col gap-4 mt-8 w-full max-w-xl mx-auto">
+<div class="flex flex-col gap-4 mt-1 w-full max-w-2xl mx-auto">
     @forelse($candidatosCurtidos as $curtido)
         @php
             $ultimaMsg = App\Models\Mensagem::where(function($q) use ($empresa, $curtido) {

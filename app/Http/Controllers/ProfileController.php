@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use App\Models\UserHabilidadePergunta; 
 use App\Models\Skill; 
+use App\Models\Avaliacao; 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -43,7 +44,7 @@ class ProfileController extends Controller
         $respostas = $request->input('respostas'); // array: [idPergunta => resposta]
 
         foreach ($respostas as $idPergunta => $resposta) {
-            \App\Models\UserHabilidadePergunta::updateOrCreate(
+            UserHabilidadePergunta::updateOrCreate(
                 [
                     'idUser' => $user->id,
                     'idHabilidade' => $idHabilidade,
@@ -56,19 +57,31 @@ class ProfileController extends Controller
         }
         return response()->json(['success' => true]);
     }
+    public function rating() {
+    $avaliacoes = \App\Models\Avaliacao::with(['avaliador', 'escala.vaga']) // Carregar quem avaliou e qual vaga
+        ->where('id_avaliado', auth()->id())
+        ->latest()
+        ->get();
+    return view('workers.rating', compact('avaliacoes'));
+}
     public function edit()
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::guard('web')->user();
-        $habilidades = \App\Models\Skill::all();
-        $userSkills = $user->skills()->pluck('habilidades_tb.id')->toArray();
+{
+    $user = Auth::guard('web')->user();
+    $habilidades = \App\Models\Skill::all();
+    $userSkills = $user->skills()->pluck('habilidades_tb.id')->toArray();
 
-        return view('workers.account', [
-            'user' => $user,
-            'habilidades' => $habilidades,
-            'userSkills' => $userSkills,
-        ]);
-    }
+    // --- CÁLCULO DAS AVALIAÇÕES ---
+    $totalAvaliacoes = \App\Models\Avaliacao::where('id_avaliado', $user->id)->count();
+    $mediaNota = \App\Models\Avaliacao::where('id_avaliado', $user->id)->avg('nota') ?? 0;
+
+    return view('workers.account', [
+        'user' => $user,
+        'habilidades' => $habilidades,
+        'userSkills' => $userSkills,
+        'totalAvaliacoes' => $totalAvaliacoes, // Enviando pro Blade
+        'mediaNota' => $mediaNota,             // Enviando pro Blade
+    ]);
+}
 
     /**
      * Atualiza o perfil completo.

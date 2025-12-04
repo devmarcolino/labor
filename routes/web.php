@@ -11,7 +11,9 @@ use App\Http\Controllers\Auth\EnterpriseLoginController;
 // Controllers de Perfil (Onboarding)
 use App\Http\Controllers\ProfileController; // Perfil User
 use App\Http\Controllers\EnterpriseProfileController;
-use App\Http\Controllers\EnterpriseVagaController; // Perfil Empresa
+use App\Http\Controllers\EnterpriseVagaController;
+use App\Http\Controllers\EnterpriseAnalyticsController;
+use App\Http\Controllers\EscalaController; // Perfil Empresa
 
 // Models
 use App\Models\Skill;
@@ -80,6 +82,8 @@ Route::middleware('auth:web')->group(function () {
         Route::get('/workers/settings', function() {
             return view('workers.settings');
         })->name('workers.settings');
+
+        Route::get('/workers/rating', [ProfileController::class, 'rating'])->name('workers.rating');
     // Perguntas por habilidade (AJAX)
     Route::post('/workers/perguntas-habilidade', [ProfileController::class, 'perguntasPorHabilidade'])->name('workers.perguntas.habilidade');
     // Salvar respostas das perguntas
@@ -114,7 +118,6 @@ Route::middleware('auth:web')->group(function () {
     // === OUTRAS PÁGINAS ===
     Route::get('/workers/schedule', [App\Http\Controllers\WorkerScheduleController::class, 'index'])->name('workers.schedule');
     Route::post('/workers/desistir-vaga', [App\Http\Controllers\WorkerScheduleController::class, 'desistirVaga'])->name('workers.desistir-vaga');
-    Route::view('/workers/rating', 'workers.rating')->name('workers.rating');
 
     Route::get('/workers/skills', [ProfileController::class, 'editSkills'])
         ->name('workers.skills');
@@ -198,14 +201,22 @@ Route::middleware('auth:empresa')->group(function () {
     Route::get('/enterprises/vagas', [EnterpriseVagaController::class, 'list'])
         ->name('enterprises.vagas.list');
 
+Route::get('/enterprises/analytics', [EnterpriseAnalyticsController::class, 'index'])
+        ->name('enterprises.analytics');
 
+    // Rota para confirmar a escala (Disparada via AJAX/Fetch/Axios)
 
 Route::prefix('enterprise/api')->group(function () {
     Route::get('/feed', [CandidatoFeedController::class, 'feed'])->name('enterprise.feed');
     Route::get('/vaga/{id}/candidatos', [CandidatoFeedController::class, 'candidatosModal'])->name('enterprise.modal');
 });
 
+Route::post('/escala/{id}/confirmar', [EscalaController::class, 'confirmarEscala']);
+Route::post('/enterprises/remover-escala', [EscalaController::class, 'removerEscala']);
+Route::post('/enterprises/remover-usuario-escala', [EscalaController::class, 'removerUsuarioEscala']);
+Route::post('/workers/desistir-vaga', [EscalaController::class, 'desistirVaga']);
 
+route::post('/avaliar-freelancers', [App\Http\Controllers\EnterpriseScheduleController::class, 'salvarAvaliacao']);
     // Chat 1:1 empresa-usuário (aceita GET e POST)
     Route::match(['get', 'post'], '/enterprises/chat/{user}/{vaga}', [\App\Http\Controllers\EnterpriseChatController::class, 'chatWithUser'])->name('enterprises.chat.user');
 
@@ -269,6 +280,4 @@ Route::prefix('enterprise/api')->group(function () {
     Route::post('/enterprises/remover-escala', [App\Http\Controllers\EnterpriseScheduleController::class, 'removerEscala'])->name('enterprises.remover-escala');
     Route::post('/enterprises/remover-usuario-escala', [App\Http\Controllers\EnterpriseScheduleController::class, 'removerUsuarioEscala'])->name('enterprises.remover-usuario-escala');
     Route::view('/enterprises/jobs', 'enterprises.jobs')->name('enterprises.jobs');
-    Route::view('/enterprises/rating', 'enterprises.rating')->name('enterprises.rating');
-    Route::view('/enterprises/analytics', 'enterprises.analytics')->name('enterprises.analytics');
 });

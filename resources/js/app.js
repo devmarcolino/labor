@@ -4,6 +4,7 @@ import interact from "interactjs";
 import IMask from "imask";
 import "flowbite";
 import { Datepicker } from "flowbite-datepicker";
+import ApexCharts from 'apexcharts';
 import ptBR from "./flowbite-locale-pt.js";
 
 function cardStack() {
@@ -849,11 +850,13 @@ function dashboardView() {
 
 // Registro Global do Alpine
 window.Alpine = Alpine;
+window.ApexCharts = ApexCharts;
 Alpine.data("enterpriseFeed", enterpriseFeed);
 Alpine.data("cardStack", cardStack);
 Alpine.data("registrationForm", registrationForm);
 Alpine.data("enterpriseForm", enterpriseForm);
 Alpine.data("dashboardView", dashboardView);
+
 Alpine.start();
 
 // --- 4. LÓGICA EXECUTADA APÓS O DOM CARREGAR ---

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Escala;
+use App\Models\Avaliacao;
 use Illuminate\Support\Facades\Auth;
 
 class EnterpriseScheduleController extends Controller
@@ -28,6 +29,28 @@ class EnterpriseScheduleController extends Controller
         return view('enterprises.schedule', compact('escalasPorVaga', 'empresa'));
     }
 
+    public function salvarAvaliacao(Request $request)
+{
+    $avaliacoes = $request->avaliacoes; // Vai receber um array de notas
+    $escalaId = $request->escala_id;
+    $empresaId = auth()->id();
+
+    foreach ($avaliacoes as $av) {
+        // Verifica se a nota é válida (1 a 5)
+        if ($av['nota'] > 0) {
+            Avaliacao::create([ // Certifique-se de criar o Model Avaliacao
+                'id_avaliador' => $empresaId,
+                'id_avaliado'  => $av['user_id'],
+                'escala_id'    => $escalaId,
+                'nota'         => $av['nota'],
+                'comentario'   => $av['comentario'] ?? null,
+                'tipo_avaliacao' => 'contratante'
+            ]);
+        }
+    }
+
+    return response()->json(['success' => true]);
+}
     public function removerEscala(Request $request)
     {
         $request->validate([

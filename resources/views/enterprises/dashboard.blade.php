@@ -140,7 +140,6 @@
                         
                         <div class="mb-2 flex items-center gap-2">
                             <span class="px-3 py-1 rounded-full bg-sky-600/80 backdrop-blur text-xs font-bold border border-sky-400/30" x-text="card.titulo_vaga"></span>
-                            <span class="px-3 py-1 rounded-full bg-green-500/80 backdrop-blur text-xs font-bold border border-green-400/30" x-text="card.match_percent + '% Match'"></span>
                         </div>
 
                         <h2 class="text-4xl font-bold leading-none mb-1">

@@ -99,6 +99,7 @@
         </a>
     </header>
 
+    <div class="flex flex-col justify-center w-full max-w-2xl items-center mx-auto">
     <!-- CONTEÚDO AJUSTADO COM MARGEM PARA O HEADER FIXO -->
     <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 mb-5 px-5 items-center mt-20">
         <div
@@ -166,6 +167,6 @@
             <p class="text-gray-400 font-light">Nenhuma empresa conversou com você ainda</p>
         </div>
     @endif
-
+</div>
 </body>
 </html>

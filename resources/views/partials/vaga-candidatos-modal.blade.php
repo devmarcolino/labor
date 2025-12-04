@@ -58,9 +58,6 @@
                                         <div class="flex-1">
                                             <div class="flex justify-between">
                                                 <h4 class="font-bold text-gray-900 dark:text-white" x-text="cand.nome"></h4>
-                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border"
-                                                      :class="getMatchColor(cand.porcentagem)"
-                                                      x-text="cand.porcentagem + '%'"></span>
                                             </div>
                                             <p class="text-xs text-gray-500" x-text="cand.cidade"></p>
                                         </div>

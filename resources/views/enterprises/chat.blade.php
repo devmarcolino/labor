@@ -73,15 +73,20 @@
             </a>
     </header>
 
-        <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 px-5 mb-5 items-center fixed top-16 left-0 z-10 bg-white" style="max-width:100vw;">
-            <div class="flex gap-3 items-center py-3 px-5 w-full max-w-2xl border border-gray-200 bg-white shadow-md rounded-full">
-                <img src="../img/zoom.svg" alt="">
-                <input type="text" id="search" name="search" class="w-full border-transparent focus:border-none">
-            </div>
+         <div class="flex flex-col justify-center w-full max-w-2xl items-center mx-auto">
+    <!-- CONTEÚDO AJUSTADO COM MARGEM PARA O HEADER FIXO -->
+    <div class="flex flex-col w-full max-w-2xl mx-auto justify-center py-3 mb-5 px-5 mt-20">
+        <div
+            class="flex gap-3 items-center py-3 px-5 w-full max-w-2xl border border-gray-200 bg-white shadow-md rounded-full">
+            <img src="../img/zoom.svg" alt="">
+            <input type="text" id="search" name="search"
+                class="w-full border-transparent focus:border-none">
         </div>
+    </div>
 
-        <div class="flex-1 overflow-y-auto pt-[120px] pb-4 px-2 w-full max-w-xl mx-auto" style="max-width:100vw;">
+        <div class="flex-1 overflow-y-auto pt-1 pb-4 px-4 w-full max-w-2xl mx-auto" style="max-width:100vw;">
             @include('enterprises.partials.curtidos-list')
+        </div>
         </div>
     </body>
 </html>

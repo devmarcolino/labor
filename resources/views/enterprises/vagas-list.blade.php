@@ -36,10 +36,15 @@
       }" @open-delete-modal.window="openDelete = true; vagaId = $event.detail.id"
      @open-candidates-modal.window="activeModal = $event.detail.id; console.log('Abriu vaga:', $event.detail.id)">
 <div class="container mx-auto px-5 py-5 sm:py-9 max-w-md">
-    <div class="flex items-center justify-between w-full max-w-2xl gap-2 mb-4">
-        <x-btn-back/>
-        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Minhas <span class="text-sky-500">vagas</span></h1>
-    </div>
+     <header class="flex justify-center w-full mx-auto pt-4 mb-2">
+        <div class="flex items-center justify-between w-full max-w-2xl px-5 relative">
+            <a href="{{ route('enterprises.dashboard') }}" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                <svg class="w-6 h-6 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            
+            <h1 class="text-xl font-bold text-center dark:text-white">Minhas vagas</h1>
+        </div>
+    </header>
 
     <!-- Controle do modal de criar vaga -->
     <div x-data="{ openVagaModal: false }" class="pb-2">

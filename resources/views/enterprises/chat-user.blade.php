@@ -168,12 +168,14 @@
 
 <!-- Modal de Confirmação -->
 <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[45px] px-6 pt-10 pb-4 max-w-sm w-full mx-4">
         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Confirmar Escala</h3>
         <p class="text-gray-700 dark:text-gray-300 mb-6">Tem certeza que deseja escalar este usuário para esta vaga?</p>
-        <div class="flex justify-end gap-3">
-            <button id="confirmNo" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Não</button>
-            <button id="confirmYes" class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition">Sim</button>
+        <div class="flex flex-col gap-1">
+            <x-btn-outline id="confirmNo">
+            Cancelar
+            </x-btn-outline>
+            <x-btn-primary id="confirmYes" >Confirmar</x-btn-primary>
         </div>
     </div>
 </div>

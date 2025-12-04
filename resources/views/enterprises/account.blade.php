@@ -93,23 +93,6 @@
 
         <hr class="border-1.5 border-gray-300 px-[4rem] my-2 dark:border-gray-700">
 
-        <a href="{{ route('enterprises.rating') }}" class="w-full">
-        <div class="shadow-sm hover:shadow-md ease-in bg-gray-50/15 dark:bg-gray-800 dark:border-gray-600 flex items-center justify-between gap-3 w-full border border-gray-300 rounded-full px-5 py-5 mt-2">
-          
-          <p class="text-gray-800 dark:text-gray-200">(0)</p>
-          <div class="flex">
-            <img src="../img/star-stroke.svg" alt="">
-            <img src="../img/star-stroke.svg" alt="">
-            <img src="../img/star-stroke.svg" alt="">
-            <img src="../img/star-stroke.svg" alt="">
-            <img src="../img/star-stroke.svg" alt="">
-          </div>
-
-          <svg class="text-gray-900 dark:text-gray-200" width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        </a>
       </div>
     
 

@@ -97,3 +97,13 @@ button[data-carousel-slide-to][aria-current="true"] {
         opacity: 0;
     }
 }
+
+.swipe-right {
+    transform: translateX(400px) rotate(20deg);
+    transition: 0.3s ease;
+}
+
+.swipe-left {
+    transform: translateX(-400px) rotate(-20deg);
+    transition: 0.3s ease;
+}

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Vaga;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class CandidatoFeedController extends Controller
 {
@@ -16,7 +17,6 @@ class CandidatoFeedController extends Controller
     {
         $empresaId = Auth::id();
 
-        // Corrigido: usa idEmpresa
         $vagas = Vaga::where('idEmpresa', $empresaId)
             ->with(['candidaturas.user.endereco'])
             ->get();
@@ -29,10 +29,21 @@ class CandidatoFeedController extends Controller
                 continue;
             }
 
-            // Ordenando pela NOTA IA correta
-            $melhor = $vaga->candidaturas
-                ->sortByDesc('nota_ia')
-                ->first();
+            // 🔥 Carregando candidatos já vistos dessa vaga
+            $cacheKey = "empresa:{$empresaId}:vaga:{$vaga->id}:candidatos_vistos";
+            $vistos = Cache::get($cacheKey, []);
+
+            // 🔥 Filtrar candidatos já vistos
+            $naoVistos = $vaga->candidaturas->filter(function ($c) use ($vistos) {
+                return !in_array($c->idUser, $vistos);
+            });
+
+            if ($naoVistos->count() === 0) {
+                continue; // não tem ninguém novo para mostrar
+            }
+
+            // Ordena normalmente pela IA
+            $melhor = $naoVistos->sortByDesc('nota_ia')->first();
 
             if (!$melhor || !$melhor->user) continue;
 
@@ -47,7 +58,7 @@ class CandidatoFeedController extends Controller
                 'id' => $vaga->id,
                 'titulo_vaga' => $vaga->tipoVaga,
                 'match_percent' => (int) $melhor->nota_ia,
-                'total_candidatos' => $vaga->candidaturas->count(),
+                'total_candidatos' => $naoVistos->count(),
 
                 'candidato' => [
                     'id' => $user->id,
@@ -67,10 +78,20 @@ class CandidatoFeedController extends Controller
      */
     public function candidatosModal($vagaId)
     {
+        $empresaId = Auth::id();
+
         $vaga = Vaga::with(['candidaturas.user.endereco'])
             ->findOrFail($vagaId);
 
+        // 🔥 Puxando candidatos já vistos dessa vaga
+        $cacheKey = "empresa:{$empresaId}:vaga:{$vaga->id}:candidatos_vistos";
+        $vistos = Cache::get($cacheKey, []);
+
+        // 🔥 Filtra da modal também
         $lista = $vaga->candidaturas
+            ->filter(function ($c) use ($vistos) {
+                return !in_array($c->idUser, $vistos);
+            })
             ->sortByDesc('nota_ia')
             ->map(function ($c) {
                 $user = $c->user;

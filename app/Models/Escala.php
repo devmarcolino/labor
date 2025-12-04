@@ -7,8 +7,13 @@ class Escala extends Model
 {
     protected $table = 'escala_tb';
     protected $fillable = [
-        'user_id',
-        'empresa_id',
+        'idUser',
+        'idEmpresa',
+        'idVaga',
+        'dataDiaria',
+        'horaDiaria',
+        'gastoTotal',
+        'dataCriacao',
         'created_at',
         'updated_at',
     ];

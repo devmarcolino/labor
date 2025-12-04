@@ -15,7 +15,8 @@ class UserHabilidadePergunta extends Model
         'idUser', 
         'idHabilidade', // <--- Essencial
         'idPergunta', 
-        'idOpcao'       // <--- Essencial
+        'idOpcao',      // <--- Essencial
+        'nota'          // <--- Pontos da opção
     ];
 
     public function opcao()

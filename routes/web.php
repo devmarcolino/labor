@@ -204,7 +204,7 @@ Route::prefix('enterprise/api')->group(function () {
 
 
     // Chat 1:1 empresa-usuário (aceita GET e POST)
-    Route::match(['get', 'post'], '/enterprises/chat/{user}', [\App\Http\Controllers\EnterpriseChatController::class, 'chatWithUser'])->name('enterprises.chat.user');
+    Route::match(['get', 'post'], '/enterprises/chat/{user}/{vaga}', [\App\Http\Controllers\EnterpriseChatController::class, 'chatWithUser'])->name('enterprises.chat.user');
 
     // Rota para curtir candidato em uma vaga
     Route::post('/enterprise/candidatos/curtir', [CandidatoCurtidoController::class, 'store']);
@@ -245,6 +245,8 @@ Route::prefix('enterprise/api')->group(function () {
 
     // Chat & Perfil
     Route::get('/enterprises/chat', fn() => view('enterprises.chat'))->name('enterprises.chat');
+
+    Route::post('/enterprises/chat/scale', [\App\Http\Controllers\ChatController::class, 'scaleUser'])->name('enterprises.chat.scale');
 
     Route::get('/enterprises/account', [EnterpriseProfileController::class, 'edit'])->name('enterprises.account');
     Route::patch('/enterprises/account', [EnterpriseProfileController::class, 'update'])->name('enterprises.profile.update');

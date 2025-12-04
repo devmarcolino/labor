@@ -26,19 +26,25 @@ class WorkerRespostaController extends Controller
 
         // 2. Salva as Respostas das Perguntas
         foreach ($respostas as $idPergunta => $idOpcao) {
-            // Descobre a qual habilidade essa pergunta pertence (opcional, mas bom pra organização)
-            // Aqui simplificamos salvando direto
-            
-            UserHabilidadePergunta::updateOrCreate(
-                [
-                    'idUser' => $user->id,
-                    'idPergunta' => $idPergunta
-                ],
-                [
-                    // 'idHabilidade' => ... (se precisar salvar, busque da pergunta)
-                    'idOpcao' => $idOpcao // Salva o ID da opção (com os pontos)
-                ]
-            );
+            // Busca a pergunta para obter idHabilidade
+            $pergunta = \App\Models\Pergunta::find($idPergunta);
+            if ($pergunta) {
+                // Busca a opção para obter os pontos
+                $opcao = \App\Models\Opcao::find($idOpcao);
+                $nota = $opcao ? $opcao->pontos : 0;
+                
+                UserHabilidadePergunta::updateOrCreate(
+                    [
+                        'idUser' => $user->id,
+                        'idPergunta' => $idPergunta
+                    ],
+                    [
+                        'idHabilidade' => $pergunta->idHabilidade,
+                        'idOpcao' => $idOpcao, // Salva o ID da opção
+                        'nota' => $nota // Salva os pontos da opção
+                    ]
+                );
+            }
         }
 
         return response()->json(['success' => true, 'message' => 'Perfil salvo com sucesso!']);

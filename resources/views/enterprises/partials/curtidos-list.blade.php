@@ -27,7 +27,8 @@
         @include('partials.chat-user-card', [
             'user' => $curtido->user,
             'mensagem' => $msgTxt,
-            'hora' => $msgHora
+            'hora' => $msgHora,
+            'vaga' => $curtido->vaga
         ])
     @empty
         <div class="text-center text-gray-400 py-8">Nenhum candidato curtido ainda.</div>

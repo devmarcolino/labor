@@ -1008,4 +1008,49 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+
+    // MÓDULO: NOTIFICAÇÕES GLOBAIS (TOAST)
+    window.addEventListener("notify", (event) => {
+        const { type, title, msg } = event.detail;
+
+        // Cria o toast
+        const toast = document.createElement("div");
+        toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white transition-transform duration-300 transform translate-x-full ${
+            type === "success"
+                ? "bg-green-500"
+                : type === "error" || type === "danger"
+                ? "bg-red-500"
+                : "bg-blue-500"
+        }`;
+        toast.innerHTML = `
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${
+                        type === "success"
+                            ? "M5 13l4 4L19 7"
+                            : "M6 18L18 6M6 6l12 12"
+                    }"></path>
+                </svg>
+                <div>
+                    <div class="font-bold">${title}</div>
+                    <div class="text-sm">${msg}</div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Anima entrada
+        setTimeout(() => {
+            toast.classList.remove("translate-x-full");
+        }, 100);
+
+        // Remove após 3 segundos
+        setTimeout(() => {
+            toast.classList.add("translate-x-full");
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    });
 });

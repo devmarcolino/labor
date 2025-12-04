@@ -5,6 +5,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Labor for enterprises</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
@@ -12,15 +13,18 @@
 </head>
 <body>
 <div class="flex flex-col h-screen bg-gray-50">
-    <header class="flex items-center gap-3 px-4 py-4 bg-white shadow-sm fixed top-0 left-0 w-full z-10" style="max-width: 100vw;">
-        <a href="{{ route('enterprises.chat') }}" class="text-gray-500">
-            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-        </a>
-        <img src="{{ $user->fotoUser ? asset('storage/' . $user->fotoUser) : asset('img/default-avatar.png') }}" class="w-10 h-10 rounded-full object-cover">
-        <div class="flex flex-col">
-            <span class="font-bold text-gray-900">{{ $user->username }}</span>
-            <span class="text-xs text-gray-400">Hoje</span>
+    <header class="flex items-center justify-between px-4 py-4 bg-white shadow-sm fixed top-0 left-0 w-full z-10" style="max-width: 100vw;">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('enterprises.chat') }}" class="text-gray-500">
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            <img src="{{ $user->fotoUser ? asset('storage/' . $user->fotoUser) : asset('img/default-avatar.png') }}" class="w-10 h-10 rounded-full object-cover">
+            <div class="flex flex-col">
+                <span class="font-bold text-gray-900">{{ $user->username }}</span>
+                <span class="text-xs text-gray-400">Hoje</span>
+            </div>
         </div>
+        <img src="{{ asset('img/button.svg') }}" class="w-15 h-15 cursor-pointer" onclick="scaleUser({{ $user->id }})" alt="Escalar">
     </header>
     <main id="chatMessages" class="flex-1 flex flex-col gap-2 px-4 py-6 overflow-y-auto bg-gray-50" style="margin-top:72px; margin-bottom:72px;">
         @foreach($mensagens as $msg)
@@ -153,7 +157,7 @@
         formData.append('mensagem', mensagem);
         if (arquivo) formData.append('arquivo', arquivo);
 
-        fetch(`{{ route('enterprises.chat.user', $user->id) }}`, {
+        fetch(`{{ route('enterprises.chat.user', [$user->id, $vaga->id]) }}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -162,5 +166,80 @@
         });
     });
 </script>
+<script>
+    window.scaleUser = function(userId) {
+        // Mostra o modal de confirmação
+        const modal = document.getElementById('confirmModal');
+        modal.classList.remove('hidden');
+
+        // Configura os botões
+        document.getElementById('confirmYes').onclick = () => {
+            modal.classList.add('hidden');
+            performScale(userId);
+        };
+        document.getElementById('confirmNo').onclick = () => {
+            modal.classList.add('hidden');
+        };
+    };
+
+    function performScale(userId) {
+        fetch('/enterprises/chat/scale', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ user_id: userId, vaga_id: {{ $vaga->id }} })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.dispatchEvent(
+                    new CustomEvent("notify", {
+                        detail: {
+                            type: "success",
+                            title: "Sucesso",
+                            msg: "Usuário escalado com sucesso!",
+                        },
+                    })
+                );
+            } else {
+                window.dispatchEvent(
+                    new CustomEvent("notify", {
+                        detail: {
+                            type: "error",
+                            title: "Erro",
+                            msg: data.message || "Falha ao escalar usuário.",
+                        },
+                    })
+                );
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            window.dispatchEvent(
+                new CustomEvent("notify", {
+                    detail: {
+                        type: "error",
+                        title: "Erro",
+                        msg: "Erro ao escalar usuário.",
+                    },
+                })
+            );
+        });
+    };
+</script>
+
+<!-- Modal de Confirmação -->
+<div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Confirmar Escala</h3>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">Tem certeza que deseja escalar este usuário para esta vaga?</p>
+        <div class="flex justify-end gap-3">
+            <button id="confirmNo" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Não</button>
+            <button id="confirmYes" class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition">Sim</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

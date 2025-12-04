@@ -31,11 +31,14 @@ class CandidaturaController extends Controller
         // Habilidades da vaga
         $skills_vaga = [];
         if ($vaga && $vaga->funcVaga) {
-            $skills_vaga[] = $vaga->funcVaga;
+            $skills_vaga[] = $vaga->funcVaga; // funcVaga é o ID da habilidade
         }
 
         // Habilidades do usuário
         $skills_user = $user->skills()->pluck('idHabilidade')->toArray();
+
+        // Habilidades em comum (usuário deve ter a habilidade da vaga para calcular nota)
+        $common_skills = array_intersect($skills_user, $skills_vaga);
 
         // Experiência (exemplo: pode ser ajustado para buscar de outro campo)
         $experiencia = 0;
@@ -43,17 +46,19 @@ class CandidaturaController extends Controller
             $experiencia = $user->experiencia;
         }
 
-        // Respostas do usuário para as perguntas das habilidades que ele selecionou
+        // Respostas do usuário para as perguntas das habilidades em comum
         $respostas = \App\Models\UserHabilidadePergunta::where('idUser', $user_id)
-            ->whereIn('idHabilidade', $skills_user)
+            ->whereIn('idHabilidade', $common_skills)
+            ->with('opcao')
             ->get();
         $respostas_json = [];
         foreach ($respostas as $resp) {
+            $pontos = $resp->nota ?? ($resp->opcao ? $resp->opcao->pontos : 0);
             $respostas_json[] = [
                 'idPergunta' => $resp->idPergunta,
-                'resposta' => $resp->resposta,
+                'idOpcao' => $resp->idOpcao,
+                'pontos' => $pontos,
                 'idHabilidade' => $resp->idHabilidade,
-                'nota' => is_numeric($resp->resposta) ? floatval($resp->resposta) : 0
             ];
         }
 
@@ -62,20 +67,12 @@ class CandidaturaController extends Controller
 
 
         // Calcula nota manualmente
-        $valores = [
-            'Ruim' => 20,
-            'Regular' => 40,
-            'Bom' => 60,
-            'Ótimo' => 80,
-            'Excelente' => 100
-        ];
         $notas = [];
         foreach ($respostas_json as $r) {
-            $resp = $r['resposta'];
-            $notas[] = $valores[$resp] ?? 0;
+            $notas[] = $r['pontos'];
         }
         $nota_ia = count($notas) ? intval(array_sum($notas) / count($notas)) : 0;
-        $explicacao_ia = 'Nota calculada automaticamente pela média das respostas.';
+        $explicacao_ia = 'Nota calculada automaticamente pela média dos pontos das respostas.';
 
         // Salva candidatura
         $candidatura = Candidatura::firstOrCreate([

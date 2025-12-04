@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
 class EnterpriseChatController extends Controller
 {
     /**
-     * Exibe o chat entre a empresa logada e um usuário específico.
+     * Exibe o chat entre a empresa logada e um usuário específico sobre uma vaga.
      */
-    public function chatWithUser(Request $request, User $user)
+    public function chatWithUser(Request $request, User $user, $vagaId)
     {
         // Empresa logada
         $empresa = Auth::guard('empresa')->user();
@@ -21,6 +21,9 @@ class EnterpriseChatController extends Controller
         if (!$empresa) {
             abort(403, 'Acesso negado. Você não está logado como empresa.');
         }
+
+        // Buscar a vaga
+        $vaga = \App\Models\Vaga::findOrFail($vagaId);
 
         // Se o formulário foi enviado, salva a mensagem
         if ($request->isMethod('post')) {
@@ -59,7 +62,7 @@ class EnterpriseChatController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => true]);
             }
-            return redirect()->route('enterprises.chat.user', $user->id);
+            return redirect()->route('enterprises.chat.user', [$user->id, $vagaId]);
         }
 
         // Busca todas as mensagens ENTRE a empresa e o usuário curtido
@@ -77,6 +80,6 @@ class EnterpriseChatController extends Controller
         ->orderBy('horario', 'asc')
         ->get();
 
-        return view('enterprises.chat-user', compact('user', 'empresa', 'mensagens'));
+        return view('enterprises.chat-user', compact('user', 'empresa', 'mensagens', 'vaga'));
     }
 }

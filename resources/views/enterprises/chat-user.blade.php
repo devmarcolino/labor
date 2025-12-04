@@ -164,6 +164,7 @@
             },
             body: formData
         });
+    });
     </script>
 
 <!-- Modal de Confirmação -->

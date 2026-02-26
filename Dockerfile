@@ -42,22 +42,23 @@ WORKDIR /var/www/html
 # extensões PHP
 RUN docker-php-ext-install pdo pdo_mysql
 
-# habilita rewrite (Laravel precisa)
-RUN a2enmod rewrite
-
-# ✅ FIX DEFINITIVO DO APACHE (remove TODOS MPMs)
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork
+# ✅ FIX MPM: Desabilita todos e habilita apenas mpm_prefork
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true \
+    && a2enmod mpm_prefork \
+    && a2enmod rewrite
 
 # copia aplicação
 COPY --from=build /app /var/www/html
 
+# copia configuração customizada do Apache
+COPY docker-apache.conf /etc/apache2/sites-available/000-default.conf
+
 # permissões Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Apache aponta para /public
-RUN sed -i 's!/var/www/html!/var/www/html/public!g' \
-    /etc/apache2/sites-available/000-default.conf
+# Apache ServerName para evitar warnings
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
 EXPOSE 80
+
+CMD ["apache2-foreground"]

@@ -6,6 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Worker - Minhas Escalas</title>
 
+        <link rel="manifest" href="/manifest.webmanifest">
+        <meta name="theme-color" content="#0ea5e9">
+        <meta name="mobile-web-app-capable" content="yes">
+        <link rel="apple-touch-icon" href="/img/auth-worker.png">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
     <style>

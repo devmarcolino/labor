@@ -7,6 +7,10 @@
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
     <link rel="shortcut icon" href="../img/lb-blue.svg" type="image/x-icon">
+        <link rel="manifest" href="/manifest.webmanifest">
+        <meta name="theme-color" content="#0ea5e9">
+        <meta name="mobile-web-app-capable" content="yes">
+        <link rel="apple-touch-icon" href="/img/auth-worker.png">
 </head>
 <body class="bg-gray-50 flex flex-col h-screen">
     <header class="flex items-center gap-3 px-4 py-4 bg-white shadow-sm fixed top-0 left-0 w-full z-10" style="max-width: 100vw;">

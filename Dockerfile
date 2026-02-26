@@ -1,24 +1,34 @@
-# Build do Laravel
-FROM ghcr.io/composer/composer:2 AS build
+# ---------- BUILD ----------
+FROM composer:2 AS build
 
 WORKDIR /app
 
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-COPY package.json package-lock.json* ./
-RUN npm install
-
 COPY . .
-RUN npm run build
 
-# Runtime usando FrankenPHP pelo GHCR (não usa Docker Hub!)
-FROM ghcr.io/dunglas/frankenphp:1.1.0
+RUN php artisan config:cache || true
+RUN php artisan route:cache || true
+RUN php artisan view:cache || true
 
-WORKDIR /app
 
-COPY --from=build /app ./
+# ---------- RUNTIME ----------
+FROM php:8.3-apache
 
-EXPOSE 8000
+WORKDIR /var/www/html
 
-CMD ["php", "public/index.php"]
+# extensões necessárias do Laravel
+RUN docker-php-ext-install pdo pdo_mysql
+
+# habilita rewrite (Laravel precisa)
+RUN a2enmod rewrite
+
+# copia projeto
+COPY --from=build /app /var/www/html
+
+# Apache aponta para /public
+RUN sed -i 's!/var/www/html!/var/www/html/public!g' \
+    /etc/apache2/sites-available/000-default.conf
+
+EXPOSE 80

@@ -4,8 +4,41 @@ import interact from "interactjs";
 import IMask from "imask";
 import "flowbite";
 import { Datepicker } from "flowbite-datepicker";
-import ApexCharts from 'apexcharts';
+import ApexCharts from "apexcharts";
 import ptBR from "./flowbite-locale-pt.js";
+
+// Service Worker Registration para PWA
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js", { scope: "/" })
+            .then((registration) => {
+                console.log(
+                    "Service Worker registered successfully",
+                    registration,
+                );
+
+                // Check for updates every hour
+                setInterval(
+                    () => {
+                        registration.update();
+                    },
+                    60 * 60 * 1000,
+                );
+            })
+            .catch((error) => {
+                console.error("Service Worker registration failed", error);
+            });
+    });
+
+    // Handle updates to service worker
+    if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+            console.log("Service Worker updated");
+            // Optionally notify user about app update
+        });
+    }
+}
 
 function cardStack() {
     return {
@@ -26,10 +59,10 @@ function cardStack() {
                 const data = await response.json();
                 // Filtra vagas já interagidas
                 const interacoes = await fetch(
-                    "/workers/vagas-interacoes-json"
+                    "/workers/vagas-interacoes-json",
                 ).then((res) => res.json());
                 const interagidasIds = Object.keys(interacoes).map((id) =>
-                    parseInt(id)
+                    parseInt(id),
                 );
                 this.cards = Array.isArray(data)
                     ? data.filter((v) => !interagidasIds.includes(v.id))
@@ -63,7 +96,7 @@ function cardStack() {
         activateTopCard() {
             this.$nextTick(() => {
                 const cards = this.$el.querySelectorAll(
-                    ".card-item:not(.interact-enabled)"
+                    ".card-item:not(.interact-enabled)",
                 );
                 if (cards.length === 0) return;
 
@@ -79,7 +112,7 @@ function cardStack() {
                         duration: 300,
                         easing: "ease-out",
                         fill: "forwards",
-                    }
+                    },
                 );
 
                 this.initInteract(top);
@@ -124,7 +157,7 @@ function cardStack() {
                     }s`;
                     document.body.appendChild(heart);
                     heart.addEventListener("animationend", () =>
-                        heart.remove()
+                        heart.remove(),
                     );
                 }
 
@@ -157,7 +190,7 @@ function cardStack() {
                             duration: 550,
                             easing: "ease-in-out",
                             fill: "forwards",
-                        }
+                        },
                     );
 
                     rise.onfinish = () => {
@@ -235,7 +268,9 @@ function cardStack() {
                             }),
                         }).catch(console.error);
                         card.classList.add(
-                            direction === "right" ? "swipe-right" : "swipe-left"
+                            direction === "right"
+                                ? "swipe-right"
+                                : "swipe-left",
                         );
                         setTimeout(() => {
                             component.removeTopCard();
@@ -293,7 +328,7 @@ function enterpriseFeed() {
         activateTopCard() {
             this.$nextTick(() => {
                 const cards = this.$el.querySelectorAll(
-                    ".card-item:not(.interact-enabled)"
+                    ".card-item:not(.interact-enabled)",
                 );
                 if (cards.length === 0) return;
 
@@ -308,7 +343,7 @@ function enterpriseFeed() {
                         duration: 300,
                         easing: "ease-out",
                         fill: "forwards",
-                    }
+                    },
                 );
 
                 this.initInteract(top);
@@ -354,7 +389,7 @@ function enterpriseFeed() {
                     }s`;
                     document.body.appendChild(heart);
                     heart.addEventListener("animationend", () =>
-                        heart.remove()
+                        heart.remove(),
                     );
                 }
 
@@ -378,7 +413,7 @@ function enterpriseFeed() {
                             duration: 550,
                             easing: "ease-in-out",
                             fill: "forwards",
-                        }
+                        },
                     );
 
                     rise.onfinish = () => {
@@ -435,7 +470,7 @@ function enterpriseFeed() {
                                 headers: {
                                     "Content-Type": "application/json",
                                     "X-CSRF-TOKEN": document.querySelector(
-                                        'meta[name="csrf-token"]'
+                                        'meta[name="csrf-token"]',
                                     ).content,
                                 },
                                 body: JSON.stringify({
@@ -447,7 +482,9 @@ function enterpriseFeed() {
 
                         // Adiciona a classe CSS exata que o cardStack usa
                         card.classList.add(
-                            direction === "right" ? "swipe-right" : "swipe-left"
+                            direction === "right"
+                                ? "swipe-right"
+                                : "swipe-left",
                         );
 
                         // Remove depois da animação
@@ -486,7 +523,7 @@ window.aprovarCandidato = async function (vagaId, userId) {
                         title: "Erro",
                         msg: "CSRF token não encontrado.",
                     },
-                })
+                }),
             );
             return;
         }
@@ -513,7 +550,7 @@ window.aprovarCandidato = async function (vagaId, userId) {
                         title: "Aprovado!",
                         msg: json.message || "Candidato aprovado.",
                     },
-                })
+                }),
             );
         } else {
             window.dispatchEvent(
@@ -525,7 +562,7 @@ window.aprovarCandidato = async function (vagaId, userId) {
                             (json && json.message) ||
                             "Falha ao aprovar candidato.",
                     },
-                })
+                }),
             );
         }
     } catch (e) {
@@ -537,7 +574,7 @@ window.aprovarCandidato = async function (vagaId, userId) {
                     title: "Erro",
                     msg: "Falha ao aprovar candidato.",
                 },
-            })
+            }),
         );
     }
 };
@@ -641,7 +678,7 @@ function registrationForm() {
 
             try {
                 const csrf = document.querySelector(
-                    'meta[name="csrf-token"]'
+                    'meta[name="csrf-token"]',
                 )?.content;
                 const response = await fetch("/api/validate-field", {
                     method: "POST",
@@ -667,7 +704,7 @@ function registrationForm() {
                                 title: "Atenção",
                                 msg: msg,
                             },
-                        })
+                        }),
                     );
                 } else {
                     // Se validou com sucesso na API, garante que limpa o erro
@@ -777,7 +814,7 @@ function enterpriseForm() {
 
             try {
                 const csrf = document.querySelector(
-                    'meta[name="csrf-token"]'
+                    'meta[name="csrf-token"]',
                 )?.content;
                 const response = await fetch("/api/validate-field", {
                     method: "POST",
@@ -803,7 +840,7 @@ function enterpriseForm() {
                                 title: "Atenção",
                                 msg: msg,
                             },
-                        })
+                        }),
                     );
                 } else {
                     // Se validou com sucesso na API, garante que limpa o erro
@@ -962,11 +999,11 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         const checkActiveAndSetTitle = () => {
             const activeButton = carouselWrapper.querySelector(
-                'button[data-carousel-slide-to][aria-current="true"]'
+                'button[data-carousel-slide-to][aria-current="true"]',
             );
             if (activeButton) {
                 const activeIndex = activeButton.getAttribute(
-                    "data-carousel-slide-to"
+                    "data-carousel-slide-to",
                 );
                 updateTitle(activeIndex);
             }
@@ -1022,8 +1059,8 @@ document.addEventListener("DOMContentLoaded", () => {
             type === "success"
                 ? "bg-green-500"
                 : type === "error" || type === "danger"
-                ? "bg-red-500"
-                : "bg-blue-500"
+                  ? "bg-red-500"
+                  : "bg-blue-500"
         }`;
         toast.innerHTML = `
             <div class="flex items-center gap-2">
@@ -1096,7 +1133,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 title: "Sucesso",
                                 msg: "Usuário escalado com sucesso!",
                             },
-                        })
+                        }),
                     );
                 } else {
                     window.dispatchEvent(
@@ -1107,7 +1144,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 msg:
                                     data.message || "Falha ao escalar usuário.",
                             },
-                        })
+                        }),
                     );
                 }
             })
@@ -1120,7 +1157,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             title: "Erro",
                             msg: "Erro ao escalar usuário.",
                         },
-                    })
+                    }),
                 );
             });
     }

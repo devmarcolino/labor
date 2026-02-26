@@ -1,0 +1,57 @@
+{
+    "name": "Labor - Plataforma de Trabalho",
+    "short_name": "Labor",
+    "description": "Plataforma conectando trabalhadores e empresas",
+    "lang": "pt-BR",
+    "dir": "ltr",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#ffffff",
+    "theme_color": "#0ea5e9",
+    "categories": ["productivity", "business"],
+    "screenshots": [
+        {
+            "src": "/img/auth-worker.png",
+            "sizes": "540x720",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ],
+    "icons": [
+        {
+            "src": "/img/auth-worker.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/img/auth-worker.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/img/auth-worker.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/img/auth-worker.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "Acesse seu dashboard",
+            "url": "/workers/dashboard",
+            "icons": [{ "src": "/img/lb-blue.svg", "sizes": "any" }]
+        }
+    ]
+}

@@ -30,6 +30,21 @@ use App\Http\Controllers\CandidatoCurtidoController;
 Route::get('/', fn() => view('index'))->name('home');
 Route::get('/choose', fn() => view('choose'))->name('choose');
 
+// PWA Routes - Service Worker com headers corretos
+Route::get('/sw.js', function () {
+    return response()->file(public_path('sw.js'), [
+        'Content-Type' => 'application/javascript; charset=utf-8',
+        'Service-Worker-Allowed' => '/',
+    ]);
+});
+
+// PWA Manifest com headers corretos
+Route::get('/manifest.webmanifest', function () {
+    return response()->file(public_path('manifest.webmanifest'), [
+        'Content-Type' => 'application/manifest+json; charset=utf-8',
+    ]);
+});
+
 /*
 |--------------------------------------------------------------------------
 | 👷 TRABALHADORES (Workers) - Guard: 'web'

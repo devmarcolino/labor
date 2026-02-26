@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     curl
 
-# composer usando mesma versão de PHP
+# instala composer usando mesma versão de PHP
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # extensões necessárias
@@ -28,7 +28,7 @@ RUN composer install \
 # copia projeto
 COPY . .
 
-# cria env temporário para evitar erro no artisan
+# evita erro artisan durante build
 RUN cp .env.example .env || true
 RUN php artisan key:generate || true
 RUN php artisan package:discover --ansi || true
@@ -42,22 +42,21 @@ WORKDIR /var/www/html
 # extensões PHP
 RUN docker-php-ext-install pdo pdo_mysql
 
-# apache modules
+# habilita rewrite (Laravel precisa)
 RUN a2enmod rewrite
 
-# 🔥 FIX: evita erro "More than one MPM loaded"
-RUN a2dismod mpm_event || true
-RUN a2dismod mpm_worker || true
-RUN a2enmod mpm_prefork
+# ✅ FIX DEFINITIVO DO APACHE (remove TODOS MPMs)
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+    && rm -f /etc/apache2/mods-enabled/mpm_*.conf \
+    && a2enmod mpm_prefork
 
 # copia aplicação
 COPY --from=build /app /var/www/html
 
-# permissões Laravel (ESSENCIAL)
-RUN chown -R www-data:www-data \
-    storage bootstrap/cache
+# permissões Laravel
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Apache serve pasta public
+# Apache aponta para /public
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' \
     /etc/apache2/sites-available/000-default.conf
 
